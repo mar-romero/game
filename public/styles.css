@@ -51,3 +51,47 @@
 @media(max-width:800px){.league-duel{grid-template-columns:1fr}.league-vs{text-align:center}.league-schedule{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .research-branch{border:1px solid #294b62;border-radius:12px;padding:10px;background:linear-gradient(145deg,#102235,#0b1926)}.research-branch-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px;color:#8ce4d0;font-size:11px;letter-spacing:.06em}.research-branch-head span{color:#9eb5c2;font-size:10px;letter-spacing:0}.research-branch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.research-branch .research{min-width:0}
 @media(max-width:700px){.research-branch-grid{grid-template-columns:1fr}}
+
+/* Mobile layout: safer in iOS Safari and more compact on narrow screens. */
+@media(max-width:640px){
+  html,body{max-width:100%;overflow-x:hidden;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+  .shell{padding:calc(10px + env(safe-area-inset-top)) 10px calc(18px + env(safe-area-inset-bottom))}
+  .topbar{position:static;gap:9px;padding:10px;border-radius:13px}
+  .topbar>div{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .brand b{font-size:13px;letter-spacing:.09em}
+  .resource-strip{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .resource-pill,.resource-pill:last-child{grid-column:auto;grid-template-columns:24px minmax(0,1fr);gap:5px;min-height:58px;padding:7px}
+  .resource-pill>i{font-size:20px}
+  .resource-pill b{font-size:17px}
+  .resource-pill em{font-size:8px}
+  .resource-pill .resource-use{font-size:7px;white-space:normal}
+  .nav{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 11px}
+  .nav button{min-width:0;min-height:44px;padding:10px 5px;font-size:11px;line-height:1.2;overflow-wrap:anywhere}
+  .hero{padding:18px 15px;border-radius:15px}
+  .hero h1{font-size:clamp(27px,8vw,36px);line-height:1.08}
+  .hero p{font-size:14px;line-height:1.45;margin:10px 0}
+  .hero .btn{width:100%;white-space:normal}
+  .grid{gap:8px}
+  .card{min-width:0;padding:12px}
+  .card h2{font-size:18px}
+  .card h3{font-size:15px}
+  .metric{font-size:25px}
+  .factory-hero{gap:10px}
+  .factory-rule{font-size:13px;line-height:1.4}
+  .production-summary{padding:10px 12px;font-size:14px}
+  .factory-coach{grid-template-columns:34px minmax(0,1fr);gap:8px;padding:10px;margin-bottom:8px}
+  .factory-coach:empty{display:none}
+  .factory-coach>span{font-size:22px}
+  .factory-coach em{font-size:9px}
+  .factory-grid,.civ-grid,.legacy{grid-template-columns:1fr}
+  .building,.building.oneglance{min-height:0}
+  .research-branch{padding:8px}
+  .research{align-items:flex-start;gap:8px;padding:9px}
+  .research-cost{min-width:86px}
+  .research-cost .btn{white-space:normal;padding:8px 5px;font-size:10px}
+  .league-arena-card{padding:10px}
+  .league-player b{font-size:16px}
+  .league-actions .btn{width:100%}
+  .league-schedule{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .arena-frame{border-radius:10px}
+}
