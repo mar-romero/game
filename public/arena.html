@@ -49,7 +49,7 @@
   <div class="startbar"><div class="fine">Elegí civilizaciones y rival. La Megafábrica principal y sus recompensas están en la pantalla de Imperio.</div><button id="startBtn" class="btn-primary">EMPEZAR PARTIDA →</button></div>
  </section>
  <main id="game" class="hidden">
-  <div class="matchtop"><div class="toolbar"><div><span class="clock" id="clock">04:00</span><div id="clockCaption">Tiempo de juego restante</div></div><span class="status" id="matchStatus">Preparando partida</span></div><div class="toolbar"><div class="speeds" aria-label="Velocidad de simulación"><button data-speed="0.5" type="button">×0,5</button><button data-speed="1" class="active" type="button">×1</button><button data-speed="5" type="button">×5</button><button data-speed="20" type="button">×20</button></div><div class="prototype-controls"><label for="arenaBotSelect">Rival</label><select id="arenaBotSelect" class="arena-select" title="Estrategia rival"></select><button class="btn-secondary" id="arenaBotApply" type="button">CAMBIAR</button><button class="btn-secondary" id="soundBtn" type="button">🔊</button><button class="btn-secondary" id="labToggle" type="button">LAB</button><button class="btn-secondary" id="arenaExportBtn" type="button">JSON</button></div><button class="btn-secondary" id="helpBtn">OCULTAR GUÍA</button><button class="btn-secondary" id="pauseBtn">PAUSAR</button><button class="btn-secondary" id="resetBtn">NUEVA PARTIDA</button></div></div>
+  <div class="matchtop"><div class="toolbar"><div><span class="clock" id="clock">04:00</span><div id="clockCaption">Tiempo de juego restante</div></div><span class="status" id="matchStatus">Preparando partida</span></div><div class="toolbar"><div class="speeds" aria-label="Velocidad de simulación"><button data-speed="0.5" type="button">×0,5</button><button data-speed="1" class="active" type="button">×1</button><button data-speed="5" type="button">×5</button><button data-speed="20" type="button">×20</button></div><div class="prototype-controls"><label for="arenaBotSelect">Rival</label><select id="arenaBotSelect" class="arena-select" title="Estrategia rival"></select><button class="btn-secondary" id="arenaBotApply" type="button">CAMBIAR</button><button class="btn-secondary" id="soundBtn" type="button">🔊</button><button class="btn-secondary" id="labToggle" type="button">LAB</button><button id="industryTrigger" class="industry-trigger locked" type="button"><div><b>INVESTIGAR</b><small id="industryTriggerText">Ver mejoras de fábrica</small></div><div class="slot-dots" id="industrySlots"></div></button><button class="btn-secondary" id="arenaExportBtn" type="button">JSON</button></div><button class="btn-secondary" id="helpBtn">OCULTAR GUÍA</button><button class="btn-secondary" id="pauseBtn">PAUSAR</button><button class="btn-secondary" id="resetBtn">NUEVA PARTIDA</button></div></div>
   <section class="guide panel" id="guideCard" aria-label="Tu siguiente decisión" aria-live="polite">
    <div class="threat-banner hidden" id="threatBanner"></div>
    <div class="guide-top"><div style="flex:1;min-width:205px"><div class="guide-badges"><span id="guidePhase">PASO 1 DE 3</span><span id="guideState">PAUSA PARA APRENDER</span></div>
@@ -81,7 +81,6 @@
       <div class="module-head"><div><div class="eyebrow">PARTIDA PAUSADA · ELEGÍ UNA</div><h3>¿Qué querés ganar?</h3><p>GANÁS · PAGÁS · TARDA</p></div><button id="moduleClose" class="btn-secondary" type="button">CERRAR</button></div>
       <div id="evoContext" class="evo-context"></div>
       <div id="moduleGrid" class="module-grid"></div>
-      <section id="factoryResearchPvP" style="margin:12px 0;padding:13px;border:1px solid #3b596b;border-radius:12px;background:#0d1b2a"><div class="eyebrow">MEJORAS DE FÁBRICA</div><h3 style="margin:4px 0 6px;font-size:16px">Investigaciones desbloqueadas</h3><p class="fine">Elegí entre tus investigaciones por categoría. Cada rama permite hasta 4 mejoras; el costo aumenta con cada una y consume un slot industrial.</p><div id="factoryResearchPvPList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:10px"></div><div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid #30495d"><label class="fine" for="guardianSendCount">Oleada de guardianes<input id="guardianSendCount" type="number" min="1" max="300" value="100" style="display:block;width:135px;margin-top:4px;padding:9px;border-radius:8px;border:1px solid #456075;background:#13263a;color:#fff"></label><button id="guardianSendButton" class="btn-primary" type="button">ENVIAR AL NODO</button><label class="fine" for="guardianRetreatCount">Retirar del nodo<input id="guardianRetreatCount" type="number" min="1" max="300" value="10" style="display:block;width:135px;margin-top:4px;padding:9px;border-radius:8px;border:1px solid #456075;background:#13263a;color:#fff"></label><button id="guardianRetreatButton" class="btn-secondary" type="button">RETIRADA ORDENADA</button><button id="emergencyShieldButton" class="btn-secondary" type="button">ESCUDO DE EMERGENCIA · 145 ◈</button><span id="guardianStatus" class="fine" style="align-self:center"></span></div></section>
     </section>
     <section id="decisionLab" class="lab-panel hidden"><h3>LAB · Densidad de decisiones</h3><div class="lab-grid"><div class="lab-metric" id="labDecisions"><b>0</b><span>DECISIONES / 14–20</span></div><div class="lab-metric" id="labRate"><b>0/min</b><span>OBJETIVO 3,5–5/min</span></div><div class="lab-metric" id="labInvalid"><b>0%</b><span>INPUTS INVÁLIDOS</span></div><div class="lab-metric" id="labThreats"><b>0</b><span>MÁX. AMENAZAS SIMULTÁNEAS</span></div></div><div class="lab-note">Estos rangos son hipótesis de playtest, no leyes universales. Buscamos ciclos de observar → decidir → ver resultado, con picos de tensión y pequeños respiros.</div></section>
     <div class="validation-note">PROTOTIPO DE VALIDACIÓN · buscá decisiones incompatibles, no una build perfecta.</div>
@@ -130,6 +129,19 @@
     <button class="quickcmd node" data-quick="capture" type="button" data-tip="ENVIAR GUARDIANES: la oleada predeterminada es de 100. Superá a los guardianes neutrales o a la guarnición rival para controlar el nodo; podés reforzar el tuyo."><span class="cmd-icon">⚑</span><span class="cmd-copy"><b>ENVIAR GUARDIANES</b><small>OLEADA 100</small><span class="cmd-effect">CONTROL · INGRESO</span></span><em id="dockNodeCost"><b>—</b><small>—</small></em></button>
     <button class="quickcmd sabotage" data-quick="sabotage" type="button" data-tip="SABOTAJE: durante su efecto el rival pierde 20% de ingreso y fabrica 30% más lento. No hace daño directo: compra tiempo y rompe su ritmo."><span class="cmd-icon">⌁</span><span class="cmd-copy"><b>SABOTAJE</b><small>RIVAL −20% INGRESO</small><span class="cmd-effect">−30% FABRICACIÓN</span></span><em id="dockSabCost"><b>—</b><small>—</small></em></button>
   </div>
+  <section id="factoryResearchPvP" class="megafactory-panel" aria-label="Investigaciones de la Megafábrica">
+    <header class="megafactory-head"><div><span class="eyebrow">MEGAFÁBRICA · INVESTIGACIONES</span><h2>Mejoras disponibles</h2><p>Lo investigado en Imperio se convierte acá en mejoras construibles para esta partida.</p></div><button id="factoryPanelToggle" class="btn-secondary" type="button" aria-expanded="true">OCULTAR INVESTIGACIONES</button></header>
+    <div id="factoryResearchPvPList"></div>
+    <div class="guardian-controls">
+      <div class="guardian-heading"><span class="eyebrow">NODO CENTRAL</span><b>Fuerza de la oleada</b><small id="guardianLimit">Podés enviar entre 1 y 200 guardianes</small></div>
+      <label class="guardian-count-label" for="guardianSendCount">Guardianes a enviar<input id="guardianSendCount" type="number" min="1" max="200" value="100"></label>
+      <button id="guardianSendButton" class="btn-primary" type="button">ENVIAR AL NODO</button>
+      <div class="guardian-cost-preview" id="guardianCostPreview" aria-live="polite"></div>
+      <div class="guardian-retreat"><label for="guardianRetreatCount">Retirada<input id="guardianRetreatCount" type="number" min="1" max="300" value="10"></label><button id="guardianRetreatButton" class="btn-secondary" type="button">RETIRADA ORDENADA</button></div>
+      <button id="emergencyShieldButton" class="btn-secondary" type="button">ESCUDO DE EMERGENCIA · 145 ◈</button>
+      <span id="guardianStatus" class="guardian-status" aria-live="polite"></span>
+    </div>
+  </section>
   <div class="command-feedback" id="commandFeedback">v1.4 · EXPERIENCE LAB · Elegí una orden; su trayectoria y resultado aparecen en la arena.</div>
 </section>
 <section class="arena" aria-label="Campo de batalla">
@@ -137,7 +149,7 @@
    <div class="mid"><section class="objective panel" id="objectiveNode"><div class="eyebrow">TERRITORIO NEUTRAL</div><div class="node-art"><div class="node-glyph">⚡</div></div><h3>Nodo energético</h3><div class="owner" id="territoryOwner">SIN CONTROL</div><div class="territory-effect">+18% producción al controlarlo.<br/>Enviar drones requiere fábrica y recursos.</div></section><section class="travel panel"><h3>Tráfico de drones <span id="flightCount" class="muted">0</span></h3><div class="trips" id="trips"><small>El espacio aéreo está despejado.</small></div></section></div>
    <article class="base b panel" id="baseB"><div class="base-head"><div><h3 id="titleB">FÁBRICA RIVAL</h3><small id="civLabelB">ENJAMBRE</small></div><span class="civ-chip" id="levelB">TALLER I</span></div><div class="hp-label"><span>♥ HP del núcleo</span><strong id="hpB">700 / 700</strong></div><div class="meter"><span id="barB"></span></div><div class="base-stat"><div class="stat"><b id="bankB">???</b><span>Recursos</span></div><div class="stat"><b id="incomeB">9/s</b><span>Producción visible</span></div><div class="stat"><b id="shieldB">0</b><span>Escudo</span></div></div><div class="grid-wrap"><div class="factory-grid" id="gridB" aria-label="Cuadrícula de la fábrica rival"></div></div><div class="active-tags" id="tagsB"></div></article>
   </section>
-  <section class="under"><article class="actions panel"><div class="section-title"><span>TUS DECISIONES</span><div class="decision-tools"><button id="industryTrigger" class="industry-trigger locked" type="button"><div><b>MEJORAR FÁBRICA</b><small id="industryTriggerText">Economía II abre una decisión estratégica</small></div><div class="slot-dots" id="industrySlots"></div></button><button type="button" class="btn-secondary" id="advancedToggle">MOSTRAR MÁS OPCIONES ▾</button></div></div>
+  <section class="under"><article class="actions panel"><div class="section-title"><span>TUS DECISIONES</span><div class="decision-tools"><button type="button" class="btn-secondary" id="advancedToggle">MOSTRAR MÁS OPCIONES ▾</button></div></div>
   <div class="action-explainer" id="actionExplainer">◈ Tus recursos se generan solos. Construir economía te da más después; atacar o defenderte te protege ahora. No necesitás tocar todos los botones.</div>
   <div class="action-grid" id="actions">
    <button class="act" data-act="eco"><span class="act-title">▤ ECONOMÍA</span><span class="act-desc" id="ecoDesc">Subir producción</span><span class="cost" id="ecoCost">160 ◈</span></button>
@@ -170,14 +182,14 @@
 <script src="./game/domain/arena/match-engine.js"></script>
 <script src="./game/domain/arena/industrial-modules.js"></script>
 <script src="./game/adapters/web/campaign-lab.js"></script>
-<script src="./game/adapters/web/arena-core-runtime.js"></script>
-<script src="./game/adapters/web/arena-production-system.js"></script>
+<script src="./game/adapters/web/arena-core-runtime.js?v=20261007-2"></script>
+<script src="./game/adapters/web/arena-production-system.js?v=20261007-2"></script>
 <script src="./game/adapters/web/arena-balance-overrides.js"></script>
 <script src="./game/adapters/web/arena-experience-lab.js"></script>
 <script src="./game/adapters/web/arena-league-bridge.js"></script>
 
-<script src="./game/adapters/web/arena-tech.js"></script>
-<link rel="stylesheet" href="./game/presentation/styles/arena-runtime-overrides.css">
+<script src="./game/adapters/web/arena-tech.js?v=20261007-2"></script>
+<link rel="stylesheet" href="./game/presentation/styles/arena-runtime-overrides.css?v=20261007-2">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./game/adapters/web/config.js"></script>
