@@ -324,16 +324,18 @@ let threeArena=null,threeArenaDisabled=false;
 function initThreeArena(){
  if(threeArena) return true; if(typeof THREE==="undefined"){const st=$("threeStatus");if(st){st.textContent="3D · LIBRERÍA NO CARGADA";st.style.color="#ffb0a0";}return false;}
  const cv=$("battleCanvas"); if(!cv)return false;
- const scene=new THREE.Scene();scene.background=new THREE.Color(0x07101a);scene.fog=new THREE.FogExp2(0x07101a,.025);
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a2a);scene.fog=new THREE.FogExp2(0x101a2a,.012);
  const camera=new THREE.OrthographicCamera(-10,10,9,-9,.1,100);camera.position.set(0,17.2,12.2);camera.lookAt(0,.4,0);
  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:"high-performance",alpha:false});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;if("outputColorSpace" in renderer)renderer.outputColorSpace=THREE.SRGBColorSpace;
- scene.add(new THREE.HemisphereLight(0x9bdfff,0x091018,1.25));const sun=new THREE.DirectionalLight(0xdff4ff,1.9);sun.position.set(-4,18,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
- const lightA=new THREE.PointLight(0x5af1d2,10,11,2);lightA.position.set(0,3,6.4);scene.add(lightA);const lightB=new THREE.PointLight(0xff8f72,10,11,2);lightB.position.set(0,3,-6.4);scene.add(lightB);const lightN=new THREE.PointLight(0xffcf71,7,7,2);lightN.position.set(0,2,0);scene.add(lightN);
- const groundMat=new THREE.MeshStandardMaterial({color:0x0a1623,roughness:.88,metalness:.18});const ground=new THREE.Mesh(new THREE.PlaneGeometry(17.5,20),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
- const grid=new THREE.GridHelper(22,22,0x294e63,0x142d3d);grid.position.y=.02;grid.scale.x=.7;scene.add(grid);
- // central industrial lane
- const laneMat=new THREE.MeshBasicMaterial({color:0x163446,transparent:true,opacity:.65});for(const x of [-2.4,0,2.4]){const lane=new THREE.Mesh(new THREE.BoxGeometry(.12,.025,9.2),laneMat);lane.position.set(x,.035,0);scene.add(lane)}
- const mats={A:new THREE.MeshStandardMaterial({color:0x19615a,emissive:0x0a4038,emissiveIntensity:.9,metalness:.58,roughness:.28}),B:new THREE.MeshStandardMaterial({color:0x70342d,emissive:0x3c1511,emissiveIntensity:.9,metalness:.58,roughness:.28}),dark:new THREE.MeshStandardMaterial({color:0x172637,metalness:.72,roughness:.32}),steel:new THREE.MeshStandardMaterial({color:0x516474,metalness:.75,roughness:.28}),gold:new THREE.MeshStandardMaterial({color:0xc3924b,emissive:0x49300f,emissiveIntensity:.4,metalness:.65,roughness:.28}),purple:new THREE.MeshStandardMaterial({color:0x7450a7,emissive:0x311b58,emissiveIntensity:.7,metalness:.4,roughness:.25}),blue:new THREE.MeshStandardMaterial({color:0x377aa8,emissive:0x123b5e,emissiveIntensity:.65,metalness:.4,roughness:.24})};
+ scene.add(new THREE.HemisphereLight(0xb8e9ff,0x152033,1.65));const sun=new THREE.DirectionalLight(0xfff2da,2.45);sun.position.set(-7,20,11);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);scene.add(sun);
+ const lightA=new THREE.PointLight(0x5af1d2,14,14,2);lightA.position.set(-7,4,2.5);scene.add(lightA);const lightB=new THREE.PointLight(0xff8f72,14,14,2);lightB.position.set(7,4,-2.5);scene.add(lightB);const lightN=new THREE.PointLight(0xffcf71,10,9,2);lightN.position.set(0,3,0);scene.add(lightN);
+ const groundMat=new THREE.MeshStandardMaterial({color:0x101b2a,roughness:.96,metalness:.04});const ground=new THREE.Mesh(new THREE.PlaneGeometry(28,17),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ const tileGeo=new THREE.PlaneGeometry(.96,.96),tileMats=[new THREE.MeshStandardMaterial({color:0x182b3c,roughness:.88,metalness:.04,emissive:0x07131c,emissiveIntensity:.2}),new THREE.MeshStandardMaterial({color:0x203647,roughness:.86,metalness:.05,emissive:0x0a1922,emissiveIntensity:.18})],tileBatches=tileMats.map(m=>new THREE.InstancedMesh(tileGeo,m,28*16)),tileDummy=new THREE.Object3D(),tileCounts=[0,0];for(let x=-14;x<14;x++)for(let z=-8;z<8;z++){const batch=(x+z)&1;tileDummy.position.set(x+.5,.035,z+.5);tileDummy.rotation.set(-Math.PI/2,0,0);tileDummy.updateMatrix();tileBatches[batch].setMatrixAt(tileCounts[batch]++,tileDummy.matrix)}for(let i=0;i<tileBatches.length;i++){tileBatches[i].count=tileCounts[i];tileBatches[i].receiveShadow=true;scene.add(tileBatches[i])}
+ for(const batch of tileBatches)batch.instanceMatrix.needsUpdate=true;
+ const grid=new THREE.GridHelper(28,28,0x43627a,0x294255);grid.position.y=.047;scene.add(grid);
+ // Crossed factory lanes give both camera layouts a clear route through the arena.
+ const laneMat=new THREE.MeshBasicMaterial({color:0x64b9c8,transparent:true,opacity:.22});for(const p of [-2.4,0,2.4]){const across=new THREE.Mesh(new THREE.BoxGeometry(24,.025,.1),laneMat);across.position.set(0,.055,p);scene.add(across);const along=new THREE.Mesh(new THREE.BoxGeometry(.1,.025,12),laneMat);along.position.set(p,.055,0);scene.add(along)}
+ const mats={A:new THREE.MeshStandardMaterial({color:0x237f73,emissive:0x0e5548,emissiveIntensity:1.15,metalness:.34,roughness:.34}),B:new THREE.MeshStandardMaterial({color:0x9b4b43,emissive:0x56201c,emissiveIntensity:1.1,metalness:.34,roughness:.34}),dark:new THREE.MeshStandardMaterial({color:0x263b4d,metalness:.45,roughness:.42}),steel:new THREE.MeshStandardMaterial({color:0x718595,metalness:.55,roughness:.34}),gold:new THREE.MeshStandardMaterial({color:0xe3b65e,emissive:0x765016,emissiveIntensity:.65,metalness:.45,roughness:.32}),purple:new THREE.MeshStandardMaterial({color:0x8969c2,emissive:0x452c78,emissiveIntensity:.85,metalness:.32,roughness:.3}),blue:new THREE.MeshStandardMaterial({color:0x4a9dd1,emissive:0x1b5482,emissiveIntensity:.8,metalness:.34,roughness:.3})};
  function box(g,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
  function cyl(g,x,y,z,r,h,mat,n=12){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,n),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
  function pipe(g,x,y,z,len,mat,rot=0){const m=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,len,8),mat);m.rotation.z=Math.PI/2;m.rotation.y=rot;m.position.set(x,y,z);g.add(m);return m}
@@ -358,7 +360,8 @@ function initThreeArena(){
  }
 
  function makeCity(id,z){const root=new THREE.Group();root.position.z=z;if(id==='B')root.rotation.y=Math.PI;scene.add(root);const team=mats[id];
-   const pad=box(root,0,.12,0,7.15,.24,4.9,new THREE.MeshStandardMaterial({color:id==='A'?0x0f322f:0x331d20,metalness:.25,roughness:.82}));
+   const pad=box(root,0,.12,0,7.15,.24,4.9,new THREE.MeshStandardMaterial({color:id==='A'?0x145349:0x542b2c,emissive:id==='A'?0x0b332d:0x301316,emissiveIntensity:.5,metalness:.18,roughness:.88}));
+   const trimMat=new THREE.MeshStandardMaterial({color:id==='A'?0x48d9bd:0xff9178,emissive:id==='A'?0x1f806c:0x853b30,emissiveIntensity:.55,metalness:.35,roughness:.4});for(const x of [-3.42,3.42])box(root,x,.285,0,.12,.12,4.45,trimMat);for(const zz of [-2.3,2.3])box(root,0,.285,zz,6.85,.12,.12,trimMat);
    // walls and lamps
    for(const x of [-2.8,2.8])for(const zz of [-1.65,1.65]){cyl(root,x,.28,zz,.13,.55,team,8)}
    const coreBase=cyl(root,0,.52,.65,.92,.85,mats.dark,10);const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.57,2),new THREE.MeshStandardMaterial({color:id==='A'?0xa0ffea:0xffa78f,emissive:id==='A'?0x29ffd2:0xff5939,emissiveIntensity:2.5,metalness:.1,roughness:.15}));core.position.set(0,1.3,.65);core.castShadow=true;root.add(core);const ring=new THREE.Mesh(new THREE.TorusGeometry(.9,.055,10,50),new THREE.MeshBasicMaterial({color:id==='A'?0x75ffe0:0xff997f,transparent:true,opacity:.85}));ring.rotation.x=Math.PI/2;ring.position.set(0,1.25,.65);root.add(ring);
@@ -549,4 +552,3 @@ function runBatch(){if(settings.mode!=="bots")return;const btn=$("batchBtn");btn
  }catch(err){$("batchResults").textContent="Error en la simulación: "+err.message;console.error(err);}finally{btn.disabled=false;btn.textContent=`SIMULAR ${GAME_CONFIG.batchMatches} PARTIDAS`;}
  },20);
 }
-

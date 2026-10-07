@@ -148,8 +148,8 @@
 .player-hud{top:54px!important;bottom:auto!important;left:18px!important;right:auto!important}
 .threat-hud{top:14px!important}
 .core-validation-strip,.validation-note{display:none!important}
-.industry-trigger{top:154px!important;bottom:auto!important;left:18px!important;max-width:min(270px,30%)!important}
-.module-readout{top:154px!important;bottom:auto!important;right:18px!important;max-width:min(270px,30%)!important}
+.industry-trigger{top:auto!important;bottom:54px!important;left:18px!important;max-width:min(270px,30%)!important}
+.module-readout{top:auto!important;bottom:54px!important;right:18px!important;max-width:min(270px,30%)!important}
 .growth-banner{top:58px!important}
 .strategy-ribbon{bottom:13px!important;z-index:13!important}
 .factory-legend{display:none!important}
@@ -157,16 +157,77 @@
 .production-strip{border-top:1px solid #304b60!important}
 @media(max-width:900px){
   .arena08-stage{height:min(62vh,570px)!important;min-height:430px!important}
-  .industry-trigger{top:auto!important;bottom:12px!important;left:12px!important;max-width:44%!important}
-  .module-readout{top:150px!important;right:10px!important;max-width:38%!important}
+  .industry-trigger{top:auto!important;bottom:54px!important;left:12px!important;max-width:44%!important}
+  .module-readout{top:auto!important;bottom:54px!important;right:10px!important;max-width:38%!important}
 }
 @media(max-width:650px){
   .arena08-stage{height:clamp(420px,112vw,540px)!important;min-height:420px!important;max-height:540px!important}
   .enemy-city-tag{right:8px!important;top:auto!important;bottom:8px!important}.player-city-tag{left:8px!important;bottom:8px!important}
   .player-hud{left:7px!important;top:42px!important;bottom:auto!important}
   .enemy-hud{right:7px!important;top:42px!important;left:auto!important}
-  .industry-trigger{left:7px!important;bottom:10px!important;top:auto!important;max-width:48%!important}
+  .industry-trigger{left:7px!important;bottom:52px!important;top:auto!important;max-width:48%!important}
   .module-readout{display:none!important}
   .strategy-ribbon{bottom:10px!important;left:auto!important;right:7px!important;transform:none!important;width:auto!important;max-width:46%!important;padding:6px 8px!important;display:grid!important;gap:2px!important}
   .strategy-ribbon span{white-space:normal!important;font-size:7px!important}
+}
+
+/* Isometric board and illustrated command cards. */
+.arena08-stage{height:clamp(430px,66vh,640px)!important;min-height:430px!important;max-height:640px!important}
+.arena08-stage:before{inset:5% 2%!important;opacity:.2!important;background:radial-gradient(ellipse at center,transparent 0 30%,#9ac8d512 30.2% 30.35%,transparent 30.6% 62%,#9ac8d50d 62.2% 62.35%,transparent 62.6%)!important}
+.arena08-stage:after{background:linear-gradient(90deg,rgba(4,10,18,.38),transparent 18% 82%,rgba(4,10,18,.38)),linear-gradient(180deg,rgba(255,118,97,.06),transparent 24%,transparent 72%,rgba(64,231,199,.08))!important}
+.arena-hud{width:min(340px,30%)!important;background:linear-gradient(145deg,rgba(7,19,31,.96),rgba(10,23,36,.9))!important;border-width:1px!important;backdrop-filter:blur(14px)!important}
+.enemy-hud{border-color:#ff927c99!important;box-shadow:0 12px 36px #0007,0 0 22px #ff735412!important}
+.player-hud{border-color:#59e2c499!important;box-shadow:0 12px 36px #0007,0 0 22px #51edcf12!important}
+.node-hud{min-width:174px!important;padding:13px 19px!important;border-radius:20px!important;background:linear-gradient(145deg,#302c21f5,#111e2ceF)!important;border-color:#f0cf79!important;box-shadow:0 0 0 8px #edcb610c,0 18px 48px #000b,0 0 36px #ffce5b3d!important}
+.node-hud:before{content:"";position:absolute;inset:-13px;border:1px solid #ffda7c55;border-radius:25px;pointer-events:none}
+.node-hud b{font-size:17px!important;letter-spacing:.04em}
+.city-tag{font-size:10px!important;padding:7px 12px!important;letter-spacing:.12em!important}
+.enemy-city-tag{background:#452323e8!important;border-color:#ff967b!important}
+.player-city-tag{background:#123d36e8!important;border-color:#6bf0d0!important}
+.threat-hud{min-width:190px;max-width:290px!important;background:linear-gradient(145deg,#162a3aF2,#0d1928F2)!important;border-color:#608198!important}
+.industry-trigger{border-color:#73d8c1!important;background:linear-gradient(140deg,#102e32f5,#0a1925f5)!important;box-shadow:0 12px 32px #0009!important}
+.industry-trigger.locked{opacity:.9!important}
+.module-readout{background:#101c2df0!important;border-color:#577184!important}
+.strategy-ribbon{border-color:#9b8250!important;background:linear-gradient(100deg,#332c1cf5,#0a1825f5)!important;box-shadow:0 10px 34px #0009!important}
+.command-dock{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:10px!important;padding:13px!important;background:linear-gradient(180deg,#111f2d,#0b1521)!important}
+.command-dock .quickcmd{
+  min-width:0!important;min-height:118px!important;padding:10px 11px!important;
+  grid-template-columns:36px minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important;
+  gap:7px 9px!important;align-items:center!important;border-radius:17px!important;
+  box-shadow:0 9px 20px #0005,inset 0 1px #ffffff14!important;
+}
+.command-dock .quickcmd:before{height:4px!important;opacity:.72!important}
+.command-dock .cmd-icon{grid-column:1!important;grid-row:1/3!important;align-self:center;font-size:31px!important;filter:drop-shadow(0 3px 8px #0008)!important}
+.command-dock .cmd-copy{grid-column:2!important;grid-row:1!important;gap:4px!important;align-self:end!important}
+.command-dock .cmd-copy b{font-size:11px!important;line-height:1.22!important;letter-spacing:.035em!important}
+.command-dock .cmd-copy small{font-size:10px!important;color:#f1f7fb!important;line-height:1.25!important}
+.command-dock .cmd-effect{font-size:8px!important;line-height:1.25!important;color:#a8f1d6!important}
+.command-dock .quickcmd em{grid-column:2!important;grid-row:2!important;width:100%!important;max-width:none!important;display:flex!important;justify-content:space-between!important;align-items:center!important;gap:4px!important;text-align:left!important;white-space:normal!important;border-top:1px solid #ffffff22!important;padding-top:6px!important;color:#ffdc89!important}
+.command-dock .quickcmd em b{font-size:9px!important;line-height:1.2!important}
+.command-dock .quickcmd em small{font-size:8px!important;color:#c3d1db!important;line-height:1.2!important}
+.command-dock .eco{background:linear-gradient(150deg,#18564b,#112732)!important}
+.command-dock .attack-small{background:linear-gradient(150deg,#522d3a,#271e2b)!important}
+.command-dock .attack-large{background:linear-gradient(150deg,#69352d,#2e2027)!important}
+.command-dock .shield-small{background:linear-gradient(150deg,#174972,#14283d)!important}
+.command-dock .shield-large{background:linear-gradient(150deg,#225b83,#152b43)!important}
+.command-dock .node{background:linear-gradient(150deg,#645127,#2d2a20)!important}
+.command-dock .sabotage{background:linear-gradient(150deg,#4a366c,#231f35)!important}
+.command-dock .quickcmd:hover:not(:disabled){transform:translateY(-4px)!important;box-shadow:0 16px 28px #0008,0 0 0 1px currentColor!important}
+@media(max-width:1100px){
+  .arena-hud{width:min(300px,34%)!important}
+  .command-dock{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media(max-width:650px){
+  .arena08-stage{height:clamp(420px,76vh,580px)!important;min-height:420px!important;max-height:580px!important}
+  .arena-hud{width:47%!important;padding:8px!important}
+  .node-hud{min-width:120px!important;padding:8px 10px!important}
+  .node-hud b{font-size:12px!important}
+  .command-dock{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:9px!important;gap:7px!important}
+  .command-dock .quickcmd{min-height:100px!important;padding:8px!important;grid-template-columns:27px minmax(0,1fr)!important;gap:6px!important}
+  .command-dock .cmd-icon{font-size:23px!important}
+  .command-dock .cmd-copy b{font-size:9px!important}
+  .command-dock .cmd-copy small{font-size:9px!important}
+  .command-dock .cmd-effect{font-size:7px!important}
+  .command-dock .quickcmd em b{font-size:8px!important}
+  .command-dock .quickcmd em small{font-size:7px!important}
 }
