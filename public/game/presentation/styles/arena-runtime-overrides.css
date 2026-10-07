@@ -17,6 +17,7 @@
   .command-dock .quickcmd{min-height:78px!important}
   body.show-match .shell{padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}
 }
+
 .production-strip{display:grid!important;grid-template-columns:minmax(180px,.65fr) minmax(0,2fr)!important;gap:10px!important;margin:0!important;padding:14px!important;border:0!important;border-top:1px solid #304b60!important;border-radius:0!important;background:linear-gradient(180deg,#0d1b29,#0a1521)!important;align-items:start!important}
 .prod-head{display:grid;gap:5px;align-content:start}.prod-head>b{font-size:12px;letter-spacing:.08em;color:#82e3d0}.prod-cap{font-size:12px;color:#c0d3de}.prod-cap em{font-size:20px;font-weight:950;color:#f6d17c;font-style:normal}.prod-head small{font-size:10px;color:#9ab0bd;line-height:1.45}.prod-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.prod-slot{display:grid;gap:5px;min-width:0;padding:10px;border:1px solid #35536a;border-radius:10px;background:#101f2e}.prod-slot small{font-size:9px;letter-spacing:.07em;color:#9ab3c2;font-weight:850}.prod-slot b{font-size:12px;overflow-wrap:anywhere}.prod-slot span{font-size:10px;color:#b0c1ca}.prod-slot.free{border-style:dashed;background:#0a1824}.prod-slot.free b{color:#7fe0ba}.prod-slot.working{border-color:#bd9447;background:#292416}.prod-slot.queued{border-color:#547085}.prod-rival,.prod-storage{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;align-items:center;padding-top:8px;border-top:1px solid #293f52;font-size:10px;color:#9db3bf}.prod-rival b{color:#ffab96;white-space:nowrap}.prod-rival span,.prod-storage span{min-width:0}
 @media(max-width:700px){.production-strip{grid-template-columns:1fr!important;padding:10px!important}.prod-head{grid-template-columns:1fr auto;align-items:center}.prod-head small{grid-column:1/-1}.prod-cap em{font-size:16px}.prod-slots{grid-template-columns:1fr 1fr}.prod-slot{padding:8px}.prod-slot small{font-size:8px}.prod-slot b{font-size:11px}.prod-rival,.prod-storage{align-items:flex-start;flex-direction:column;gap:3px}}
@@ -231,3 +232,25 @@
   .command-dock .quickcmd em b{font-size:8px!important}
   .command-dock .quickcmd em small{font-size:7px!important}
 }
+
+/* Compact, separated layout: small square cities and readable action tiles. */
+.arena08-stage{height:clamp(350px,52vh,490px)!important;min-height:350px!important;max-height:490px!important;border-radius:8px!important;background:#0b1722!important}
+.arena08-stage:before{inset:8% 14%!important;opacity:.08!important;background-image:none!important}
+.arena08-stage:after{background:linear-gradient(180deg,#0b111b22,transparent 26% 74%,#0b111b22)!important}
+.arena-hud{width:min(230px,23%)!important;padding:8px 10px!important;border-radius:6px!important;background:#0a1722ed!important;backdrop-filter:none!important;box-shadow:0 3px 10px #0005!important}
+.enemy-hud{top:44px!important;right:14px!important;left:auto!important}.player-hud{top:44px!important;bottom:auto!important;left:14px!important}
+.hud-title{gap:6px!important}.hud-title span,.hud-title b{font-size:9px!important}.hud-hp{margin:6px 0!important}.hud-stats{gap:6px!important;font-size:8px!important}.spec-readout{margin-top:4px!important;font-size:8px!important}
+.city-tag,.core-validation-strip,.factory-legend,.strategy-ribbon,.module-readout{display:none!important}
+.node-hud{top:53%!important;left:50%!important;min-width:126px!important;padding:7px 10px!important;border-radius:6px!important;background:#13232df2!important;border:1px solid #b7a16c!important;box-shadow:0 3px 10px #0006!important;transform:translate(-50%,-50%)!important}
+.node-hud:before{display:none!important}.node-hud span{font-size:8px!important}.node-hud b{font-size:12px!important}.node-hud small{font-size:8px!important}
+.threat-hud{top:10px!important;left:50%!important;max-width:190px!important;padding:6px 10px!important;border-radius:6px!important;box-shadow:0 3px 10px #0005!important;transform:translateX(-50%)!important}.threat-hud b{font-size:9px!important}.threat-hud span{font-size:8px!important}
+.battle-overlay{display:none!important}
+.command-dock{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;padding:9px!important;background:#0d1924!important}
+.command-dock .quickcmd{min-height:84px!important;padding:7px!important;grid-template-columns:24px minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important;gap:4px 6px!important;border-radius:6px!important;box-shadow:none!important}
+.command-dock .quickcmd:before{height:2px!important}.command-dock .cmd-icon{font-size:21px!important;filter:none!important}.command-dock .cmd-copy{gap:2px!important}.command-dock .cmd-copy b{font-size:9px!important}.command-dock .cmd-copy small{font-size:8px!important}.command-dock .cmd-effect{font-size:7px!important}.command-dock .quickcmd em{padding-top:4px!important}.command-dock .quickcmd:hover:not(:disabled){transform:none!important;box-shadow:none!important}
+.command-dock .eco{background:#173c37!important}.command-dock .attack-small{background:#3d2930!important}.command-dock .attack-large{background:#49302b!important}.command-dock .shield-small,.command-dock .shield-large{background:#1d3547!important}.command-dock .node{background:#403a28!important}.command-dock .sabotage{background:#352d43!important}
+.decision-tools{display:flex;align-items:center;gap:7px}.decision-tools .industry-trigger{position:static!important;max-width:260px!important;min-height:30px!important;padding:5px 8px!important;border-radius:5px!important;box-shadow:none!important}.decision-tools .industry-trigger small{display:none!important}.decision-tools .industry-trigger b{font-size:8px!important}.decision-tools .btn-secondary{white-space:nowrap}
+.combat-radar-grid{gap:6px!important}.radar-card{border-radius:6px!important;padding:8px 10px!important;box-shadow:none!important}
+@media(max-width:1050px){.arena-hud{width:min(210px,27%)!important}.command-dock{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:650px){.arena08-stage{height:clamp(350px,100vw,430px)!important;min-height:350px!important;max-height:430px!important}.arena-hud{width:36%!important;padding:6px!important}.player-hud,.enemy-hud{top:38px!important}.node-hud{top:55%!important}.command-dock{grid-template-columns:repeat(2,minmax(0,1fr))!important}.command-dock .quickcmd{min-height:72px!important}.decision-tools{gap:4px}.decision-tools .industry-trigger{max-width:130px!important}.decision-tools .industry-trigger b{font-size:7px!important}.combat-radar-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:370px){.arena-hud{width:40%!important}.command-dock{grid-template-columns:1fr!important}.decision-tools{flex-wrap:wrap;justify-content:flex-end}}
