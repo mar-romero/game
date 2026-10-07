@@ -139,3 +139,34 @@
   .under{margin-top:12px!important}.actions,.logs{padding:11px!important}.act{min-height:96px!important;padding:9px!important}.act .act-desc{font-size:10px!important}
 }
 @media(prefers-reduced-motion:reduce){.command-dock .quickcmd{transition:none!important}}
+
+/* Follow-up composition: use the wide viewport, keep controls attached to the playfield. */
+.arena08-stage{height:min(58vh,590px)!important;min-height:460px!important;max-height:590px!important}
+.enemy-city-tag{left:auto!important;right:18px!important;top:auto!important;bottom:14px!important;transform:none!important}
+.player-city-tag{left:18px!important;right:auto!important;top:auto!important;bottom:14px!important;transform:none!important}
+.enemy-hud{top:54px!important;right:18px!important;left:auto!important}
+.player-hud{top:54px!important;bottom:auto!important;left:18px!important;right:auto!important}
+.threat-hud{top:14px!important}
+.core-validation-strip,.validation-note{display:none!important}
+.industry-trigger{top:154px!important;bottom:auto!important;left:18px!important;max-width:min(270px,30%)!important}
+.module-readout{top:154px!important;bottom:auto!important;right:18px!important;max-width:min(270px,30%)!important}
+.growth-banner{top:58px!important}
+.strategy-ribbon{bottom:13px!important;z-index:13!important}
+.factory-legend{display:none!important}
+.command-dock{margin:0!important}
+.production-strip{border-top:1px solid #304b60!important}
+@media(max-width:900px){
+  .arena08-stage{height:min(62vh,570px)!important;min-height:430px!important}
+  .industry-trigger{top:auto!important;bottom:12px!important;left:12px!important;max-width:44%!important}
+  .module-readout{top:150px!important;right:10px!important;max-width:38%!important}
+}
+@media(max-width:650px){
+  .arena08-stage{height:clamp(420px,112vw,540px)!important;min-height:420px!important;max-height:540px!important}
+  .enemy-city-tag{right:8px!important;top:auto!important;bottom:8px!important}.player-city-tag{left:8px!important;bottom:8px!important}
+  .player-hud{left:7px!important;top:42px!important;bottom:auto!important}
+  .enemy-hud{right:7px!important;top:42px!important;left:auto!important}
+  .industry-trigger{left:7px!important;bottom:10px!important;top:auto!important;max-width:48%!important}
+  .module-readout{display:none!important}
+  .strategy-ribbon{bottom:10px!important;left:auto!important;right:7px!important;transform:none!important;width:auto!important;max-width:46%!important;padding:6px 8px!important;display:grid!important;gap:2px!important}
+  .strategy-ribbon span{white-space:normal!important;font-size:7px!important}
+}
