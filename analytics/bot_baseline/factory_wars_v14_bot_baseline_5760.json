@@ -1,0 +1,839 @@
+{
+  "version": "Factory Wars v1.4 Experience Lab",
+  "simulation": {
+    "matches": 5760,
+    "step_seconds": 0.5,
+    "design": "Full bot round-robin; every unordered bot pair x every ordered civilization pairing x 10 reps, alternating sides (5 each orientation)",
+    "seed_base": 987654321
+  },
+  "N": 5760,
+  "health": {
+    "score": 0.6794818400951882,
+    "balance": 0.9996527174856746,
+    "counter": 0.5412396381447668,
+    "diversity": 0.7532165215285646,
+    "tempo": 0.5809031122889212,
+    "rev": 0,
+    "pacing": 0.83541961945765,
+    "wrA": 0.5000868206285813,
+    "avgChanges": 2.3147569444444445,
+    "comeback": 0.6982638888888889,
+    "dur": 174.61145833333333,
+    "timeouts": 0.1998263888888889,
+    "earlyLock": 0.12760416666666666
+  },
+  "bots": {
+    "GREEDY": {
+      "games": 1280,
+      "score": 985,
+      "w": 985,
+      "l": 295,
+      "d": 0,
+      "dur": 228491.5,
+      "rate": 0.76953125,
+      "meanDuration": 178.508984375
+    },
+    "RUSHER": {
+      "games": 1280,
+      "score": 518,
+      "w": 518,
+      "l": 762,
+      "d": 0,
+      "dur": 218480.5,
+      "rate": 0.4046875,
+      "meanDuration": 170.687890625
+    },
+    "TURTLE": {
+      "games": 1280,
+      "score": 845,
+      "w": 845,
+      "l": 435,
+      "d": 0,
+      "dur": 236398,
+      "rate": 0.66015625,
+      "meanDuration": 184.6859375
+    },
+    "TEMPO": {
+      "games": 1280,
+      "score": 598.5,
+      "w": 598,
+      "l": 681,
+      "d": 1,
+      "dur": 216489,
+      "rate": 0.467578125,
+      "meanDuration": 169.13203125
+    },
+    "ADAPTIVE": {
+      "games": 1280,
+      "score": 603,
+      "w": 603,
+      "l": 677,
+      "d": 0,
+      "dur": 216277,
+      "rate": 0.47109375,
+      "meanDuration": 168.96640625
+    },
+    "RANDOM": {
+      "games": 1280,
+      "score": 22,
+      "w": 22,
+      "l": 1258,
+      "d": 0,
+      "dur": 187969.5,
+      "rate": 0.0171875,
+      "meanDuration": 146.851171875
+    },
+    "BALANCED": {
+      "games": 1280,
+      "score": 615.5,
+      "w": 615,
+      "l": 664,
+      "d": 1,
+      "dur": 217339.5,
+      "rate": 0.480859375,
+      "meanDuration": 169.796484375
+    },
+    "HOARDER": {
+      "games": 1280,
+      "score": 818,
+      "w": 818,
+      "l": 462,
+      "d": 0,
+      "dur": 236929.5,
+      "rate": 0.6390625,
+      "meanDuration": 185.101171875
+    },
+    "SABOTEUR": {
+      "games": 1280,
+      "score": 755,
+      "w": 755,
+      "l": 525,
+      "d": 0,
+      "dur": 253149.5,
+      "rate": 0.58984375,
+      "meanDuration": 197.773046875
+    }
+  },
+  "civs": {
+    "forge": {
+      "games": 2880,
+      "score": 1285,
+      "w": 1285,
+      "l": 1595,
+      "d": 0,
+      "dur": 511006,
+      "rate": 0.4461805555555556,
+      "meanDuration": 177.4326388888889
+    },
+    "bastion": {
+      "games": 2880,
+      "score": 1394,
+      "w": 1394,
+      "l": 1486,
+      "d": 0,
+      "dur": 516052.5,
+      "rate": 0.4840277777777778,
+      "meanDuration": 179.18489583333334
+    },
+    "swarm": {
+      "games": 2880,
+      "score": 1681,
+      "w": 1680,
+      "l": 1198,
+      "d": 2,
+      "dur": 469024.5,
+      "rate": 0.5836805555555555,
+      "meanDuration": 162.85572916666666
+    },
+    "nexus": {
+      "games": 2880,
+      "score": 1400,
+      "w": 1400,
+      "l": 1480,
+      "d": 0,
+      "dur": 515441,
+      "rate": 0.4861111111111111,
+      "meanDuration": 178.97256944444445
+    }
+  },
+  "matchup": {
+    "GREEDY vs RUSHER": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 139,
+          "rate": 0.86875
+        },
+        "RUSHER": {
+          "g": 160,
+          "score": 21,
+          "rate": 0.13125
+        }
+      }
+    },
+    "GREEDY vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 104,
+          "rate": 0.65
+        },
+        "TURTLE": {
+          "g": 160,
+          "score": 56,
+          "rate": 0.35
+        }
+      }
+    },
+    "GREEDY vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 130,
+          "rate": 0.8125
+        },
+        "TEMPO": {
+          "g": 160,
+          "score": 30,
+          "rate": 0.1875
+        }
+      }
+    },
+    "ADAPTIVE vs GREEDY": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 116,
+          "rate": 0.725
+        },
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 44,
+          "rate": 0.275
+        }
+      }
+    },
+    "GREEDY vs RANDOM": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 159,
+          "rate": 0.99375
+        },
+        "RANDOM": {
+          "g": 160,
+          "score": 1,
+          "rate": 0.00625
+        }
+      }
+    },
+    "BALANCED vs GREEDY": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 118,
+          "rate": 0.7375
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 42,
+          "rate": 0.2625
+        }
+      }
+    },
+    "GREEDY vs HOARDER": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 126,
+          "rate": 0.7875
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 34,
+          "rate": 0.2125
+        }
+      }
+    },
+    "GREEDY vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "GREEDY": {
+          "g": 160,
+          "score": 93,
+          "rate": 0.58125
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 67,
+          "rate": 0.41875
+        }
+      }
+    },
+    "RUSHER vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 39,
+          "rate": 0.24375
+        },
+        "TURTLE": {
+          "g": 160,
+          "score": 121,
+          "rate": 0.75625
+        }
+      }
+    },
+    "RUSHER vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 64,
+          "rate": 0.4
+        },
+        "TEMPO": {
+          "g": 160,
+          "score": 96,
+          "rate": 0.6
+        }
+      }
+    },
+    "ADAPTIVE vs RUSHER": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 68,
+          "rate": 0.425
+        },
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 92,
+          "rate": 0.575
+        }
+      }
+    },
+    "RANDOM vs RUSHER": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 157,
+          "rate": 0.98125
+        },
+        "RANDOM": {
+          "g": 160,
+          "score": 3,
+          "rate": 0.01875
+        }
+      }
+    },
+    "BALANCED vs RUSHER": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 59,
+          "rate": 0.36875
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 101,
+          "rate": 0.63125
+        }
+      }
+    },
+    "HOARDER vs RUSHER": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 20,
+          "rate": 0.125
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 140,
+          "rate": 0.875
+        }
+      }
+    },
+    "RUSHER vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "RUSHER": {
+          "g": 160,
+          "score": 90,
+          "rate": 0.5625
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 70,
+          "rate": 0.4375
+        }
+      }
+    },
+    "TEMPO vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 89,
+          "rate": 0.55625
+        },
+        "TEMPO": {
+          "g": 160,
+          "score": 71,
+          "rate": 0.44375
+        }
+      }
+    },
+    "ADAPTIVE vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 112,
+          "rate": 0.7
+        },
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 48,
+          "rate": 0.3
+        }
+      }
+    },
+    "RANDOM vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 159,
+          "rate": 0.99375
+        },
+        "RANDOM": {
+          "g": 160,
+          "score": 1,
+          "rate": 0.00625
+        }
+      }
+    },
+    "BALANCED vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 106,
+          "rate": 0.6625
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 54,
+          "rate": 0.3375
+        }
+      }
+    },
+    "HOARDER vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 128,
+          "rate": 0.8
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 32,
+          "rate": 0.2
+        }
+      }
+    },
+    "SABOTEUR vs TURTLE": {
+      "games": 160,
+      "bots": {
+        "TURTLE": {
+          "g": 160,
+          "score": 74,
+          "rate": 0.4625
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 86,
+          "rate": 0.5375
+        }
+      }
+    },
+    "ADAPTIVE vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "TEMPO": {
+          "g": 160,
+          "score": 67,
+          "rate": 0.41875
+        },
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 93,
+          "rate": 0.58125
+        }
+      }
+    },
+    "RANDOM vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "TEMPO": {
+          "g": 160,
+          "score": 156,
+          "rate": 0.975
+        },
+        "RANDOM": {
+          "g": 160,
+          "score": 4,
+          "rate": 0.025
+        }
+      }
+    },
+    "BALANCED vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "TEMPO": {
+          "g": 160,
+          "score": 74.5,
+          "rate": 0.465625
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 85.5,
+          "rate": 0.534375
+        }
+      }
+    },
+    "HOARDER vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "TEMPO": {
+          "g": 160,
+          "score": 27,
+          "rate": 0.16875
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 133,
+          "rate": 0.83125
+        }
+      }
+    },
+    "SABOTEUR vs TEMPO": {
+      "games": 160,
+      "bots": {
+        "TEMPO": {
+          "g": 160,
+          "score": 77,
+          "rate": 0.48125
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 83,
+          "rate": 0.51875
+        }
+      }
+    },
+    "ADAPTIVE vs RANDOM": {
+      "games": 160,
+      "bots": {
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 154,
+          "rate": 0.9625
+        },
+        "RANDOM": {
+          "g": 160,
+          "score": 6,
+          "rate": 0.0375
+        }
+      }
+    },
+    "ADAPTIVE vs BALANCED": {
+      "games": 160,
+      "bots": {
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 75,
+          "rate": 0.46875
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 85,
+          "rate": 0.53125
+        }
+      }
+    },
+    "ADAPTIVE vs HOARDER": {
+      "games": 160,
+      "bots": {
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 15,
+          "rate": 0.09375
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 145,
+          "rate": 0.90625
+        }
+      }
+    },
+    "ADAPTIVE vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "ADAPTIVE": {
+          "g": 160,
+          "score": 82,
+          "rate": 0.5125
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 78,
+          "rate": 0.4875
+        }
+      }
+    },
+    "BALANCED vs RANDOM": {
+      "games": 160,
+      "bots": {
+        "RANDOM": {
+          "g": 160,
+          "score": 6,
+          "rate": 0.0375
+        },
+        "BALANCED": {
+          "g": 160,
+          "score": 154,
+          "rate": 0.9625
+        }
+      }
+    },
+    "HOARDER vs RANDOM": {
+      "games": 160,
+      "bots": {
+        "RANDOM": {
+          "g": 160,
+          "score": 0,
+          "rate": 0
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 160,
+          "rate": 1
+        }
+      }
+    },
+    "RANDOM vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "RANDOM": {
+          "g": 160,
+          "score": 1,
+          "rate": 0.00625
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 159,
+          "rate": 0.99375
+        }
+      }
+    },
+    "BALANCED vs HOARDER": {
+      "games": 160,
+      "bots": {
+        "BALANCED": {
+          "g": 160,
+          "score": 16,
+          "rate": 0.1
+        },
+        "HOARDER": {
+          "g": 160,
+          "score": 144,
+          "rate": 0.9
+        }
+      }
+    },
+    "BALANCED vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "BALANCED": {
+          "g": 160,
+          "score": 78,
+          "rate": 0.4875
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 82,
+          "rate": 0.5125
+        }
+      }
+    },
+    "HOARDER vs SABOTEUR": {
+      "games": 160,
+      "bots": {
+        "HOARDER": {
+          "g": 160,
+          "score": 30,
+          "rate": 0.1875
+        },
+        "SABOTEUR": {
+          "g": 160,
+          "score": 130,
+          "rate": 0.8125
+        }
+      }
+    }
+  },
+  "civmatch": {
+    "bastion vs forge": {
+      "games": 720,
+      "civs": {
+        "forge": {
+          "g": 720,
+          "score": 337,
+          "rate": 0.46805555555555556
+        },
+        "bastion": {
+          "g": 720,
+          "score": 383,
+          "rate": 0.5319444444444444
+        }
+      }
+    },
+    "forge vs swarm": {
+      "games": 720,
+      "civs": {
+        "forge": {
+          "g": 720,
+          "score": 251,
+          "rate": 0.3486111111111111
+        },
+        "swarm": {
+          "g": 720,
+          "score": 469,
+          "rate": 0.6513888888888889
+        }
+      }
+    },
+    "forge vs nexus": {
+      "games": 720,
+      "civs": {
+        "forge": {
+          "g": 720,
+          "score": 337,
+          "rate": 0.46805555555555556
+        },
+        "nexus": {
+          "g": 720,
+          "score": 383,
+          "rate": 0.5319444444444444
+        }
+      }
+    },
+    "bastion vs swarm": {
+      "games": 720,
+      "civs": {
+        "bastion": {
+          "g": 720,
+          "score": 309,
+          "rate": 0.42916666666666664
+        },
+        "swarm": {
+          "g": 720,
+          "score": 411,
+          "rate": 0.5708333333333333
+        }
+      }
+    },
+    "bastion vs nexus": {
+      "games": 720,
+      "civs": {
+        "bastion": {
+          "g": 720,
+          "score": 342,
+          "rate": 0.475
+        },
+        "nexus": {
+          "g": 720,
+          "score": 378,
+          "rate": 0.525
+        }
+      }
+    },
+    "nexus vs swarm": {
+      "games": 720,
+      "civs": {
+        "swarm": {
+          "g": 720,
+          "score": 441,
+          "rate": 0.6125
+        },
+        "nexus": {
+          "g": 720,
+          "score": 279,
+          "rate": 0.3875
+        }
+      }
+    }
+  },
+  "winnerLoser": {
+    "econ": {
+      "winner": 390.8504948775829,
+      "loser": 186.92463969439137
+    },
+    "mil": {
+      "winner": 1651.3741969091857,
+      "loser": 788.0533078659489
+    },
+    "def": {
+      "winner": 612.3846153846154,
+      "loser": 1077.4507727035943
+    },
+    "sab": {
+      "winner": 162.3234936620941,
+      "loser": 253.2057648897378
+    },
+    "terr": {
+      "winner": 99.76679979163049,
+      "loser": 38.42585518319153
+    },
+    "dmg": {
+      "winner": 641.3573537072408,
+      "loser": 234.36985587775655
+    },
+    "shieldWaste": {
+      "winner": 86.24969612779996,
+      "loser": 301.98645598194133
+    },
+    "peakBank": {
+      "winner": 482.69711767641587,
+      "loser": 388.92817085974167
+    },
+    "level": {
+      "winner": 2.468136829310644,
+      "loser": 1.6987324188227122
+    },
+    "decisions": {
+      "winner": 18.682757423163743,
+      "loser": 18.175377669734328
+    },
+    "commitments": {
+      "winner": 6.988366035770099,
+      "loser": 3.435144990449731
+    }
+  }
+}
