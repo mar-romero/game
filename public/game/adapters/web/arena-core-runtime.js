@@ -1,0 +1,552 @@
+"use strict";
+
+/* Arena balance data lives in game/domain/arena-config.js. */
+const { GAME_CONFIG, CIVILIZATIONS, SPECIALIZATIONS, BOTS } = window.FactoryWars.Config;
+const $ = id => document.getElementById(id);
+const money = n => Math.floor(n).toLocaleString("es-AR");
+const round = (n,d=1) => Number(n.toFixed(d));
+const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
+const fmtTime = secs => `${String(Math.floor(Math.max(0,secs)/60)).padStart(2,"0")}:${String(Math.floor(Math.max(0,secs)%60)).padStart(2,"0")}`;
+function seededRng(seed) { return window.FactoryWars.Random.createSeededRandom(seed); }
+
+function tileMarkup(type,isOwn,selectedBuild){
+  if(!type){
+    return isOwn && selectedBuild ? `<div class="tile-slot"><span class="tile-plus">＋</span><span class="tile-build-label">COLOCAR</span></div>` : `<div class="tile-slot"><span class="tile-dots"></span></div>`;
+  }
+  const label={specIndustry:"INDUSTRIA",specArsenal:"ARSENAL",specControl:"CONTROL",core:"NÚCLEO",mine:"MINA",refinery:"REFINERÍA",fabricator:"HANGAR",shieldTower:"ESCUDO",antenna:"SEÑAL"}[type]||type;
+  const art={
+    core:`<span class="reactor-ring"></span><span class="reactor-core"></span><span class="reactor-beam"></span>`,
+    mine:`<span class="mine-body"></span><span class="mine-arm"></span><span class="mine-bit"></span>`,
+    refinery:`<span class="ref-stack"></span><span class="ref-stack2"></span><span class="ref-base"></span><span class="ref-pipe"></span>`,
+    fabricator:`<span class="fab-pad"></span><span class="fab-arm"></span><span class="fab-drone"></span><span class="fab-wing1"></span><span class="fab-wing2"></span>`,
+    shieldTower:`<span class="shield-dome"></span><span class="shield-wave1"></span><span class="shield-wave2"></span><span class="shield-tower"></span>`,
+    antenna:`<span class="ant-wave1"></span><span class="ant-wave2"></span><span class="ant-head"></span><span class="ant-mast"></span>`,
+    specIndustry:`<span class="industry-c1"></span><span class="industry-c2"></span><span class="industry-c3"></span><span class="industry-gear"></span>`,
+    specArsenal:`<span class="arsenal-pad"></span><span class="arsenal-drone1"></span><span class="arsenal-drone2"></span><span class="arsenal-drone3"></span><span class="arsenal-trail1"></span><span class="arsenal-trail2"></span><span class="arsenal-trail3"></span>`,
+    specControl:`<span class="control-ring1"></span><span class="control-ring2"></span><span class="control-core"></span><span class="control-grid"></span>`
+  };
+  return `<div class="tile-art">${art[type]||""}<span class="tile-label">${label}</span></div>`;
+}
+
+/* ==============================================================
+   V1.2.2 · INDUSTRIAL EVOLUTION · DECISION CLARITY + INTERACTION HOTFIX
+   Complejidad progresiva sin aumentar la barra principal de acciones.
+================================================================ */
+const INDUSTRIAL_MODULES = window.FactoryWars.IndustrialModules;
+let selectedModuleKey=null;
+function industrialCap(p){const level=p?.level||1;return Math.min(4,Math.max(0,level-1+(level>=4?1:0)))}
+function moduleUsed(p){return Object.keys(p?.modules||{}).filter(k=>p.modules[k]).length+(p?.moduleBuild?1:0)}
+function hasModule(p,k){return !!(p&&p.modules&&p.modules[k])}
+const MODULE_BLUEPRINTS={armory2:'blueprint_armory',refinery2:'blueprint_refinery',shield2:'blueprint_shield',control2:'blueprint_control'};
+function missingModuleBlueprint(p,key){if(!p||p.id!=='A'||settings.mode!=='human')return null;const module=INDUSTRIAL_MODULES[key],blueprintKey=MODULE_BLUEPRINTS[module?.requires||key];if(!blueprintKey)return null;let research=p.factoryProgress?.research;if(!research){try{const state=JSON.parse(localStorage.getItem('factory-wars-v15-imperios-local')||'{}');research=state.research||[];}catch{research=[];}}return research.includes(blueprintKey)?null:blueprintKey;}
+function moduleFamilyLabel(k){const m=INDUSTRIAL_MODULES[k];return m?m.name:k}
+function moduleSummary(p){if(!p)return "GENERALISTA";const arr=Object.keys(p.modules||{}).filter(k=>p.modules[k]);if(p.moduleBuild)arr.push("⏳ "+INDUSTRIAL_MODULES[p.moduleBuild.key].name);return arr.length?arr.map(k=>k.startsWith("⏳")?k:INDUSTRIAL_MODULES[k].name.replace("ARMERÍA ","ARM ").replace("REFINERÍA ","REF ").replace("ESCUDOS ","ESC ").replace("CONTROL ","CTRL ")).join(" · "):"GENERALISTA"}
+
+const __createPlayer=Match.prototype.createPlayer;
+Match.prototype.createPlayer=function(id,civ,bot){const p=__createPlayer.call(this,id,civ,bot);p.modules={};p.moduleBuild=null;p.lastDamageAt=0;p.telemetry={inputs:0,validDecisions:0,invalidInputs:0,majorDecisions:0,maxThreats:0,urgentWindows:0,lastThreatCount:0};p.stats.techSpend=0;p.stats.modulesBuilt=0;return p;};
+Match.prototype.canModule=function(p,key){const m=INDUSTRIAL_MODULES[key];if(!m||this.ended||p.moduleBuild||hasModule(p,key)||missingModuleBlueprint(p,key))return false;if(p.level<m.minLevel||moduleUsed(p)>=industrialCap(p)||p.bank<m.cost)return false;if(m.requires&&!hasModule(p,m.requires))return false;if(m.group&&Object.keys(p.modules).some(k=>p.modules[k]&&INDUSTRIAL_MODULES[k]?.group===m.group))return false;return true;};
+Match.prototype.startModule=function(p,key){const m=INDUSTRIAL_MODULES[key];if(!this.canModule(p,key))return false;p.bank-=m.cost;p.moduleBuild={key,start:this.t,finish:this.t+m.build};p.stats.techSpend+=m.cost;p.stats.modulesBuilt++;this.log("module_start",p,{module:key,name:m.name,cost:m.cost,finish:round(p.moduleBuild.finish)});return true;};
+Match.prototype.completeModules=function(){for(const p of this.players){if(p.moduleBuild&&p.moduleBuild.finish<=this.t+1e-6){const key=p.moduleBuild.key,m=INDUSTRIAL_MODULES[key];p.modules[key]=true;p.moduleBuild=null;if(key==="refinery3_compound")p.lastDamageAt=this.t;this.log("module_complete",p,{module:key,name:m.name});this.placeDecoration(p,m.family==="armory"?"fabricator":m.family==="refinery"?"refinery":m.family==="shield"?"shieldTower":"antenna");}}};
+
+const __cost=Match.prototype.cost;
+Match.prototype.cost=function(p,what){if(["specIndustry","specArsenal","specControl"].includes(what))return Infinity;let n=__cost.call(this,p,what);if(!Number.isFinite(n))return n;if(["small","large"].includes(what)&&hasModule(p,"armory2"))n*=1;if(what==="small"&&hasModule(p,"armory3_salvo"))n*=1.08;if(what==="large"&&hasModule(p,"armory3_siege"))n*=1.10;if(["defSmall","defLarge"].includes(what)&&hasModule(p,"shield2"))n*=.95;if(what==="capture"&&hasModule(p,"control2"))n*=.88;if(what==="capture"&&hasModule(p,"control3_interference"))n*=.92;return Math.round(n);};
+const __income=Match.prototype.income;
+Match.prototype.income=function(p){let n=__income.call(this,p);if(hasModule(p,"refinery2"))n*=1.16;if(hasModule(p,"refinery3_compound")){const quiet=Math.max(0,this.t-p.lastDamageAt-20),bonus=Math.min(.24,quiet/60*.24);n*=1+bonus;}if(this.owner===p.id&&hasModule(p,"control2"))n*=1.05;if(this.owner===p.id&&hasModule(p,"control3_interference"))n*=1.03;return n;};
+const __can=Match.prototype.can;
+Match.prototype.can=function(p,action){if(["specIndustry","specArsenal","specControl"].includes(action))return false;return __can.call(this,p,action);};
+const __act=Match.prototype.act;
+Match.prototype.act=function(p,action,cell){const beforeTransit=this.transit.length,beforeShield=p.shields.length;const ok=__act.call(this,p,action,cell);if(!ok)return false;
+ if(action==="small"||action==="large"){const tr=this.transit[this.transit.length-1];if(tr&&this.transit.length>beforeTransit){let mult=hasModule(p,"armory2")?1.15:1;if(action==="small"&&hasModule(p,"armory3_salvo"))mult*=1.18;if(action==="large"&&hasModule(p,"armory3_siege")){mult*=1.30;tr.eta+=3;p.cd.large+=4;}tr.damage=Math.round(tr.damage*mult);const ev=[...this.events].reverse().find(e=>e.player===p.id&&e.type==="attack_commit");if(ev){ev.damage=tr.damage;ev.eta=round(tr.eta);}}}
+ if((action==="defSmall"||action==="defLarge")&&p.shields.length>beforeShield&&hasModule(p,"shield2")){const sh=p.shields[p.shields.length-1];sh.hp=Math.min(GAME_CONFIG.maxShield,Math.round(sh.hp*1.20));}
+ if(action==="sabotage"&&hasModule(p,"control2")){const op=this.other(p);op.sabotagedUntil+=3;if(hasModule(p,"control3_interference")&&this.owner===p.id)p.cd.sabotage=this.t+GAME_CONFIG.sabotageCooldown*.70;}
+ return true;};
+const __resolveTrip=Match.prototype.resolveTrip;
+Match.prototype.resolveTrip=function(x){const target=x.kind==="attack"?this.players.find(q=>q.id===x.to):null;const beforeEvents=this.events.length;__resolveTrip.call(this,x);if(target&&this.events.length>beforeEvents){const ev=[...this.events].reverse().find(e=>e.type==="base_damage"&&e.target===target.id);if(ev){if(ev.damage>0)target.lastDamageAt=this.t;if(ev.damage===0&&ev.absorbed>0&&hasModule(target,"shield3_reactive")){const refund=Math.min(40,Math.round(ev.absorbed*.12));target.bank+=refund;this.log("reactive_refund",target,{refund,absorbed:ev.absorbed});}}}};
+const __step=Match.prototype.step;
+Match.prototype.step=function(dt,withBots=true){__step.call(this,dt,withBots);this.completeModules();for(const p of this.players){const n=this.incoming(p).length;if(n>p.telemetry.maxThreats)p.telemetry.maxThreats=n;if(n>0&&p.telemetry.lastThreatCount===0)p.telemetry.urgentWindows++;p.telemetry.lastThreatCount=n;}};
+const __botDecision=Match.prototype.botDecision;
+Match.prototype.botDecision=function(p){if(!p.moduleBuild&&moduleUsed(p)<industrialCap(p)){const pref={GREEDY:["refinery2","refinery3_compound","control2"],RUSHER:["armory2","armory3_siege","shield2"],TURTLE:["shield2","shield3_reactive","refinery2"],TEMPO:["armory2","armory3_salvo","control2"],ADAPTIVE:["control2","armory2","shield2","refinery2"],BALANCED:["armory2","control2","shield2"],HOARDER:["refinery2","refinery3_compound","shield2"],SABOTEUR:["control2","control3_interference","refinery2"],RANDOM:Object.keys(INDUSTRIAL_MODULES)}[p.bot]||["armory2","refinery2","shield2","control2"];for(const k of pref){if(this.canModule(p,k)&&this.rand()<.52){this.startModule(p,k);return;}}}return __botDecision.call(this,p);};
+const __report=Match.prototype.report;
+Match.prototype.report=function(){const r=__report.call(this);r.modules=INDUSTRIAL_MODULES;r.players=this.players.map(p=>({id:p.id,civilization:p.civ,bot:p.bot,final:{bank:round(p.bank,1),income:round(this.income(p),2),hp:p.hp,level:p.level,shield:this.shield(p),modules:Object.keys(p.modules).filter(k=>p.modules[k])},stats:{...p.stats,territorySeconds:round(p.stats.territorySeconds)},telemetry:{...p.telemetry}}));return r;};
+
+let settings={mode:"human",civA:"forge",civB:"swarm",botA:"GREEDY",botB:"RUSHER"};
+let soundEnabled=true,audioCtx=null;
+let match=null,selectedBuild=null,selectedCommand=null,paused=false,speed=1,loopHandle=null,lastFrame=0,batchData=null,lastVisibleEventIndex=0,lastFxEventIndex=0;
+let fxBursts=[],animHandle=null;
+let tutorialStep=4,showAdvanced=false,guideShown=true,firstThreatPaused=false,lastNotice="";
+const ACTION_LABELS={eco:"MEJORAR ECONOMÍA",factory:"CONSTRUIR HANGAR",small:"ENVIAR ATAQUE",defSmall:"ACTIVAR ESCUDO",capture:"TOMAR NODO",large:"ATAQUE PESADO",defLarge:"ESCUDO PESADO",sabotage:"SABOTAJEAR",overdrive:"SOBRECARGAR",scan:"ESCANEAR"};
+let metaRewardClaimed=false;
+function grantMatchReward(){return 0;}
+
+function ensureAudio(){
+ try{if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}catch(_){return null;}
+}
+function synth(freq=440,dur=.08,type='sine',vol=.025,endFreq=null,delay=0){
+ if(!soundEnabled)return;const ac=ensureAudio();if(!ac)return;const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(endFreq)o.frequency.exponentialRampToValueAtTime(Math.max(20,endFreq),t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.03);
+}
+function playSfx(kind){if(!soundEnabled)return;switch(kind){
+ case 'small':synth(520,.09,'sawtooth',.018,780);synth(760,.06,'square',.012,980,.05);break;
+ case 'large':synth(150,.26,'sawtooth',.035,55);synth(75,.30,'square',.018,45,.03);break;
+ case 'shield':synth(280,.22,'sine',.025,720);synth(520,.28,'sine',.014,920,.04);break;
+ case 'impact':synth(95,.18,'sawtooth',.04,35);synth(55,.25,'square',.025,30,.02);break;
+ case 'hack':synth(820,.07,'square',.012,330);synth(610,.07,'square',.012,920,.08);synth(450,.08,'square',.01,250,.16);break;
+ case 'node':synth(320,.16,'sine',.018,620);synth(480,.18,'sine',.014,880,.12);break;
+ case 'eco':synth(420,.09,'triangle',.012,620);synth(620,.11,'triangle',.012,880,.07);break;
+ case 'spec':synth(260,.12,'sine',.018,520);synth(520,.14,'sine',.018,1040,.10);break;
+ case 'win':synth(330,.15,'triangle',.025,440);synth(440,.16,'triangle',.025,660,.15);synth(660,.28,'triangle',.03,990,.31);break;
+ case 'loss':synth(260,.18,'sine',.022,180);synth(180,.28,'sine',.024,90,.15);break;
+ }}
+function updateCoreValidation(){
+ if(!match)return;const A=match.players[0],B=match.players[1];const da=match.income(A)-match.income(B);const out=match.transit.filter(x=>x.kind==='attack'&&x.from==='A').reduce((n,x)=>n+x.damage,0),inc=match.transit.filter(x=>x.kind==='attack'&&x.from==='B').reduce((n,x)=>n+x.damage,0),pd=out-inc;
+ const eco=$('cvEco'),pressure=$('cvPressure'),control=$('cvControl');if(eco){eco.className='cv-pill '+(da>2?'good':da<-2?'bad':'');eco.innerHTML=`ECONOMÍA <strong>${da>2?'+'+round(da,1)+'/s':da<-2?round(da,1)+'/s':'PAR'}</strong>`;}if(pressure){pressure.className='cv-pill '+(pd>0?'good':pd<0?'bad':'');pressure.innerHTML=`PRESIÓN <strong>${pd>0?'+':''}${Math.round(pd)}</strong>`;}if(control){control.className='cv-pill node '+(match.owner==='A'?'good':match.owner==='B'?'bad':'');control.innerHTML=`CENTRO <strong>${match.owner==='A'?'TUYO':match.owner==='B'?'RIVAL':'NEUTRAL'}</strong>`;}
+}
+
+
+function recordInput(valid,major=false){if(!match||settings.mode!=="human")return;const p=match.players[0];p.telemetry.inputs++;if(valid){p.telemetry.validDecisions++;if(major)p.telemetry.majorDecisions++;}else p.telemetry.invalidInputs++;}
+
+function moduleIntent(key){
+ const map={
+  armory2:{icon:"🔥",role:"PRESIONAR",question:"¿Querés castigar al rival antes de que escale?",use:"Elegilo si ves greed o querés convertir banco en amenaza ya."},
+  refinery2:{icon:"⚙",role:"ESCALAR",question:"¿Querés ser mucho más rico dentro de 30–60 s?",use:"Elegilo si estás relativamente seguro y querés ganar el late game."},
+  shield2:{icon:"🛡",role:"RESISTIR",question:"¿Te preocupa morir antes de que tu economía pague?",use:"Elegilo contra presión, misiles pesados o un rival agresivo."},
+  control2:{icon:"⚡",role:"CONTROLAR",question:"¿Querés ganar sin chocar contra su defensa?",use:"Elegilo si el nodo está disputado o el rival se está encerrando."},
+  armory3_salvo:{icon:"☄",role:"HOSTIGAR",question:"¿Querés ataques rápidos frecuentes?",use:"Convierte el cohete rápido en presión repetida; bueno para romper greed."},
+  armory3_siege:{icon:"🚀",role:"ASEDIAR",question:"¿Querés una amenaza enorme y telegráfica?",use:"Golpe muy fuerte; da más tiempo de reacción y castiga si lo usás mal."},
+  refinery3_compound:{icon:"📈",role:"COMPONER",question:"¿Podés mantener tu núcleo sin recibir daño?",use:"Premia largos períodos seguros; un impacto reinicia el crecimiento."},
+  shield3_reactive:{icon:"🔷",role:"CONTRAATACAR",question:"¿Leés bien cuándo defender?",use:"Premia bloquear ataques completos y convierte buena defensa en economía."},
+  control3_interference:{icon:"📡",role:"INTERFERIR",question:"¿Podés conservar el centro?",use:"Hace que nodo + sabotaje se potencien entre sí mientras controles territorio."}
+ };return map[key]||{icon:"✦",role:"EVOLUCIONAR",question:"¿Querés especializar esta rama?",use:"Profundiza tu build actual."};
+}
+function modulePreview(p,key){
+ const C=GAME_CONFIG,m=INDUSTRIAL_MODULES[key],income=match?match.income(p):C.economicLevels[p.level-1];
+ const c=match?match.civ(p):CIVILIZATIONS[p.civ];
+ const ds=Math.round(C.attackDamage.small*(p.spec?SPECIALIZATIONS[p.spec].attackDamage:1));
+ const dl=Math.round(C.attackDamage.large*(p.spec?SPECIALIZATIONS[p.spec].attackDamage:1));
+ const sc=Math.round(C.defenseCapacity.small*c.defenseHP),lc=Math.round(C.defenseCapacity.large*c.defenseHP);
+ const capCost=match?match.cost(p,"capture"):C.territoryCaptureCost;
+ const previews={
+  armory2:{before:`${ds} / ${dl} daño`,after:`${Math.round(ds*1.15)} / ${Math.round(dl*1.15)} daño`,label:"RÁPIDO / PESADO"},
+  refinery2:{before:`${round(income,1)}/s`,after:`≈ ${round(income*1.16,1)}/s`,label:"PRODUCCIÓN"},
+  shield2:{before:`${sc} / ${lc}`,after:`${Math.round(sc*1.20)} / ${Math.round(lc*1.20)}`,label:"ESCUDO CHICO / GRANDE"},
+  control2:{before:`Nodo +${Math.round(C.territoryBonus*100)}% · ${capCost}◈`,after:`Nodo +≈${Math.round((C.territoryBonus+.05)*100)}% · ${Math.round(capCost*.88)}◈`,label:"CONTROL TERRITORIAL"},
+  armory3_salvo:{before:`Rápido ${Math.round(ds*1.15)} daño`,after:`Rápido ${Math.round(ds*1.15*1.18)} daño`,label:"COHETE RÁPIDO"},
+  armory3_siege:{before:`Pesado ${Math.round(dl*1.15)} · ${C.attackTravel.large}s`,after:`Pesado ${Math.round(dl*1.15*1.30)} · ${C.attackTravel.large+3}s`,label:"COHETE PESADO"},
+  refinery3_compound:{before:`${round(income,1)}/s estable`,after:`hasta +24% extra`,label:"PRODUCCIÓN SI NO TE DAÑAN"},
+  shield3_reactive:{before:`Bloquear = sobrevivir`,after:`Bloqueo total = reembolso`,label:"DEFENSA EFICIENTE"},
+  control3_interference:{before:`Sabotaje normal`,after:`Nodo: -30% cooldown`,label:"SABOTAJE CON NODO"}
+ };
+ return previews[key]||{before:"Actual",after:m.desc,label:"EFECTO"};
+}
+function moduleRecommendation(p){
+ if(!match)return null;const incoming=match.incoming(p),incomingDamage=incoming.reduce((s,x)=>s+x.damage,0),shield=match.shield(p),op=match.other(p);
+ const candidates=[];
+ if(incomingDamage>shield+80)candidates.push(["shield2",100,"Tenés daño entrante sin cubrir"]);
+ if(op.level>p.level||op.tiles.filter(x=>x==="refinery").length>=2)candidates.push(["armory2",82,"El rival está invirtiendo en economía"]);
+ if(match.owner!==p.id&&match.t>35)candidates.push(["control2",65,"El centro no es tuyo"]);
+ if(!incoming.length&&p.hp>GAME_CONFIG.coreHP*.68)candidates.push(["refinery2",55,"Tenés una ventana relativamente segura"]);
+ for(const [k,score,why] of candidates.sort((a,b)=>b[1]-a[1])){if(INDUSTRIAL_MODULES[k]&&!hasModule(p,k)&&!missingModuleBlueprint(p,k)&&(!INDUSTRIAL_MODULES[k].requires||hasModule(p,INDUSTRIAL_MODULES[k].requires)))return {key:k,why};}
+ return null;
+}
+function postPurchaseReadout(p,key){
+ const m=INDUSTRIAL_MODULES[key],remaining=Math.max(0,p.bank-m.cost),smallAtk=match.cost(p,"small"),smallDef=match.cost(p,"defSmall"),largeDef=match.cost(p,"defLarge");
+ const options=[];if(remaining>=smallAtk)options.push("1 ataque rápido");if(remaining>=smallDef)options.push("1 escudo chico");if(remaining>=largeDef)options.push("1 escudo grande");
+ return {remaining,options:options.length?options.join(" + "):"sin respuesta inmediata cara"};
+}
+function visibleModuleChoices(p){
+ const keys=Object.keys(INDUSTRIAL_MODULES),primary=[],secondary=[];
+ // First slot: only the four strategic archetypes. No Tier III noise.
+ if(p.level===2||Object.keys(p.modules||{}).length===0){return {primary:["armory2","refinery2","shield2","control2"],secondary:[]};}
+ for(const k of keys){const m=INDUSTRIAL_MODULES[k];if(hasModule(p,k)||p.moduleBuild?.key===k)continue;if(m.tier===3&&m.requires&&hasModule(p,m.requires))primary.push(k);else if(m.tier===2)secondary.push(k);}
+ return {primary,secondary};
+}
+
+function moduleStatusReason(p,key){const m=INDUSTRIAL_MODULES[key];if(!m)return "Módulo inválido";if(hasModule(p,key))return "Ya instalado";if(p.moduleBuild)return `Construyendo ${INDUSTRIAL_MODULES[p.moduleBuild.key].name}`;const blueprint=missingModuleBlueprint(p,key);if(blueprint)return `Investigá ${blueprint.replace('blueprint_','PLANO · ').toUpperCase()} en la Megafábrica`;if(p.level<m.minLevel)return `Requiere Economía ${m.minLevel}`;if(moduleUsed(p)>=industrialCap(p))return "Sin slots industriales libres";if(m.requires&&!hasModule(p,m.requires))return `Requiere ${INDUSTRIAL_MODULES[m.requires].name}`;if(m.group&&Object.keys(p.modules).some(k=>p.modules[k]&&INDUSTRIAL_MODULES[k]?.group===m.group))return "Ya elegiste la otra rama de Armería III";if(p.bank<m.cost)return `Faltan ${Math.ceil(m.cost-p.bank)} ◈`;return "Disponible";}
+let modulePauseWas=false;
+function openModuleSheet(){if(!match||settings.mode!=="human")return;const A=match.players[0];if(A.level<2){combatToast("Economía II abre tu primera evolución","info");return;}modulePauseWas=paused;paused=true;selectedModuleKey=null;$("moduleSheet").scrollTop=0;$("moduleSheet").classList.remove("hidden");renderModuleSheet();render();}
+function closeModuleSheet(){selectedModuleKey=null;$("moduleSheet").classList.add("hidden");if(match&&!match.ended)paused=modulePauseWas;render();}
+function startPlayerModule(key){if(!match||settings.mode!=="human"||match.ended)return;const A=match.players[0],valid=match.canModule(A,key);recordInput(valid,true);if(!valid){const why=moduleStatusReason(A,key);combatToast(why,"danger");setHint(why);renderModuleSheet();return;}const m=INDUSTRIAL_MODULES[key],intent=moduleIntent(key);match.startModule(A,key);selectedModuleKey=null;combatToast(`${intent.role} · ${m.name} · obra ${m.build} s`,`good`);setHint(`Elegiste ${intent.role}: invertiste ${m.cost} ◈ en ${m.name}. El beneficio llega en ${m.build} s; hasta entonces quedaste con menos banco.`);closeModuleSheet();render();}
+function moduleTipSafe(x){return String(x??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderModuleSheet(){
+ if(!match)return;const A=match.players[0],grid=$("moduleGrid");if(!grid)return;const used=moduleUsed(A),cap=industrialCap(A),rec=moduleRecommendation(A),choices=visibleModuleChoices(A);
+ const incoming=match.incoming(A),incomingDamage=incoming.reduce((n,x)=>n+x.damage,0),ctx=$("evoContext");
+ if(ctx)ctx.innerHTML=`<div class="evo-context-pill"><b>${money(A.bank)} ◈</b><span>TENÉS</span></div><div class="evo-context-pill"><b>${round(match.income(A),1)}/s</b><span>GANÁS</span></div><div class="evo-context-pill"><b>${incomingDamage?incomingDamage:'0'}</b><span>AMENAZA</span></div><div class="evo-context-pill"><b>${used}/${cap}</b><span>SLOTS</span></div>`;
+ const renderCard=(k)=>{const mod=INDUSTRIAL_MODULES[k],intent=moduleIntent(k),pv=modulePreview(A,k),reason=moduleStatusReason(A,k),available=match.canModule(A,k),installed=hasModule(A,k),building=A.moduleBuild?.key===k,selected=selectedModuleKey===k,recommended=rec?.key===k,remain=building?Math.max(0,A.moduleBuild.finish-match.t):0;const tip=`${mod.name}. ${intent.question} ${intent.use} Ganás: ${pv.before} → ${pv.after}. Cuesta ${mod.cost} recursos y ${mod.build}s de obra. Costo de oportunidad: ${mod.trade}`;return `<button type="button" class="module-card ${mod.family} ${installed?'installed':''} ${building?'building':''} ${!available&&!installed&&!building?'locked':''} ${selected?'selected':''}" data-module-preview="${k}" data-tip="${moduleTipSafe(tip)}" aria-disabled="${available?'false':'true'}">${recommended?`<span class="module-reco">SUGERIDA</span>`:''}<span class="module-role"><i>${intent.icon}</i>${intent.role}</span><span class="module-beforeafter"><span><b>${pv.before}</b><small>AHORA</small></span><span class="arrow">→</span><span><b>${pv.after}</b><small>GANA</small></span></span><span class="module-costrow"><strong>PAGÁS ${mod.cost} ◈</strong><small>${installed?'✓ INSTALADO':building?`⏳ ${remain.toFixed(1)}s`:available?`⏱ ${mod.build}s`:'⛔ '+reason}</small></span></button>`};
+ let html=`<div class="module-section"><b>${Object.keys(A.modules||{}).length?'ELEGÍ TU PRÓXIMA MEJORA':'¿QUÉ QUERÉS MEJORAR?'}</b><span>Los detalles aparecen al mantener 2 s.</span></div>`+choices.primary.map(renderCard).join('');
+ if(choices.secondary.length)html+=`<div class="module-section"><b>OTRAS RAMAS</b><span>Alternativas de especialización.</span></div>`+choices.secondary.map(renderCard).join('');
+ if(selectedModuleKey&&INDUSTRIAL_MODULES[selectedModuleKey]){const k=selectedModuleKey,mod=INDUSTRIAL_MODULES[k],intent=moduleIntent(k),pv=modulePreview(A,k),valid=match.canModule(A,k),status=moduleStatusReason(A,k),post=postPurchaseReadout(A,k);html+=`<div class="module-confirm"><div><div class="eyebrow">CONFIRMAR</div><h4>${intent.icon} ${mod.name}</h4><div class="confirm-flow"><span>${pv.before}</span><b>→</b><span class="gain">${pv.after}</span></div><div class="confirm-cost">−${mod.cost} ◈ · ${mod.build}s obra · quedan ${money(post.remaining)} ◈</div></div><div class="module-confirm-actions"><button type="button" class="btn-primary" data-confirm-module="${k}" ${valid?'':'disabled'}>${valid?'CONSTRUIR':'⛔ '+status}</button><button type="button" class="btn-secondary" data-cancel-module="1">ATRÁS</button></div></div>`;}
+ grid.innerHTML=html;
+ grid.querySelectorAll('[data-module-preview]').forEach(b=>b.addEventListener('click',()=>{selectedModuleKey=b.dataset.modulePreview;renderModuleSheet();}));
+ grid.querySelectorAll('[data-confirm-module]').forEach(b=>b.addEventListener('click',()=>startPlayerModule(b.dataset.confirmModule)));
+ grid.querySelectorAll('[data-cancel-module]').forEach(b=>b.addEventListener('click',()=>{selectedModuleKey=null;renderModuleSheet();}));
+ const h=$("moduleSheet").querySelector('h3');if(h)h.textContent=cap===1?'Elegí 1 ventaja':'Elegí tu próxima ventaja';
+}
+
+function v152DockOneGlance(){if(!match||settings.mode!=="human")return;const A=match.players[0],C=GAME_CONFIG.production||{},dur=C.durations||{};const defs={eco:{id:"dockEcoCost",time:dur.eco||0},small:{id:"dockSmallCost",time:dur.small||0},large:{id:"dockLargeCost",time:dur.large||0},defSmall:{id:"dockShieldSmallCost",time:dur.defSmall||0},defLarge:{id:"dockShieldLargeCost",time:dur.defLarge||0},capture:{id:"dockNodeCost",time:dur.capture||0},sabotage:{id:"dockSabCost",time:dur.sabotage||0}};for(const [act,d] of Object.entries(defs)){const btn=document.querySelector(`.command-dock .quickcmd[data-quick="${act}"]`),el=$(d.id);if(!btn||!el)continue;const cost=match.cost(A,act),missing=Number.isFinite(cost)?Math.max(0,Math.ceil(cost-A.bank)):0,can=match.can(A,act);el.innerHTML=Number.isFinite(cost)?`<b>PAGÁS ${money(cost)} ◈</b><small>⏱ ${d.time||'—'}s</small>`:`<b>NIVEL MÁX.</b><small>—</small>`;let reason='LISTO';if(!can){if(missing>0)reason=`FALTAN ${missing} ◈`;else if(act==='large'&&A.cd?.large>match.t)reason=`RECARGA ${Math.ceil(A.cd.large-match.t)}s`;else if((act==='capture'||act==='sabotage')&&A.cd?.[act]>match.t)reason=`RECARGA ${Math.ceil(A.cd[act]-match.t)}s`;else reason='OCUPADO / BLOQUEADO';}btn.dataset.lockreason=reason;}const eco=$('dockEcoInfo');if(eco)eco.textContent=A.level>=4?'MÁXIMO':`${GAME_CONFIG.economicLevels[A.level-1]}/s → ${GAME_CONFIG.economicLevels[A.level]}/s`;const small=document.querySelector('.command-dock [data-quick="small"] .cmd-copy small');if(small)small.textContent=`${v13AttackDamage(A,'small')} DAÑO`;const large=document.querySelector('.command-dock [data-quick="large"] .cmd-copy small');if(large)large.textContent=`${v13AttackDamage(A,'large')} DAÑO`;const ds=document.querySelector('.command-dock [data-quick="defSmall"] .cmd-copy small');if(ds)ds.textContent=`+${Math.round(GAME_CONFIG.defenseCapacity.small*(CIVILIZATIONS[A.civ]?.defenseHP||1)*(hasModule(A,'shield2')?1.15:1))} ESCUDO`;const dl=document.querySelector('.command-dock [data-quick="defLarge"] .cmd-copy small');if(dl)dl.textContent=`+${Math.round(GAME_CONFIG.defenseCapacity.large*(CIVILIZATIONS[A.civ]?.defenseHP||1)*(hasModule(A,'shield2')?1.15:1))} ESCUDO`;const price=a=>match.cost(A,a),sd=Math.round(GAME_CONFIG.defenseCapacity.small*(CIVILIZATIONS[A.civ]?.defenseHP||1)*(hasModule(A,'shield2')?1.15:1)),ld=Math.round(GAME_CONFIG.defenseCapacity.large*(CIVILIZATIONS[A.civ]?.defenseHP||1)*(hasModule(A,'shield2')?1.15:1)),sabDur=GAME_CONFIG.sabotageDuration+(hasModule(A,'control2')?3:0),tips={eco:A.level>=4?'ECONOMÍA al máximo.':`ECONOMÍA: pagás ${money(price('eco'))} ◈ y ocupa las 2 líneas durante ${dur.eco}s. Al terminar tu ingreso base pasa de ${GAME_CONFIG.economicLevels[A.level-1]}/s a ${GAME_CONFIG.economicLevels[A.level]}/s. Mientras se construye producís 10% menos y sos más vulnerable.`,small:`COHETE RÁPIDO: pagás ${money(price('small'))} ◈. Fabrica en ${dur.small}s, después vuela ${v152Travel(A,'small',GAME_CONFIG.attackTravel.small).toFixed(1)}s y hace ${v13AttackDamage(A,'small')} de daño si no lo bloquean.`,large:`COHETE PESADO: pagás ${money(price('large'))} ◈. Fabrica en ${dur.large}s, vuela ${v152Travel(A,'large',GAME_CONFIG.attackTravel.large+(hasModule(A,'armory3_siege')?2:0)).toFixed(1)}s y hace ${v13AttackDamage(A,'large')} de daño. Rompe escudos con mayor eficiencia.`,defSmall:`ESCUDO RÁPIDO: pagás ${money(price('defSmall'))} ◈. Carga en ${dur.defSmall}s y agrega hasta ${sd} de escudo. Apilar escudos tiene rendimiento decreciente.`,defLarge:`ESCUDO PESADO: pagás ${money(price('defLarge'))} ◈. Carga en ${dur.defLarge}s y agrega hasta ${ld} de escudo. Es la respuesta grande contra un pesado.`,capture:`TOMAR NODO: pagás ${money(price('capture'))} ◈ y fabrica drones en ${dur.capture}s. Tras el viaje, si capturás el centro ganás +${Math.round(GAME_CONFIG.territoryBonus*100)}% ingreso y +${Math.round(GAME_CONFIG.production.territoryTempoBonus*100)}% velocidad de fabricación mientras sea tuyo.`,sabotage:`SABOTAJE: pagás ${money(price('sabotage'))} ◈ y prepara en ${dur.sabotage}s. Durante ${sabDur}s el rival pierde ${Math.round(GAME_CONFIG.sabotagePenalty*100)}% de ingreso y fabrica ${Math.round(GAME_CONFIG.production.sabotageTempoPenalty*100)}% más lento.`};for(const [act,tip] of Object.entries(tips)){const b=document.querySelector(`.command-dock .quickcmd[data-quick="${act}"]`);if(b)b.dataset.tip=tip;}}
+
+function renderIndustrialUI(){if(!match)return;v152DockOneGlance();const A=match.players[0],B=match.players[1],cap=industrialCap(A),used=moduleUsed(A),tr=$("industryTrigger"),slots=$("industrySlots");if(slots){slots.innerHTML='';for(let i=0;i<Math.max(1,cap);i++){const d=document.createElement('i');d.className='slot-dot '+(i<used-(A.moduleBuild?1:0)?'used':A.moduleBuild&&i===used-1?'build':'');slots.appendChild(d);}}if(tr){tr.classList.toggle('locked',cap===0);tr.classList.toggle('ready',cap>used&&!A.moduleBuild);$("industryTriggerText").textContent=cap===0?'Economía II desbloquea el primer slot':A.moduleBuild?`${INDUSTRIAL_MODULES[A.moduleBuild.key].name} · ${Math.max(0,A.moduleBuild.finish-match.t).toFixed(1)} s`:used<cap?`${used}/${cap} slots · mejora de fábrica disponible`:`${used}/${cap} slots ocupados`;}const alert=$("evoAlert");if(alert)alert.classList.toggle('hidden',!(cap>used&&!A.moduleBuild));const mr=$("moduleReadout");if(mr)mr.innerHTML=`<b>TU BUILD:</b> ${moduleSummary(A)} · <span class="enemy-module">Rival: ${moduleSummary(B)}</span>`;if(!$("moduleSheet").classList.contains('hidden'))renderModuleSheet();}
+function renderDecisionLab(){if(!match)return;const p=match.players[0],mins=Math.max(.15,match.t/60),rate=p.telemetry.validDecisions/mins,invalid=p.telemetry.inputs?p.telemetry.invalidInputs/p.telemetry.inputs*100:0;function metric(id,val,cls){const e=$(id);if(!e)return;e.className='lab-metric '+cls;e.querySelector('b').textContent=val;}metric('labDecisions',`${p.telemetry.validDecisions}`,p.telemetry.validDecisions>=14&&p.telemetry.validDecisions<=22?'good':p.telemetry.validDecisions>25?'warn':'');metric('labRate',`${rate.toFixed(1)}/min`,rate>=3.5&&rate<=5.5?'good':rate>7?'bad':'');metric('labInvalid',`${invalid.toFixed(0)}%`,invalid<=12?'good':invalid>20?'bad':'warn');metric('labThreats',`${p.telemetry.maxThreats}`,p.telemetry.maxThreats<=2?'good':p.telemetry.maxThreats>=4?'bad':'warn');}
+
+
+function populate(){for(const select of [$("civA"),$("civB")])for(const [id,c] of Object.entries(CIVILIZATIONS)){const o=document.createElement("option");o.value=id;o.textContent=`${c.name} · ${c.summary}`;select.appendChild(o);}$("civA").value="forge";$("civB").value="swarm";
+ for(const select of [$("botA"),$("botB")])for(const [id,description] of Object.entries(BOTS)){const opt=document.createElement("option");opt.value=id;opt.textContent=description;select.appendChild(opt);}$("botA").value="GREEDY";$("botB").value="BALANCED";
+ const abs=$("arenaBotSelect");if(abs){for(const [id,description] of Object.entries(BOTS)){const opt=document.createElement("option");opt.value=id;opt.textContent=description.split(" — ")[0];abs.appendChild(opt);}abs.value="BALANCED";}
+ $("civNotes").innerHTML=Object.entries(CIVILIZATIONS).map(([id,c])=>`<div class="note"><b>${{forge:"⚒",bastion:"⬡",swarm:"↗",nexus:"⌁"}[id]} ${c.name}</b><span>${c.summary}</span></div>`).join("");
+ $("mode").addEventListener("change",refreshSetup);$("startBtn").addEventListener("click",start);
+ document.querySelectorAll(".speeds button").forEach(b=>b.addEventListener("click",()=>{if(settings.mode==="human"&&speed>1)return;speed=Number(b.dataset.speed);document.querySelectorAll(".speeds button").forEach(z=>z.classList.toggle("active",z===b));render();}));
+ $("pauseBtn").addEventListener("click",()=>{if(!match||match.ended)return;paused=!paused;render();});
+ $("helpBtn").addEventListener("click",()=>{guideShown=!guideShown;render();});
+ $("guideDo").addEventListener("click",()=>{if(!match||settings.mode!=="human")return;const action=$("guideDo").dataset.action;if(action)humanAction(action);});
+ $("scrollActions").addEventListener("click",()=>$("actions").scrollIntoView({behavior:"smooth",block:"start"}));
+ $("skipTutorial").addEventListener("click",()=>{tutorialStep=4;if(match)match.tutorialStep=4;paused=false;setHint("Tutorial saltado. Si necesitás orientación, usá la guía de arriba o la pausa táctica.");render();});
+ $("advancedToggle").addEventListener("click",()=>{showAdvanced=!showAdvanced;render();});
+ $("learning").addEventListener("change",refreshSetup);
+ $("resetBtn").addEventListener("click",()=>{if(loopHandle)clearInterval(loopHandle);loopHandle=null;match=null;clearSelections();$("game").classList.add("hidden");document.body.classList.remove("show-match");$("batchResults").innerHTML="";if(settings&&settings.mode==="human")startPvPAgain();else enterPvpSetup();});
+ $("exportBtn").addEventListener("click",()=>{if(!match)return;const data=batchData?{currentMatch:match.report(),lastBatch:batchData}:match.report();const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`factory-wars-${match.seed}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);});
+ $("batchBtn").addEventListener("click",runBatch);
+ const abs2=$("arenaBotSelect");if(abs2)abs2.addEventListener("change",()=>{});
+ const aba=$("arenaBotApply");if(aba)aba.addEventListener("click",()=>{if(!$("arenaBotSelect"))return;$("botB").value=$("arenaBotSelect").value;combatToast(`NUEVO RIVAL: ${$("arenaBotSelect").value} · reiniciando`,`info`);setTimeout(()=>start(),120);});
+ const sb=$("soundBtn");if(sb)sb.addEventListener("click",()=>{soundEnabled=!soundEnabled;if(soundEnabled)ensureAudio();sb.textContent=soundEnabled?"🔊":"🔇";sb.classList.toggle("sound-off",!soundEnabled);combatToast(soundEnabled?"AUDIO ACTIVADO":"AUDIO SILENCIADO","info");});
+ const aeb=$("arenaExportBtn");if(aeb)aeb.addEventListener("click",()=>$("exportBtn").click());
+ const it=$("industryTrigger");if(it)it.addEventListener("click",openModuleSheet);const mc=$("moduleClose");if(mc)mc.addEventListener("click",closeModuleSheet);const lt=$("labToggle");if(lt)lt.addEventListener("click",()=>$("decisionLab").classList.toggle("hidden"));
+ document.querySelectorAll(".act").forEach(b=>b.addEventListener("click",()=>humanAction(b.dataset.act)));
+ document.querySelectorAll(".quickcmd").forEach(b=>b.addEventListener("click",()=>quickCombatAction(b.dataset.quick,b)));
+ $("tapLeft").addEventListener("click",()=>targetClick("self")); $("tapNode").addEventListener("click",()=>targetClick("node")); $("tapRight").addEventListener("click",()=>targetClick("enemy"));
+ $("baseA").addEventListener("click",()=>targetClick("self")); $("baseB").addEventListener("click",()=>targetClick("enemy")); $("objectiveNode").addEventListener("click",()=>targetClick("node"));
+ for(const id of ["A","B"]){const el=$("grid"+id);for(let i=0;i<GAME_CONFIG.gridSize**2;i++){const tile=document.createElement("button");tile.className="tile";tile.type="button";tile.dataset.index=i;tile.addEventListener("click",()=>gridClick(id,i));el.appendChild(tile);}}
+ refreshSetup();
+}
+
+function refreshSetup(){const botmode=$("mode").value==="bots";$("botAField").classList.toggle("hidden",!botmode);$("labelA").textContent=botmode?"Civilización A":"Tu civilización";$("learningField").classList.toggle("hidden",botmode);$("startBtn").textContent=botmode?"INICIAR SIMULACIÓN →":"INICIAR PARTIDA →";}
+
+function actionTargetType(action){
+  if(["eco","factory"].includes(action)) return "grid";
+  if(["small","large","sabotage","scan"].includes(action)) return "enemy";
+  if(["defSmall","defLarge","overdrive"].includes(action)) return "self";
+  if(action==="capture") return "node";
+  return "instant";
+}
+function actionTargetHint(action){
+  return {
+    enemy:"Ahora tocá la BASE RIVAL en el escenario para confirmar la orden.",
+    self:"Ahora tocá TU BASE para activar esta orden.",
+    node:"Ahora tocá el NODO CENTRAL para enviar drones de control.",
+    grid:"Elegí una casilla libre en tu fábrica para construir.",
+    instant:""
+  }[actionTargetType(action)]||"";
+}
+function clearSelections(){selectedBuild=null;selectedCommand=null;}
+function triggerPanelFlash(id, cls="flash-hit"){ const el=$(id); if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls),650);} 
+function queueFx(kind,target){fxBursts.push({kind,target,t0:performance.now()}); if(fxBursts.length>40) fxBursts=fxBursts.slice(-40);} 
+
+let combatToastTimer=null;
+function combatToast(message,tone="info"){
+ const el=$("combatToast"); if(!el)return; el.textContent=message; el.className="show "+tone; clearTimeout(combatToastTimer); combatToastTimer=setTimeout(()=>{el.className="";},1700);
+}
+function actionUnavailableReason(action,p){
+ const c=match.cost(p,action); if(p.bank<c)return `Necesitás ${Math.ceil(c-p.bank)} ◈ más`;
+ if(["small","large","capture"].includes(action)&&!p.factory)return "Primero construí un HANGAR";
+ if(action==="capture"&&match.owner===p.id)return "El nodo ya está bajo tu control";
+ if(action==="large"&&match.t<p.cd.large)return `Cohete pesado en recarga: ${Math.ceil(p.cd.large-match.t)} s`;
+ if(action==="sabotage"&&match.t<p.cd.sabotage)return `Sabotaje en recarga: ${Math.ceil(p.cd.sabotage-match.t)} s`;
+ if(action==="capture"&&match.t<p.cd.capture)return `Nodo en recarga: ${Math.ceil(p.cd.capture-match.t)} s`;
+ return "Acción no disponible ahora";
+}
+function quickCombatAction(action,button){
+ if(!match||settings.mode!=="human"||match.ended)return; const p=findPlayer("A");
+ if(["eco","factory"].includes(action)){humanAction(action);return;}
+ const valid=match.can(p,action);recordInput(valid,["large","capture"].includes(action));
+ if(!valid){const why=actionUnavailableReason(action,p);setHint(why);combatToast(why,"danger");render();return;}
+ clearSelections(); const ok=match.act(p,action); if(!ok){combatToast("No se pudo ejecutar la orden","danger");return;}
+ if(button){button.classList.remove("action-fired");void button.offsetWidth;button.classList.add("action-fired");setTimeout(()=>button.classList.remove("action-fired"),500);}
+ const msg={small:`ATAQUE RÁPIDO · ${GAME_CONFIG.attackDamage.small} daño · impacto en ${GAME_CONFIG.attackTravel.small} s`,large:`ATAQUE PESADO · ${GAME_CONFIG.attackDamage.large} daño · ${GAME_CONFIG.attackTravel.large} s · logística comprometida`,defSmall:`ESCUDO RÁPIDO · +${GAME_CONFIG.defenseCapacity.small} · dura ${GAME_CONFIG.shieldDuration} s`,defLarge:`ESCUDO PESADO · +${GAME_CONFIG.defenseCapacity.large} · dura ${GAME_CONFIG.shieldDuration} s`,capture:`DRONES AL NODO · +${Math.round(GAME_CONFIG.territoryBonus*100)}% si capturás`,sabotage:`SABOTAJE ACTIVO · -${Math.round(GAME_CONFIG.sabotagePenalty*100)}% producción rival`,overdrive:"SOBRECARGA ACTIVA · +50% ingreso / más vulnerable",scan:"ESCANEO COMPLETADO"}[action]||"ORDEN EJECUTADA";
+ const tone=["small","large","sabotage"].includes(action)?"good":["defSmall","defLarge"].includes(action)?"info":"good"; setHint(msg);combatToast(msg,tone);completedTutorial(action);render();
+}
+function shieldRemaining(p){return p.shields.length?Math.max(0,...p.shields.map(s=>s.expires-match.t)):0;}
+function updateCombatRadar(){
+ if(!match)return; const A=match.players[0]; const incoming=match.incoming(A).slice().sort((a,b)=>a.eta-b.eta); const outgoing=match.transit.filter(t=>t.kind==="attack"&&t.from==="A").slice().sort((a,b)=>a.eta-b.eta);
+ const inDmg=incoming.reduce((s,t)=>s+t.damage,0), outDmg=outgoing.reduce((s,t)=>s+t.damage,0), sh=Math.round(match.shield(A)), shTime=shieldRemaining(A);
+ $("radarIncoming").classList.toggle("hot",incoming.length>0); $("incomingStatus").textContent=incoming.length?`${inDmg} daño · ${Math.max(0,incoming[0].eta-match.t).toFixed(1)} s`:"Ninguno"; $("incomingDetail").textContent=incoming.length?`${incoming.length} ataque(s) vienen hacia tu núcleo.`:"Tu núcleo está seguro por ahora.";
+ $("radarOutgoing").classList.toggle("hot",outgoing.length>0); $("outgoingStatus").textContent=outgoing.length?`${outDmg} daño · ${Math.max(0,outgoing[0].eta-match.t).toFixed(1)} s`:"Ninguno"; $("outgoingDetail").textContent=outgoing.length?`${outgoing.length} ataque(s) tuyos en vuelo.`:"No hay drones ofensivos en vuelo.";
+ $("radarShield").classList.toggle("hot",sh>0); $("shieldStatus").textContent=sh>0?`${sh} · ${Math.ceil(shTime)} s`:"0"; $("shieldDetail").textContent=sh>0?"Absorberá daño antes que tu núcleo.":"Sin protección activa.";
+ const owner=match.owner; $("radarTerritory").classList.toggle("hot",owner!==null); $("territoryStatus").textContent=owner==="A"?`TUYO +${Math.round(GAME_CONFIG.territoryBonus*100)}%`:owner==="B"?`RIVAL +${Math.round(GAME_CONFIG.territoryBonus*100)}%`:"Neutral"; $("territoryDetail").textContent=owner==="A"?"Estás recibiendo bonus económico.":owner==="B"?"El rival recibe bonus económico.":"Nadie recibe el bonus del nodo."; $("combatNodePill").textContent=owner==="A"?`NODO: TUYO +${Math.round(GAME_CONFIG.territoryBonus*100)}%`:owner==="B"?`NODO: RIVAL +${Math.round(GAME_CONFIG.territoryBonus*100)}%`:"NODO NEUTRAL";
+ if(incoming.length){$("combatHeadline").textContent=`⚠ TE ATACAN · ${inDmg} daño en ${Math.max(0,incoming[0].eta-match.t).toFixed(1)} s`;} else if(outgoing.length){$("combatHeadline").textContent=`↗ ATACANDO · impacto en ${Math.max(0,outgoing[0].eta-match.t).toFixed(1)} s`;} else if(owner==="A"){$("combatHeadline").textContent="VENTAJA ECONÓMICA · NODO BAJO TU CONTROL";} else {$("combatHeadline").textContent="SIN AMENAZAS · ELEGÍ TU PRÓXIMA INVERSIÓN";}
+}
+
+
+function updateArena08Hud(){
+ if(!match)return; const A=match.players[0],B=match.players[1];
+ const eras=["TALLER I","INDUSTRIA II","ROBÓTICA III","AUTOMATIZACIÓN IV"];
+ $("mapPlayerCiv").textContent=CIVILIZATIONS[A.civ].name; $("mapEnemyCiv").textContent=CIVILIZATIONS[B.civ].name+" · "+(window.__fwLeagueMatch?.opponentName||B.bot||settings.botB||"BOT");
+ $("mapPlayerEra").textContent=eras[A.level-1]; $("mapEnemyEra").textContent=eras[B.level-1];
+ $("mapPlayerHp").textContent=Math.round(A.hp); $("mapEnemyHp").textContent=Math.round(B.hp);
+ $("mapPlayerHpBar").style.width=(A.hp/GAME_CONFIG.coreHP*100)+"%"; $("mapEnemyHpBar").style.width=(B.hp/GAME_CONFIG.coreHP*100)+"%";
+ $("mapPlayerBank").textContent=money(A.bank); $("mapPlayerIncome").textContent=round(match.income(A),1)+"/s"; $("mapEnemyIncome").textContent=round(match.income(B),1)+"/s";
+ $("mapPlayerShield").textContent=money(match.shield(A)); $("mapEnemyShield").textContent=money(match.shield(B));
+ const refB=B.tiles.filter(x=>x==="refinery").length; $("mapEnemyIntent").textContent=B.sabotagedUntil>match.t?"⌁ SABOTEADO":Object.keys(B.modules||{}).some(k=>B.modules[k])?`✧ ${moduleSummary(B)}`:refB>=2?"⚙ ECONOMÍA FUERTE":B.factory?"✦ CAPACIDAD MILITAR":"Infraestructura básica";
+ $("mapPlayerSpec").textContent=moduleSummary(A); $("mapEnemySpec").textContent=moduleSummary(B);
+ const nh=$("mapNodeHud"); nh.classList.remove("ours","enemy"); if(match.owner==="A"){nh.classList.add("ours");$("mapNodeState").textContent="TUYO";}else if(match.owner==="B"){nh.classList.add("enemy");$("mapNodeState").textContent="RIVAL";}else{$("mapNodeState").textContent="NEUTRAL";}
+ const incoming=match.incoming(A).slice().sort((a,b)=>a.eta-b.eta), outgoing=match.transit.filter(t=>t.kind==="attack"&&t.from==="A").slice().sort((a,b)=>a.eta-b.eta); const th=$("mapThreatHud");th.classList.remove("danger","attack","calm");
+ if(incoming.length){const x=incoming[0],total=incoming.reduce((q,t)=>q+t.damage,0),largeN=incoming.filter(t=>t.size==='large').length,smallN=incoming.filter(t=>t.size==='small').length;th.classList.add("danger");$("mapThreatTitle").textContent=largeN?`⚠ ${largeN} COHETE${largeN>1?'S':''} PESADO${largeN>1?'S':''} ENTRANTE${largeN>1?'S':''}`:`⚠ ${smallN} ATAQUE${smallN>1?'S':''} RÁPIDO${smallN>1?'S':''}`;$("mapThreatText").textContent=`${incoming.length>1?incoming.length+' × · ':''}${total} daño total · ${Math.max(0,x.eta-match.t).toFixed(1)} s`;}
+ else if(outgoing.length){const x=outgoing[0],largeN=outgoing.filter(t=>t.size==='large').length,smallN=outgoing.filter(t=>t.size==='small').length,total=outgoing.reduce((q,t)=>q+t.damage,0);th.classList.add("attack");$("mapThreatTitle").textContent=largeN?`🚀 ${largeN} COHETE${largeN>1?'S':''} PESADO${largeN>1?'S':''} EN VUELO`:`➤ ${smallN} ATAQUE${smallN>1?'S':''} RÁPIDO${smallN>1?'S':''} EN VUELO`;$("mapThreatText").textContent=`${total} daño total · ${Math.max(0,x.eta-match.t).toFixed(1)} s`;}
+ else{th.classList.add("calm");$("mapThreatTitle").textContent="SIN AMENAZAS";$("mapThreatText").textContent="Invertí, presioná o disputá el nodo.";}
+ const flights=match.transit.slice().sort((a,b)=>a.eta-b.eta);const fh=$("mapFlightHud");fh.classList.toggle("hidden",!flights.length);if(flights.length){fh.innerHTML=flights.slice(0,3).map(t=>{const me=t.from==="A";const kind=t.kind==="capture"?"⚑ NODO":t.size==="large"?"🚀 PESADO":"➤ RÁPIDO";return `<b style="color:${me?'#77efd6':'#ff9b83'}">${me?'TU':'RIVAL'} ${kind}</b> · ${Math.max(0,t.eta-match.t).toFixed(1)} s`;}).join("<br>");}
+ const costs={dockEcoCost:match.cost(A,"eco"),dockSmallCost:match.cost(A,"small"),dockLargeCost:match.cost(A,"large"),dockShieldSmallCost:match.cost(A,"defSmall"),dockShieldLargeCost:match.cost(A,"defLarge"),dockNodeCost:match.cost(A,"capture"),dockSabCost:match.cost(A,"sabotage")};for(const [id,c] of Object.entries(costs)){if(id==="dockEcoCost"&&Number.isFinite(c)){const dur=(GAME_CONFIG.production.ecoDurations||[0,9.5,12,15])[A.level]||0;$(id).textContent=`${money(c)} ◈ · ${dur.toFixed(1)}s`;}else $(id).textContent=Number.isFinite(c)?money(c)+" ◈":"MAX";}
+ $("dockEcoInfo").textContent=A.level>=4?"Producción máxima":`${GAME_CONFIG.economicLevels[A.level-1]} → ${GAME_CONFIG.economicLevels[A.level]} /s`;
+ const feedback=$("commandFeedback"); if(lastNotice) feedback.textContent=lastNotice;
+ updateStrategic10Hud();
+}
+
+
+function updateStrategic10Hud(){
+ if(!match)return;const A=match.players[0],B=match.players[1],human=settings.mode==="human";
+ const sc=$("strategyChoice"),cost=GAME_CONFIG.specializationCost;$("strategyCostLabel").textContent=money(cost)+" ◈";
+ const shouldShow=false; // v1.2: legacy specialization UI replaced by Industrial Evolution slots
+ sc.classList.toggle("hidden",!shouldShow);
+ sc.querySelectorAll("[data-strategy]").forEach(btn=>{const act=btn.dataset.strategy;btn.disabled=!match.can(A,act);});
+ const ribbon=$("strategyRibbon");ribbon.className="strategy-ribbon";let title="COSTO DE OPORTUNIDAD",text="Invertir ahora significa tener menos respuesta inmediata.";
+ const incoming=match.incoming(A),recentEnemyEco=match.events.some(e=>e.player==="B"&&e.type==="econ_upgrade"&&match.t-e.t<=9),enemyShield=match.shield(B)>120;
+ if(incoming.length){title="DEFENSA O GREED",text=`Vienen ${incoming.reduce((q,x)=>q+x.damage,0)} de daño. Defender cuesta recursos que no van a economía.`;ribbon.classList.add("defense");}
+ else if(recentEnemyEco&&A.factory&&A.bank>=match.cost(A,"small")){title="VENTANA DE TEMPO",text="El rival acaba de invertir en economía: tiene menos banco inmediato.";ribbon.classList.add("tempo");}
+ else if(enemyShield&&match.owner!=="A"){title="EVITÁ CHOCAR CONTRA DEFENSA",text="El rival está cubierto. El nodo puede convertir ese gasto defensivo en pérdida de tempo.";ribbon.classList.add("node");}
+ else if(A.heavyCommitUntil>match.t){title="LOGÍSTICA COMPROMETIDA",text=`Escudos +25% de costo por ${Math.ceil(A.heavyCommitUntil-match.t)} s tras el ataque pesado.`;ribbon.classList.add("tempo");}
+ else if(match.owner==="B"){title="EL RIVAL COBRA EL CENTRO",text=`Está recibiendo +${Math.round(GAME_CONFIG.territoryBonus*100)}% de producción. Ignorarlo también es una decisión.`;ribbon.classList.add("node");}
+ ribbon.querySelector("b").textContent=title;ribbon.querySelector("span").textContent=text;
+ document.querySelectorAll('.command-dock [data-quick="defSmall"],.command-dock [data-quick="defLarge"]').forEach(b=>b.classList.toggle("commit-cost",A.heavyCommitUntil>match.t));
+}
+
+function processVisualEvents(){ if(!match) return; for(let i=lastFxEventIndex;i<match.events.length;i++){ const e=match.events[i]; if(e.type==="attack_commit"){queueFx("launch", e.player);playSfx(e.size==="large"?"large":"small");} if(e.type==="base_damage"){ playSfx("impact"); queueFx("impact", e.target); triggerPanelFlash("base"+e.target,"flash-hit"); } if(e.type==="defense_commit"){ playSfx("shield"); queueFx("shield", e.player); triggerPanelFlash("base"+e.player,"flash-own"); } if(e.type==="sabotage"){ playSfx("hack"); queueFx("hack", e.target); triggerPanelFlash("base"+e.target,"flash-hit"); } if(e.type==="territory_capture"){ playSfx("node"); queueFx("node", "NODE"); const o=$("objectiveNode"); if(o){o.classList.remove("flash-node"); void o.offsetWidth; o.classList.add("flash-node"); setTimeout(()=>o.classList.remove("flash-node"),750);} } if(e.type==="econ_upgrade"||e.type==="specialization"||e.type==="module_start"||e.type==="module_complete"){playSfx(e.type==="econ_upgrade"?"eco":"spec");const gb=$("growthBanner");if(gb){const own=e.player==="A";gb.textContent=e.type==="module_start"?(own?`⏳ ${e.name} EN CONSTRUCCIÓN`:`⚠ RIVAL CONSTRUYE ${e.name}`):e.type==="module_complete"?(own?`✦ ${e.name} EN LÍNEA`:`⚠ RIVAL COMPLETÓ ${e.name}`):own?(e.type==="econ_upgrade"?"⚙ NUEVA LÍNEA INDUSTRIAL EN LÍNEA":"✦ ESPECIALIZACIÓN ACTIVADA"):(e.type==="econ_upgrade"?"⚠ EL RIVAL EXPANDIÓ SU INDUSTRIA":"⚠ EL RIVAL SE ESPECIALIZÓ");gb.classList.toggle("enemy",!own);gb.classList.add("show");clearTimeout(window.__growthBannerTimer);window.__growthBannerTimer=setTimeout(()=>gb.classList.remove("show"),1500);}} }
+  lastFxEventIndex=match.events.length;
+}
+function pointFor(tag,w,h){ if(tag==="A") return {x:w*0.13,y:h*0.55}; if(tag==="B") return {x:w*0.87,y:h*0.55}; return {x:w*0.5,y:h*0.5}; }
+function drawGlow(ctx,x,y,r,c,a=.35){ const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0, c.replace('ALPHA',a)); g.addColorStop(1, c.replace('ALPHA',0)); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+function drawDrone(ctx,x,y,size,color,enemy=false){ ctx.save(); ctx.translate(x,y); if(enemy) ctx.scale(-1,1); ctx.fillStyle=color; ctx.beginPath(); ctx.moveTo(size,0); ctx.lineTo(-size*0.6,size*0.65); ctx.lineTo(-size*0.25,0); ctx.lineTo(-size*0.6,-size*0.65); ctx.closePath(); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(size*0.05,0,size*0.22,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+let threeArena=null,threeArenaDisabled=false;
+function initThreeArena(){
+ if(threeArena) return true; if(typeof THREE==="undefined"){const st=$("threeStatus");if(st){st.textContent="3D · LIBRERÍA NO CARGADA";st.style.color="#ffb0a0";}return false;}
+ const cv=$("battleCanvas"); if(!cv)return false;
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x07101a);scene.fog=new THREE.FogExp2(0x07101a,.025);
+ const camera=new THREE.OrthographicCamera(-10,10,9,-9,.1,100);camera.position.set(0,17.2,12.2);camera.lookAt(0,.4,0);
+ const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:"high-performance",alpha:false});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;if("outputColorSpace" in renderer)renderer.outputColorSpace=THREE.SRGBColorSpace;
+ scene.add(new THREE.HemisphereLight(0x9bdfff,0x091018,1.25));const sun=new THREE.DirectionalLight(0xdff4ff,1.9);sun.position.set(-4,18,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+ const lightA=new THREE.PointLight(0x5af1d2,10,11,2);lightA.position.set(0,3,6.4);scene.add(lightA);const lightB=new THREE.PointLight(0xff8f72,10,11,2);lightB.position.set(0,3,-6.4);scene.add(lightB);const lightN=new THREE.PointLight(0xffcf71,7,7,2);lightN.position.set(0,2,0);scene.add(lightN);
+ const groundMat=new THREE.MeshStandardMaterial({color:0x0a1623,roughness:.88,metalness:.18});const ground=new THREE.Mesh(new THREE.PlaneGeometry(17.5,20),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ const grid=new THREE.GridHelper(22,22,0x294e63,0x142d3d);grid.position.y=.02;grid.scale.x=.7;scene.add(grid);
+ // central industrial lane
+ const laneMat=new THREE.MeshBasicMaterial({color:0x163446,transparent:true,opacity:.65});for(const x of [-2.4,0,2.4]){const lane=new THREE.Mesh(new THREE.BoxGeometry(.12,.025,9.2),laneMat);lane.position.set(x,.035,0);scene.add(lane)}
+ const mats={A:new THREE.MeshStandardMaterial({color:0x19615a,emissive:0x0a4038,emissiveIntensity:.9,metalness:.58,roughness:.28}),B:new THREE.MeshStandardMaterial({color:0x70342d,emissive:0x3c1511,emissiveIntensity:.9,metalness:.58,roughness:.28}),dark:new THREE.MeshStandardMaterial({color:0x172637,metalness:.72,roughness:.32}),steel:new THREE.MeshStandardMaterial({color:0x516474,metalness:.75,roughness:.28}),gold:new THREE.MeshStandardMaterial({color:0xc3924b,emissive:0x49300f,emissiveIntensity:.4,metalness:.65,roughness:.28}),purple:new THREE.MeshStandardMaterial({color:0x7450a7,emissive:0x311b58,emissiveIntensity:.7,metalness:.4,roughness:.25}),blue:new THREE.MeshStandardMaterial({color:0x377aa8,emissive:0x123b5e,emissiveIntensity:.65,metalness:.4,roughness:.24})};
+ function box(g,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
+ function cyl(g,x,y,z,r,h,mat,n=12){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,n),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
+ function pipe(g,x,y,z,len,mat,rot=0){const m=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,len,8),mat);m.rotation.z=Math.PI/2;m.rotation.y=rot;m.position.set(x,y,z);g.add(m);return m}
+ function groundLink(parent,ax,az,bx,bz,mat){const dx=bx-ax,dz=bz-az,len=Math.hypot(dx,dz);const m=new THREE.Mesh(new THREE.BoxGeometry(.11,.035,len),mat);m.position.set((ax+bx)/2,.27,(az+bz)/2);m.rotation.y=Math.atan2(dx,dz);parent.add(m);return m}
+ function makeRefinery(parent,x,z,id){const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(.035);parent.add(g);box(g,0,.3,0,1.05,.55,.9,mats.gold);cyl(g,-.28,.86,.08,.13,.8,mats.steel,8);cyl(g,.28,.72,-.08,.16,.55,mats.steel,8);pipe(g,0,.62,.35,.8,mats.gold);const glow=box(g,0,.34,-.47,.65,.12,.05,new THREE.MeshStandardMaterial({color:id==='A'?0x6ff4d3:0xff9278,emissive:id==='A'?0x36efc6:0xff5a3b,emissiveIntensity:1.3}));return {g,glow}}
+ function makeHangar(parent,id){const g=new THREE.Group();g.position.set(2.55,0,-1.35);parent.add(g);box(g,0,.3,0,2.0,.6,1.35,mats.dark);box(g,0,.72,.25,1.65,.27,.85,mats[id]);const door=box(g,0,.34,-.69,1.05,.42,.06,new THREE.MeshStandardMaterial({color:0x0b1119,emissive:id==='A'?0x1aa98f:0xa6442c,emissiveIntensity:1.8}));door.userData.baseY=.34;const lights=[];for(const xx of [-.65,.65]){cyl(g,xx,.88,.3,.09,.6,mats.steel,8);const l=new THREE.Mesh(new THREE.SphereGeometry(.075,8,6),new THREE.MeshBasicMaterial({color:id==='A'?0x79ffe1:0xff8f74}));l.position.set(xx,.92,-.45);g.add(l);lights.push(l)}return {g,door,lights}}
+ function makeMine(parent){const g=new THREE.Group();g.position.set(-2.65,0,1.25);parent.add(g);cyl(g,0,.24,0,.85,.32,mats.dark,8);box(g,0,.52,0,1.25,.3,.65,mats.steel);const arm=box(g,.35,.82,-.15,.75,.12,.12,mats.gold);arm.rotation.y=-.45;return g}
+ function makeAntenna(parent){const g=new THREE.Group();g.position.set(2.65,0,1.35);parent.add(g);cyl(g,0,.7,0,.08,1.4,mats.purple,8);const d=new THREE.Mesh(new THREE.SphereGeometry(.36,14,8,0,Math.PI*2,0,Math.PI/2),mats.purple);d.scale.y=.42;d.rotation.x=Math.PI/2;d.position.y=1.42;g.add(d);return g}
+ function makeGrowthCluster(parent,x,z,id,kind){const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(.035);parent.add(g);const team=mats[id];if(kind===0){box(g,0,.3,0,1.2,.55,1.0,mats.dark);cyl(g,-.32,.82,.18,.13,.85,team,8);cyl(g,.28,.68,-.2,.11,.55,mats.gold,8);}else if(kind===1){box(g,0,.24,0,1.35,.42,.9,mats.steel);for(const xx of [-.42,0,.42])cyl(g,xx,.7,0,.1,.85,team,8);}else{box(g,0,.22,0,1.45,.38,1.0,mats.dark);const t1=cyl(g,-.34,.72,.05,.28,.9,mats.steel,12),t2=cyl(g,.34,.72,-.05,.28,.9,mats.steel,12);t1.scale.x=t1.scale.z=1.15;t2.scale.x=t2.scale.z=1.15;}return g}
+ function makeCivDecor(parent,id){
+   const groups={forge:new THREE.Group(),bastion:new THREE.Group(),swarm:new THREE.Group(),nexus:new THREE.Group()};Object.values(groups).forEach(g=>{g.visible=false;parent.add(g)});const team=mats[id];
+   // FORJA: chimneys + hot furnaces
+   for(const [x,z,h] of [[-3.05,-1.55,1.4],[-2.55,-1.7,1.05],[3.05,1.55,1.25]]){cyl(groups.forge,x,h/2+.25,z,.14,h,mats.steel,10);const cap=cyl(groups.forge,x,h+.28,z,.18,.12,mats.gold,10);cap.material=mats.gold}
+   const furnaceMat=new THREE.MeshStandardMaterial({color:0x8f5727,emissive:0xff7627,emissiveIntensity:1.6,metalness:.35,roughness:.38});box(groups.forge,-3.0,.35,.1,.65,.42,.8,furnaceMat);
+   // BASTION: corner towers / hard silhouette
+   for(const [x,z] of [[-3.0,-1.7],[3.0,-1.7],[-3.0,1.7],[3.0,1.7]]){const t=cyl(groups.bastion,x,.62,z,.34,1.05,mats.blue,8);const rr=new THREE.Mesh(new THREE.TorusGeometry(.42,.045,8,24),new THREE.MeshBasicMaterial({color:0x7dc8ff,transparent:true,opacity:.7}));rr.rotation.x=Math.PI/2;rr.position.set(x,1.18,z);groups.bastion.add(rr)}
+   // SWARM: multiple drone pads
+   for(const [x,z] of [[-2.55,-1.6],[2.55,1.6],[-2.55,1.55]]){cyl(groups.swarm,x,.23,z,.48,.15,mats.dark,12);const d=new THREE.Mesh(new THREE.IcosahedronGeometry(.16,0),new THREE.MeshStandardMaterial({color:id==='A'?0x8affdf:0xff9b82,emissive:id==='A'?0x37d8b3:0xc74431,emissiveIntensity:1.2}));d.position.set(x,.65,z);d.userData.baseY=.65;groups.swarm.add(d)}
+   // NEXUS: signal pylons
+   for(const [x,z] of [[-2.8,-1.45],[2.8,-1.45],[0,1.8]]){cyl(groups.nexus,x,.72,z,.08,1.35,mats.purple,8);const orb=new THREE.Mesh(new THREE.OctahedronGeometry(.18),new THREE.MeshBasicMaterial({color:0xcaa8ff}));orb.position.set(x,1.48,z);groups.nexus.add(orb)}
+   return groups;
+ }
+
+ function makeCity(id,z){const root=new THREE.Group();root.position.z=z;if(id==='B')root.rotation.y=Math.PI;scene.add(root);const team=mats[id];
+   const pad=box(root,0,.12,0,7.15,.24,4.9,new THREE.MeshStandardMaterial({color:id==='A'?0x0f322f:0x331d20,metalness:.25,roughness:.82}));
+   // walls and lamps
+   for(const x of [-2.8,2.8])for(const zz of [-1.65,1.65]){cyl(root,x,.28,zz,.13,.55,team,8)}
+   const coreBase=cyl(root,0,.52,.65,.92,.85,mats.dark,10);const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.57,2),new THREE.MeshStandardMaterial({color:id==='A'?0xa0ffea:0xffa78f,emissive:id==='A'?0x29ffd2:0xff5939,emissiveIntensity:2.5,metalness:.1,roughness:.15}));core.position.set(0,1.3,.65);core.castShadow=true;root.add(core);const ring=new THREE.Mesh(new THREE.TorusGeometry(.9,.055,10,50),new THREE.MeshBasicMaterial({color:id==='A'?0x75ffe0:0xff997f,transparent:true,opacity:.85}));ring.rotation.x=Math.PI/2;ring.position.set(0,1.25,.65);root.add(ring);
+   const mine=makeMine(root);const hangar=makeHangar(root,id);const refPositions=[[-1.9,-1.2],[0,-1.4],[-.85,1.65]];const refs=refPositions.map(q=>makeRefinery(root,q[0],q[1],id));
+   const antenna=makeAntenna(root);const growth=[makeGrowthCluster(root,-2.75,-1.45,id,0),makeGrowthCluster(root,2.75,1.45,id,1),makeGrowthCluster(root,1.35,1.75,id,2)];growth.forEach(g=>g.visible=false);const eraTower=new THREE.Group();eraTower.position.set(-2.45,0,-1.15);root.add(eraTower);box(eraTower,0,.35,0,.75,.7,.75,mats.dark);cyl(eraTower,0,1.05,0,.22,1.4,team,10);const orb=new THREE.Mesh(new THREE.OctahedronGeometry(.25),new THREE.MeshBasicMaterial({color:id==='A'?0x70f5d7:0xff9579}));orb.position.y=1.8;eraTower.add(orb);
+   // v0.9 factory life: conveyors, resource packets, construction hologram, workers, civilization silhouette
+   const linkMat=new THREE.MeshBasicMaterial({color:id==='A'?0x4cd8bb:0xe47b63,transparent:true,opacity:.20});
+   const links=[groundLink(root,-2.65,1.25,0,.65,linkMat),groundLink(root,-2.65,1.25,-1.9,-1.2,linkMat),groundLink(root,-1.9,-1.2,0,.65,linkMat),groundLink(root,-2.65,1.25,0,-1.4,linkMat),groundLink(root,0,-1.4,0,.65,linkMat),groundLink(root,-2.65,1.25,-.85,1.65,linkMat),groundLink(root,-.85,1.65,0,.65,linkMat)];
+   const packetMat=new THREE.MeshStandardMaterial({color:id==='A'?0xffdd78:0xffc08f,emissive:id==='A'?0x9a6c16:0x8c401e,emissiveIntensity:1.15,metalness:.35,roughness:.25});const packets=[];for(let i=0;i<12;i++){const q=new THREE.Mesh(new THREE.OctahedronGeometry(.085),packetMat);q.castShadow=true;q.userData.offset=i/12;q.userData.route=i%4;root.add(q);packets.push(q)}
+   const workers=[];for(let i=0;i<4;i++){const w=new THREE.Mesh(new THREE.IcosahedronGeometry(.11,0),new THREE.MeshBasicMaterial({color:id==='A'?0x7fffe0:0xffa18b}));w.visible=false;root.add(w);workers.push(w)}
+   const buildFx=new THREE.Group();root.add(buildFx);const holoMat=new THREE.MeshBasicMaterial({color:id==='A'?0x7fffe0:0xffa18b,transparent:true,opacity:.0,depthWrite:false});const buildRing=new THREE.Mesh(new THREE.TorusGeometry(.85,.035,8,36),holoMat);buildRing.rotation.x=Math.PI/2;buildRing.position.y=.08;buildFx.add(buildRing);for(const [bx,bz] of [[-.62,-.5],[.62,-.5],[-.62,.5],[.62,.5]]){const beam=box(buildFx,bx,.75,bz,.025,1.5,.025,holoMat);beam.castShadow=false}buildFx.visible=false;
+   const civDecor=makeCivDecor(root,id);
+
+   const shieldSmall=new THREE.Mesh(new THREE.SphereGeometry(3.15,32,18,0,Math.PI*2,0,Math.PI/2),new THREE.MeshBasicMaterial({color:0x68bcff,transparent:true,opacity:.12,wireframe:true,depthWrite:false}));shieldSmall.position.y=.08;shieldSmall.visible=false;root.add(shieldSmall);
+   const shieldLarge=new THREE.Mesh(new THREE.SphereGeometry(4.35,40,20,0,Math.PI*2,0,Math.PI/2),new THREE.MeshBasicMaterial({color:0x8fd5ff,transparent:true,opacity:.17,wireframe:true,depthWrite:false}));shieldLarge.position.y=.08;shieldLarge.visible=false;root.add(shieldLarge);const shieldRing=new THREE.Mesh(new THREE.TorusGeometry(4.12,.085,12,72),new THREE.MeshBasicMaterial({color:0xa8e1ff,transparent:true,opacity:.75}));shieldRing.rotation.x=Math.PI/2;shieldRing.position.y=.12;shieldRing.visible=false;root.add(shieldRing);
+   const hit=new THREE.Mesh(new THREE.BoxGeometry(6.5,3,4.4),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=1;hit.userData.target=id==='A'?'self':'enemy';root.add(hit);
+   return {root,pad,core,ring,mine,hangar,refs,antenna,growth,eraTower,orb,shieldSmall,shieldLarge,shieldRing,hit,links,packets,workers,buildFx,buildRing,civDecor,lastLevel:null,lastCiv:null,buildUntil:0,buildIndex:0};
+ }
+ const cityA=makeCity('A',5.35),cityB=makeCity('B',-5.35);cityA.root.scale.set(1.18,1,1.18);cityB.root.scale.set(1.18,1,1.18);
+ // node
+ const node=new THREE.Group();scene.add(node);const np=cyl(node,0,.22,0,1.72,.46,mats.dark,12);const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(.76),new THREE.MeshStandardMaterial({color:0xffd575,emissive:0xff9a27,emissiveIntensity:2.2,metalness:.2,roughness:.15}));crystal.position.y=1.35;node.add(crystal);const nr1=new THREE.Mesh(new THREE.TorusGeometry(1.38,.065,10,56),new THREE.MeshBasicMaterial({color:0xffd575,transparent:true,opacity:.85}));nr1.rotation.x=Math.PI/2;nr1.position.y=1.05;node.add(nr1);const nr2=nr1.clone();nr2.scale.setScalar(1.34);nr2.position.y=1.58;node.add(nr2);for(const [px,pz] of [[1.25,0],[-1.25,0],[0,1.25],[0,-1.25]]){const pg=new THREE.Group();pg.position.set(px,0,pz);node.add(pg);cyl(pg,0,.48,0,.09,.9,mats.gold,8);const po=new THREE.Mesh(new THREE.OctahedronGeometry(.14),new THREE.MeshBasicMaterial({color:0xffd575}));po.position.y=1.02;pg.add(po)}const beamA=new THREE.Mesh(new THREE.BoxGeometry(.34,.045,4.5),new THREE.MeshBasicMaterial({color:0x63f1d2,transparent:true,opacity:.18}));beamA.position.set(0,.08,2.35);beamA.visible=false;scene.add(beamA);const beamB=new THREE.Mesh(new THREE.BoxGeometry(.34,.045,4.5),new THREE.MeshBasicMaterial({color:0xff9477,transparent:true,opacity:.18}));beamB.position.set(0,.08,-2.35);beamB.visible=false;scene.add(beamB);const nodeHit=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,2.8,16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));nodeHit.position.y=1;nodeHit.userData.target='node';node.add(nodeHit);
+ // missiles/drones
+ function missile(color,big=false){const g=new THREE.Group();const body=new THREE.Mesh(new THREE.CylinderGeometry(big?.24:.052,big?.30:.07,big?1.62:.50,10),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:1.1,metalness:.55,roughness:.22}));body.rotation.x=Math.PI/2;g.add(body);const nose=new THREE.Mesh(new THREE.ConeGeometry(big?.31:.085,big?.48:.16,10),body.material);nose.rotation.x=-Math.PI/2;nose.position.z=-(big?1.04:.32);g.add(nose);const flame=new THREE.Mesh(new THREE.ConeGeometry(big?.22:.05,big?.62:.2,8),new THREE.MeshBasicMaterial({color:0xffc35c,transparent:true,opacity:.9}));flame.rotation.x=Math.PI/2;flame.position.z=big?1.13:.35;g.add(flame);return g}
+ const flightPool=[];for(let i=0;i<24;i++){const g=new THREE.Group();const small=new THREE.Group();for(const x of [-.16,0,.16]){const m=missile(0xd9faff,false);m.position.x=x;small.add(m)}g.add(small);const large=missile(0xff7e4e,true);large.visible=false;g.add(large);const capture=new THREE.Group();for(const x of [-.22,0,.22]){const d=new THREE.Mesh(new THREE.IcosahedronGeometry(.11,0),new THREE.MeshBasicMaterial({color:0xffd56d}));d.position.x=x;capture.add(d)}capture.visible=false;g.add(capture);g.visible=false;scene.add(g);flightPool.push({g,small,large,capture})}
+ const fxPool=[];for(let i=0;i<20;i++){const g=new THREE.Group();const ringfx=new THREE.Mesh(new THREE.RingGeometry(.4,.58,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));ringfx.rotation.x=-Math.PI/2;g.add(ringfx);const ball=new THREE.Mesh(new THREE.SphereGeometry(.28,12,8),new THREE.MeshBasicMaterial({color:0xff6b55,transparent:true,opacity:0}));ball.position.y=.35;g.add(ball);g.visible=false;scene.add(g);fxPool.push({g,ring:ringfx,ball})}
+ const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();const clickables=[cityA.hit,cityB.hit,nodeHit];cv.addEventListener('pointerup',ev=>{if(!match||settings.mode!=="human")return;const r=cv.getBoundingClientRect();pointer.x=((ev.clientX-r.left)/r.width)*2-1;pointer.y=-((ev.clientY-r.top)/r.height)*2+1;ray.setFromCamera(pointer,camera);const h=ray.intersectObjects(clickables,false)[0];if(!h)return;const t=h.object.userData.target;if(t==='enemy')quickCombatAction('small');else if(t==='node')quickCombatAction('capture');else if(t==='self')quickCombatAction('defSmall');});
+ threeArena={scene,camera,renderer,cityA,cityB,node,crystal,nr1,nr2,beamA,beamB,flightPool,fxPool,grid,mouseX:0,mouseY:0}; const st=$("threeStatus"); if(st){st.textContent="3D · ACTIVO";st.style.color="#8fffe2";}
+ cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();threeArena.mouseX=(e.clientX-r.left)/r.width-.5;threeArena.mouseY=(e.clientY-r.top)/r.height-.5});return true;
+}
+function syncThreeBase(obj,p,id,ts){
+ if(!obj||!p)return;
+ const refs=Math.max(0,p.level-1), sim=match?match.t:0;
+ // Detect growth transitions and stage a brief construction hologram.
+ if(obj.lastLevel===null)obj.lastLevel=p.level;
+ if(p.level>obj.lastLevel){obj.buildIndex=Math.min(obj.refs.length-1,p.level-2);obj.buildUntil=sim+1.25;obj.lastLevel=p.level;const target=obj.refs[obj.buildIndex]?.g;if(target){obj.buildFx.position.copy(target.position);obj.buildFx.visible=true;}}
+ if(obj.lastCiv!==p.civ){Object.entries(obj.civDecor).forEach(([k,g])=>g.visible=k===p.civ);obj.lastCiv=p.civ;}
+ obj.core.rotation.y=ts*.0014*(id==='A'?1:-1);obj.ring.rotation.z=ts*.001*(id==='A'?1:-1);obj.ring.scale.setScalar(1+Math.sin(ts*.004)*.035);
+ obj.hangar.g.visible=!!p.factory;obj.hangar.g.scale.setScalar(hasModule(p,"armory3_salvo")||hasModule(p,"armory3_siege")?1.34:hasModule(p,"armory2")?1.22:1);
+ const launchEv=[...p.history].reverse().find(e=>e.type==='attack_commit');const launchAge=launchEv?sim-launchEv.t:99;const launching=launchAge>=0&&launchAge<1.15;obj.hangar.door.material.emissiveIntensity=launching?4.2:(p.factory?(hasModule(p,"armory2")?2.8:1.8):.2);obj.hangar.door.position.y=obj.hangar.door.userData.baseY+(launching?Math.sin(Math.min(1,launchAge/1.15)*Math.PI)*.42:0);obj.hangar.lights.forEach((l,i)=>{const pulse=launching?1.0+.55*Math.sin(ts*.025+i):.7+.12*Math.sin(ts*.004+i);l.scale.setScalar(pulse)});
+ obj.refs.forEach((r,i)=>{r.g.visible=i<refs;if(r.g.visible){const cur=r.g.scale.x||.035;const target=hasModule(p,"refinery3_compound")?1.28:hasModule(p,"refinery2")?1.14:1;r.g.scale.setScalar(Math.min(target,cur+.035));r.glow.material.emissiveIntensity=1.15+.6*Math.sin(ts*.005+i)}});
+ obj.antenna.visible=p.tiles.includes('antenna')||p.sabotagedUntil>sim||hasModule(p,'control2');obj.antenna.scale.setScalar(hasModule(p,'control3_interference')?1.38:hasModule(p,'control2')?1.22:1);
+ if(obj.growth)obj.growth.forEach((g,i)=>{g.visible=p.level>=i+2;if(g.visible){const cur=g.scale.x||.035;if(cur<.98)g.scale.setScalar(Math.min(1,cur+.025));else{const pulse=1+.012*Math.sin(ts*.003+i);g.scale.set(pulse,pulse,pulse)}}});
+ obj.eraTower.visible=p.level>=3;obj.orb.rotation.y=ts*.002;
+ // Progressive conveyor network and resource packets. Sabotage visibly slows the line.
+ obj.links.forEach((l,i)=>{l.visible=i===0 || (i<=2&&p.level>=2) || (i<=4&&p.level>=3) || p.level>=4;l.material.opacity=(p.sabotagedUntil>sim?.07:.18)+.045*Math.sin(ts*.003+i)});
+ const routes=[ [[-2.65,1.25],[0,.65]], [[-2.65,1.25],[-1.9,-1.2],[0,.65]], [[-2.65,1.25],[0,-1.4],[0,.65]], [[-2.65,1.25],[-.85,1.65],[0,.65]] ];
+ const speed=(p.sabotagedUntil>sim?.065:.18)*(1+(p.level-1)*.13);const activePackets=Math.min(obj.packets.length,3+p.level*2+(hasModule(p,"refinery2")?2:0)+(hasModule(p,"refinery3_compound")?2:0));
+ function routePoint(points,t){const seg=(points.length-1)*t,idx=Math.min(points.length-2,Math.floor(seg)),u=seg-idx,a=points[idx],b=points[idx+1];return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u];}
+ obj.packets.forEach((q,i)=>{q.visible=i<activePackets;if(!q.visible)return;const route=Math.min(p.level-1,q.userData.route),u=(sim*speed+q.userData.offset)%1,pos=routePoint(routes[route],u);q.position.set(pos[0],.43+.08*Math.sin(ts*.008+i),pos[1]);q.rotation.y=ts*.006+i;if(p.sabotagedUntil>sim)q.visible=((Math.floor(ts/180)+i)%3)!==0;});
+ obj.workers.forEach((w,i)=>{w.visible=p.level>=3;if(w.visible){const a=ts*.0009+i*Math.PI/2,r=2.0+.25*(i%2);w.position.set(Math.cos(a)*r,.92+.16*Math.sin(a*2),.4+Math.sin(a)*1.35);w.rotation.y=-a;}});
+ if(obj.civDecor.swarm.visible){obj.civDecor.swarm.children.forEach((d,i)=>{if(d.userData.baseY!==undefined)d.position.y=d.userData.baseY+.12*Math.sin(ts*.005+i)})}
+ // Construction hologram
+ const building=sim<obj.buildUntil;obj.buildFx.visible=building;if(building){const left=Math.max(0,obj.buildUntil-sim),pbuild=1-left/1.25;obj.buildRing.rotation.z=ts*.004;obj.buildFx.scale.setScalar(.75+.35*pbuild);obj.buildFx.children.forEach(ch=>{if(ch.material)ch.material.opacity=.18+.42*Math.sin(Math.PI*pbuild)});}
+ const sh=match.shield(p);obj.shieldSmall.visible=sh>0&&sh<=200;obj.shieldLarge.visible=sh>200;obj.shieldRing.visible=sh>200;if(obj.shieldSmall.visible){obj.shieldSmall.rotation.y+=.006;obj.shieldSmall.material.opacity=.09+.035*Math.sin(ts*.005)}if(obj.shieldLarge.visible){obj.shieldLarge.rotation.y+=.009;obj.shieldLarge.material.opacity=.13+.045*Math.sin(ts*.006);obj.shieldRing.rotation.z=ts*.0015}
+ const hpRatio=p.hp/GAME_CONFIG.coreHP;obj.core.material.emissiveIntensity=p.hp<=0?.08:(p.overdriveUntil>sim?4:1.7+1.1*hpRatio);obj.ring.material.opacity=p.hp<=0?.08:.85;obj.root.scale.y=1+(p.level-1)*.045;
+}
+function drawBattlefield(ts){
+ if(!initThreeArena())return;const T=threeArena,cv=$("battleCanvas"),r=cv.getBoundingClientRect();if(r.width<20||r.height<20)return;T.renderer.setSize(r.width,r.height,false);const aspect=r.width/r.height,span=8.35;T.camera.top=span;T.camera.bottom=-span;T.camera.left=-span*aspect;T.camera.right=span*aspect;T.camera.updateProjectionMatrix();if(!match){T.renderer.render(T.scene,T.camera);return}const A=match.players[0],B=match.players[1];syncThreeBase(T.cityA,A,'A',ts);syncThreeBase(T.cityB,B,'B',ts);
+ T.crystal.rotation.y=ts*.0018;T.crystal.position.y=1.35+Math.sin(ts*.003)*.11;T.nr1.rotation.z=ts*.0012;T.nr2.rotation.z=-ts*.0015;const oc=match.owner==='A'?0x61f0d0:match.owner==='B'?0xff9477:0xffd274;T.nr1.material.color.setHex(oc);T.nr2.material.color.setHex(oc);T.beamA.visible=match.owner==='A';T.beamB.visible=match.owner==='B';if(T.beamA.visible)T.beamA.material.opacity=.12+.09*Math.sin(ts*.005);if(T.beamB.visible)T.beamB.material.opacity=.12+.09*Math.sin(ts*.005);
+ for(let i=0;i<T.flightPool.length;i++){const v=T.flightPool[i],tr=match.transit[i];if(!tr){v.g.visible=false;continue}v.g.visible=true;const prog=clamp((match.t-tr.start)/(tr.eta-tr.start),0,1),fromZ=tr.from==='A'?4.65:-4.65,toZ=tr.kind==='capture'?0:(tr.to==='A'?4.65:-4.65),startX=tr.from==='A'?2.45:-2.45,endX=tr.kind==='capture'?0:(tr.to==='A'?0:0),arc=tr.size==='large'?4.1:1.65;v.g.position.set(startX+(endX-startX)*prog+Math.sin(prog*Math.PI*2+i)*.12,1.05+Math.sin(prog*Math.PI)*arc,fromZ+(toZ-fromZ)*prog);v.g.rotation.y=tr.from==='A'?0:Math.PI;v.small.visible=tr.kind==='attack'&&tr.size==='small';v.large.visible=tr.kind==='attack'&&tr.size==='large';v.capture.visible=tr.kind==='capture';const own=tr.from==='A';v.g.traverse(o=>{if(o.material&&o.material.emissive&&tr.kind==='attack'){o.material.color.setHex(own?0x9fefff:0xffb49a);o.material.emissive.setHex(own?0x39bde0:0xff6a45)}})}
+ const now=performance.now();fxBursts=fxBursts.filter(f=>now-f.t0<900);for(let i=0;i<T.fxPool.length;i++){const v=T.fxPool[i],fx=fxBursts[i];if(!fx){v.g.visible=false;continue}v.g.visible=true;const q=(now-fx.t0)/900,z=fx.target==='A'?5.45:fx.target==='B'?-5.45:0;v.g.position.set(0,.08,z);v.g.scale.setScalar(1+q*5);v.ring.material.opacity=(1-q)*.8;v.ball.material.opacity=(1-q)*.55;const col=fx.kind==='shield'?0x6dc7ff:fx.kind==='hack'?0xb886ff:fx.kind==='node'?0xffd06a:0xff6652;v.ring.material.color.setHex(col);v.ball.material.color.setHex(col)}
+ // fixed Clash-like camera, slight parallax only
+ T.camera.position.x+=(T.mouseX*.55-T.camera.position.x)*.025;T.camera.position.y+=(17.2-T.mouseY*.25-T.camera.position.y)*.025;T.camera.position.z=12.2;T.camera.lookAt(0,.35,0);T.renderer.render(T.scene,T.camera);
+}
+function animationLoop(ts){
+ if(!threeArenaDisabled){try{drawBattlefield(ts||0);}catch(err){threeArenaDisabled=true;console.error("Factory Wars: 3D de arena desactivado; el gameplay continúa",err);const st=$("threeStatus");if(st){st.textContent="3D · DESACTIVADO · GAMEPLAY ACTIVO";st.style.color="#ffcf9d";}}}
+ animHandle=requestAnimationFrame(animationLoop);
+}
+function executeTargetedAction(action){ if(!match||settings.mode!=="human"||match.ended) return; const p=findPlayer("A"); clearSelections(); if(!match.act(p,action)){ setHint("Acción no disponible. Revisá recursos, requisitos y recarga."); render(); return; } setHint({small:"Drones lanzados hacia la base rival.",large:"Ataque pesado en camino hacia la base rival.",defSmall:"Escudo rápido activado alrededor de tu núcleo.",defLarge:"Escudo pesado activado alrededor de tu núcleo.",sabotage:"Sabotaje enviado: observá la distorsión sobre la base rival.",capture:"Drones de control enviados al nodo central.",overdrive:"Sobrecarga activada en tu base.",scan:"Escaneo realizado. Revisá la lectura del rival."}[action]||"Orden ejecutada."); completedTutorial(action); render(); }
+function targetClick(kind){ if(!selectedCommand || !match || settings.mode!=="human") return; const t=actionTargetType(selectedCommand); if((kind==='enemy' && t==='enemy') || (kind==='self' && t==='self') || (kind==='node' && t==='node')) executeTargetedAction(selectedCommand); }
+
+function start(){threeArenaDisabled=false;document.body.classList.add("show-match");document.body.classList.remove("show-pvp-setup");settings={mode:$("mode").value,training:false,civA:$("civA").value||"forge",civB:$("civB").value||"swarm",botA:$("botA").value||"BALANCED",botB:$("botB").value||"BALANCED"};if(!window.__fwLeagueStarting)window.__fwLeagueMatch=null;if(!window.__fwTerritoryStarting)window.__fwTerritoryMatch=null;if(settings.civA===settings.civB){alert("PvP bloqueado: sólo podés enfrentar otra civilización.");return;}if($("arenaBotSelect"))$("arenaBotSelect").value=settings.botB;match=new Match(settings,Math.floor(Math.random()*4294967295));/* v0.7.1: ambos comienzan operativos para que el primer segundo ya tenga decisiones */for(const p of match.players){p.factory=true;if(!p.tiles.includes("fabricator")){const idx=p.tiles.findIndex(x=>x===null);if(idx>=0)p.tiles[idx]="fabricator";}p.bank=Math.max(p.bank,300);}selectedBuild=null;selectedCommand=null;fxBursts=[];closeModuleSheet();$("decisionLab")?.classList.add("hidden");lastFxEventIndex=0;paused=false;speed=1;tutorialStep=4;match.tutorialStep=4;firstThreatPaused=false;lastNotice="";showAdvanced=!settings.training;guideShown=false;lastVisibleEventIndex=0;batchData=null;metaRewardClaimed=false;$("batchResults").innerHTML="";$("setup").classList.add("hidden");$("game").classList.remove("hidden");$("endPanel").classList.add("hidden");$("endPanel").innerHTML="";$("feed").innerHTML="";$("pauseBtn").disabled=false;document.querySelectorAll(".speeds button").forEach(b=>b.classList.toggle("active",Number(b.dataset.speed)===speed));document.querySelectorAll('.speeds button[data-speed="5"],.speeds button[data-speed="20"]').forEach(b=>b.classList.toggle("hidden",settings.mode==="human"));$("batchBtn").disabled=settings.mode!=="bots";window.scrollTo({top:0,behavior:"instant"});
+ $("titleA").textContent=settings.mode==="human"?"TU FÁBRICA":"FÁBRICA BOT A";$("titleB").textContent="FÁBRICA BOT B";
+ const vo=$("arenaVictory");if(vo){vo.classList.add('hidden');vo.classList.remove('win','loss','draw');}setHint("PARTIDA ACTIVA: podés ATACAR, poner ESCUDO, TOMAR NODO o invertir en ECONOMÍA desde el primer segundo.");
+ render();if(!animHandle) animHandle=requestAnimationFrame(animationLoop);if(loopHandle)clearInterval(loopHandle);loopHandle=setInterval(()=>{if(!match||match.ended||paused)return;if(speed<=1)match.step(GAME_CONFIG.tick*speed,true);else for(let n=0;n<speed;n++){match.step(GAME_CONFIG.tick,true);if(match.ended)break;}if(settings.training&&!firstThreatPaused&&tutorialStep>=3&&match.incoming(match.players[0]).length){paused=true;firstThreatPaused=true;setHint("¡El rival te ataca! Pausamos para que puedas decidir. Compará daño entrante y escudos, o aceptá recibir el impacto.");}render();if(match.ended)showEnd();},GAME_CONFIG.tick*1000);
+}
+function findPlayer(id){return match.players[id==="A"?0:1];}
+
+function setHint(message){ lastNotice=String(message||""); const el=$("hint"); if(el) el.textContent=lastNotice; const result=$("resultNote"); if(result){ result.textContent=lastNotice; result.classList.toggle("hidden",!lastNotice); } }
+function completedTutorial(action){ /* v0.7.2: tutorial bypassed in direct PvP mode. Kept for compatibility. */ return action; }
+function gridClick(id,index){
+  if(!match||id!=="A"||settings.mode!=="human"||!selectedBuild||match.ended)return;
+  const p=findPlayer("A");
+  if(p.tiles[index]!==null){ setHint("Esa casilla está ocupada."); return; }
+  const action=selectedBuild; clearSelections();
+  if(match.act(p,action,index)){ setHint(action==="eco"?"Refinería construida.":"Hangar construido."); render(); }
+  else { setHint("No se pudo construir. Revisá recursos y espacio."); render(); }
+}
+function humanAction(action){
+ if(!match||settings.mode!=="human"||match.ended)return; const p=findPlayer("A");
+ if(action==="eco"||action==="factory"){
+   const valid=match.can(p,action) && !(action==="factory"&&p.factory);recordInput(valid,action==="eco");
+   if(action==="factory" && p.factory){combatToast("Ya tenés un hangar operativo","info");setHint("El hangar inicial ya está listo. Usá esos recursos para atacar, defender o invertir.");render();return;}
+   if(!match.can(p,action)){const why=actionUnavailableReason(action,p);setHint(why);combatToast(why,"danger");render();return;}
+   const free=p.tiles.findIndex(x=>x===null);
+   if(free<0){combatToast("No queda espacio en la fábrica","danger");return;}
+   clearSelections();
+   if(match.act(p,action,free)){
+      combatToast(action==="eco"?"REFINERÍA EN CONSTRUCCIÓN":"HANGAR CONSTRUIDO","good");
+      setHint(action==="eco"?`La refinería quedó en cola industrial. La producción sube recién cuando termina la obra; mientras tanto ocupa capacidad de fábrica.`:"Hangar operativo.");
+      render();
+   }
+   return;
+ }
+ if(["small","large","defSmall","defLarge","sabotage","capture","overdrive","scan"].includes(action)){quickCombatAction(action,document.querySelector(`.act[data-act="${action}"]`));return;}
+ clearSelections();if(!match.act(p,action)){setHint("Acción no disponible. Revisá recursos y requisitos.");combatToast("Acción no disponible","danger");render();return;}
+ setHint({specIndustry:"Industria elegida: más producción, ataques más caros.",specArsenal:"Arsenal elegido: más daño, menos producción.",specControl:"Control elegido: mejor sabotaje y territorio."}[action]||"Acción completada.");combatToast("ESPECIALIZACIÓN ACTIVADA","good");completedTutorial(action);render();
+}
+// La guía recomienda una acción y explica su costo de oportunidad; nunca decide por el jugador.
+window.nextGuideAction=null;
+function renderGuide(){const A=match.players[0],incoming=match.incoming(A),pressure=incoming.reduce((sum,tr)=>sum+tr.damage,0),uncovered=Math.max(0,pressure-match.shield(A));let action=null,title="",body="",tradeoff="",phase="DECISIÓN ESTRATÉGICA";
+ if(selectedCommand){action=selectedCommand;phase="ORDEN ARMADA"; const tt=actionTargetType(selectedCommand); title=tt==="enemy"?"Elegí el objetivo rival":tt==="self"?"Activá la defensa en tu base":"Confirmá la orden en el mapa"; body=tt==="enemy"?"Tocá la BASE RIVAL o el lado derecho del campo de batalla para lanzar la orden." : tt==="self"?"Tocá TU BASE para activar el escudo o la sobrecarga." : "Tocá el NODO CENTRAL para disputar el territorio."; tradeoff="Tu orden está lista pero todavía no se ejecutó.";}
+ else if(selectedBuild){action=selectedBuild;title="Terminá tu construcción";phase="SEGUNDO TOQUE";body=`Elegí una casilla con el símbolo + en tu cuadrícula. La construcción NO termina hasta que la coloques.`;tradeoff="Tocá una casilla libre de TU FÁBRICA, justo debajo.";}
+ else if(incoming.length&&uncovered>0){action=uncovered>GAME_CONFIG.defenseCapacity.small&&match.can(A,"defLarge")?"defLarge":"defSmall";title=`¡Ataque entrante! ${Math.ceil(incoming[0].eta-match.t)} s para decidir`;phase="PRIORIDAD: DEFENDER O ARRIESGAR";const needed=uncovered>GAME_CONFIG.defenseCapacity.small?"Un escudo rápido quizás no alcance; podés usar uno pesado desde 'Más opciones'.":"Un escudo rápido puede bloquear gran parte del daño.";body=`Vienen ${pressure} puntos de daño. Tenés ${Math.round(match.shield(A))} de escudo; podrían llegar ${uncovered} a tu núcleo. ${needed}`;tradeoff="Defender cuesta recursos ahora. También podés aceptar el daño y continuar creciendo.";}
+ else if(match.transit.some(tr=>tr.kind==="capture"&&tr.from==="A")){action=null;phase="MOVIMIENTO EN CAMINO";title="Tus drones están tomando el nodo";body="Los drones de conquista necesitan tiempo para llegar. Mirá la barra de vuelo. Hasta entonces, guardá recursos o preparate para defenderte.";tradeoff="No hace falta pagar otra captura hasta conocer el resultado de la primera.";}
+ else if(tutorialStep===0){action="eco";phase="ENTRENAMIENTO · 1/4";title="Primero: invertí en economía";body="Tu mina ya genera recursos automáticamente. Comprá una refinería y ponela en una casilla libre: pasarás de 9 a 15 recursos por segundo. Después necesitarás volver a ahorrar para tu ejército.";tradeoff="Ganás +6 recursos/s, pero te quedás con menos dinero para atacar ahora.";}
+ else if(tutorialStep===1){action="factory";phase="ENTRENAMIENTO · 2/4";title="Ahora construí un hangar";body="La refinería recupera su inversión mientras esperás. Ahorrá para un hangar: sin él no podés enviar drones, así que invertir toda la partida sería peligroso.";tradeoff="No produce recursos; desbloquea ataques y conquista territorial.";}
+ else if(tutorialStep===2){action="small";phase="ENTRENAMIENTO · 3/4";title="Probá tu primer ataque";body="Tu hangar ya puede producir drones. Enviá un ataque pequeño: tarda 6 segundos en llegar y hace 120 de daño antes de los escudos. Observá la línea de vuelo entre las fábricas.";tradeoff="Los recursos gastados en drones dejan de estar disponibles para mejorar la fábrica.";}
+ else if(tutorialStep===3){action="capture";phase="ENTRENAMIENTO · 4/4";title="Conseguí una ventaja fuera de tu fábrica";body="El nodo central da +15% de ingresos mientras lo controles. Intentá capturarlo, pero recordá que los drones cuestan recursos y el rival podría atacar mientras expandís.";tradeoff="Control territorial = ingresos futuros. Ataques y escudos = supervivencia inmediata.";}
+ else if(!A.factory){action="factory";title="Te falta capacidad ofensiva";body="Sin hangar solo podés invertir o defenderte. Construirlo abre la posibilidad de atacar y capturar el nodo.";tradeoff="Pagás el hangar ahora; los drones costarán recursos adicionales.";}
+ else if(A.level<2&&match.t<110){action="eco";title="¿Reinvertís o empezás a presionar?";body="Tu fábrica todavía genera pocos recursos. Una mejora económica se amortiza con tiempo, pero el rival puede castigarte antes. Mirá su hangar y los vuelos próximos.";tradeoff="Invertir = más después. Atacar = menos banco pero presión inmediata.";}
+ else if(match.owner!=="A"&&match.t<GAME_CONFIG.matchDuration-55){action="capture";title="El territorio es una inversión disputable";body="Si controlás el nodo, tu producción aumenta un 15%. El enemigo puede recuperarlo: no alcanza con capturarlo, también tenés que defender tu ventaja.";tradeoff="Conquistar consume recursos que podrías gastar en drones contra el núcleo.";}
+ else if(A.level>=2&&moduleUsed(A)<industrialCap(A)&&!A.moduleBuild&&match.t<185){action=null;title="Tenés capacidad industrial libre";body="Economía abrió un slot. Elegí una mejora investigada de Economía, Cohetes, Defensa o Investigación. Las ramas avanzan en orden hasta el nivel 4.";tradeoff="Abrí MEJORAR FÁBRICA. Abrí MEJORAR FÁBRICA y elegí una tecnología desbloqueada; cada rama requiere construir el nivel anterior.";}
+ else{action="small";title="Buscá una ventana para atacar";body="Mirá tu saldo, tu producción y los edificios enemigos. ¿Te conviene enviar drones, reservar escudos o reinvertir? No existe una respuesta universal.";tradeoff="Cada ataque que no conecta es una inversión que podría haberte fortalecido.";}
+ window.nextGuideAction=action;$("guidePhase").textContent=phase;$("guideState").textContent=match.ended?"FINALIZADO":paused?"TIEMPO PAUSADO":"TIEMPO CORRIENDO";$("guideTitle").textContent=title;$("guideText").textContent=body;$("guideTradeoff").textContent=tradeoff;
+ const can=action&&match.can(A,action),cost=action?match.cost(A,action):0,missing=Math.max(0,cost-A.bank),wait=missing/Math.max(.01,match.income(A));$("guideDo").dataset.action=(selectedBuild||selectedCommand)?"":action;$("guideDo").disabled=!!selectedBuild||!!selectedCommand||!can||match.ended;$("guideDo").textContent=selectedBuild?"TOCÁ UNA CASILLA VERDE ↓":selectedCommand?"TOCÁ EL OBJETIVO EN EL ESCENARIO →":!action?"ESPERAR LLEGADA DE DRONES":!can&&missing>0?`AHORRÁ ${Math.ceil(missing)} ◈`:(ACTION_LABELS[action]||"VER OPCIONES");$("budgetFill").style.width=Number.isFinite(cost)&&cost>0?Math.min(100,A.bank/cost*100)+"%":"100%";
+ $("budgetText").textContent=selectedBuild?"La partida puede quedar en pausa mientras elegís dónde construir.":selectedCommand?"La orden está armada: confirmala tocando el objetivo correcto en el escenario.":!action?"Un equipo de conquista ya está viajando. No necesitás enviarlo dos veces.":!Number.isFinite(cost)?"Mejora al máximo":"Saldo "+money(A.bank)+" ◈ / precio "+money(cost)+" ◈"+(missing>0?(paused?" · ESTÁS EN PAUSA: reanudá para que el banco vuelva a crecer":` · en ~${Math.ceil(wait)} s de juego con tu producción actual`):(" · ¡podés hacerlo ahora!"));
+ const threat=$("threatBanner");threat.classList.toggle("hidden",!incoming.length);if(incoming.length)threat.textContent=`⚠ ${incoming.length} ataque(s) detectado(s): ${pressure} de daño total; el primero llega en ${Math.ceil(incoming[0].eta-match.t)} s. Escudo actual: ${Math.round(match.shield(A))}. ${paused?"Estás en pausa: podés activar un escudo antes de reanudar.":"Decidí si defender o aceptar el golpe."}`;
+ $("rivalSnapshot").textContent=`Rival: ${match.players[1].hp} ♥ · ${round(match.income(match.players[1]),1)}/s visibles · ${match.players[1].factory?"tiene hangar militar":"sin hangar"} · Banco oculto`;
+ $("guideFooterText").textContent=selectedBuild?"Las casillas con + son sitios de construcción.":selectedCommand?"El escenario también sirve para jugar: tocá la zona iluminada para ejecutar la orden.":paused&&missing>0?"Estás en pausa: podés decidir, pero NO producís recursos. Reanudá para ahorrar.":paused?"La pausa táctica no es una penalización: podés construir, atacar o defenderte sin que avance el reloj.":tutorialStep<4?"La simulación corre a mitad de velocidad. Cuando termines los 4 pasos, elegís libremente.":"La guía es orientativa. También podés seguir una estrategia completamente distinta.";
+ $("skipTutorial").classList.toggle("hidden",!settings.training||tutorialStep>=4);$("resultNote").classList.toggle("hidden",!lastNotice);$("resultNote").textContent=lastNotice;}
+function render(){if(!match)return;processVisualEvents();updateCombatRadar();updateArena08Hud();updateCoreValidation();renderIndustrialUI();renderDecisionLab();const A=match.players[0],B=match.players[1],botmode=settings.mode==="bots";$("clock").textContent=fmtTime(GAME_CONFIG.matchDuration-match.t);$("matchStatus").textContent=match.ended?"PARTIDA FINALIZADA":paused?"PAUSA TÁCTICA · podés construir y decidir":`En curso · velocidad ×${String(speed).replace(".",",")}`;
+ $("pauseBtn").textContent=paused?"REANUDAR ▶":"PAUSA TÁCTICA ⏸";$("guideCard").classList.toggle("hidden",botmode||!guideShown);$("helpBtn").classList.toggle("hidden",botmode);$("helpBtn").textContent=guideShown?"OCULTAR GUÍA":"VER GUÍA";document.body.classList.toggle("simple-ui",!showAdvanced&&!botmode);document.body.classList.toggle("tutorial-onboarding",settings.training&&tutorialStep<4);$("advancedToggle").textContent=showAdvanced?"MOSTRAR MENOS OPCIONES ↑":"MOSTRAR MÁS OPCIONES ▾";$("specPanel").classList.toggle("hidden",!showAdvanced&&A.level<2);if(!botmode)renderGuide();
+ for(const p of match.players){const id=p.id,enemy=p.id==="B",base=$("base"+id),viewBank=!enemy||botmode;
+  base.classList.toggle("overdrive",p.overdriveUntil>match.t);for(const civ of Object.keys(CIVILIZATIONS))base.classList.toggle("civ-"+civ,p.civ===civ);
+  $("civLabel"+id).textContent=CIVILIZATIONS[p.civ].name+(p.bot?" · "+p.bot:"");$("level"+id).textContent=["TALLER I","INDUSTRIA II","ROBÓTICA III","AUTOMATIZACIÓN IV"][p.level-1];$("hp"+id).textContent=`${p.hp} / ${GAME_CONFIG.coreHP}`;$("bar"+id).style.width=(p.hp/GAME_CONFIG.coreHP*100)+"%";
+  $("bank"+id).textContent=viewBank?money(p.bank):"???";$("income"+id).textContent=round(match.income(p),1)+"/s";$("shield"+id).textContent=money(match.shield(p));
+  const grid=$("grid"+id),cells=grid.children;for(let i=0;i<cells.length;i++){const b=cells[i],type=p.tiles[i];b.className="tile "+(type||"free")+(id==="A"&&selectedBuild&&!type&&!botmode?" selecting":"");const meta={specIndustry:["⚒","INDUSTRIA"],specArsenal:["✦","ARSENAL"],specControl:["⌬","CONTROL"],core:["◈","NÚCLEO"],mine:["⛏","MINA"],refinery:["⚙","REFINERÍA"],fabricator:["✦","HANGAR"],shieldTower:["⬡","ESCUDO"],antenna:["⌁","SEÑAL"]};b.innerHTML=tileMarkup(type,id==="A",selectedBuild);b.disabled=id!=="A"||!selectedBuild||!!type||botmode;b.setAttribute("aria-label",type?meta[type][1]:`Casilla libre ${i+1}`);}
+  const tags=[];if(p.sabotagedUntil>match.t)tags.push(`⌁ Saboteado ${Math.ceil(p.sabotagedUntil-match.t)} s`);if(p.overdriveUntil>match.t)tags.push(`ϟ Sobrecarga ${Math.ceil(p.overdriveUntil-match.t)} s`);if(p.spec)tags.push(`✧ ${SPECIALIZATIONS[p.spec].name}`);if(p.id==="A"&&p.scanUntil>match.t)tags.push(`⌕ Rival: ${p.scanText}`);$("tags"+id).innerHTML=tags.map(t=>`<span>${t}</span>`).join("");
+ }
+ $("territoryOwner").textContent=match.owner===null?"SIN CONTROL":match.owner==="A"?(botmode?"CONTROL BOT A":"BAJO TU CONTROL"):"CONTROL BOT B";$("territoryOwner").style.color=match.owner==="A"?"#6ae8cb":match.owner==="B"?"#ff9f8d":"#f2deb2";
+ $("flightCount").textContent=String(match.transit.length);const trips=match.transit.slice().sort((a,b)=>a.eta-b.eta);$("trips").innerHTML=trips.length?trips.map(tr=>{const progress=clamp((match.t-tr.start)/(tr.eta-tr.start),0,1)*100;return `<div class="trip ${tr.from==="B"?"enemy":""}"><div><strong style="color:${tr.from==="A"?"#70e8c9":"#ffac96"}">${tr.from==="A"?"A":"B"} → ${tr.kind==="capture"?"NODO":tr.to==="A"?"BASE A":"BASE B"}</strong><span>${tr.kind==="capture"?"⚑ Control":tr.size==="small"?"↗ Rápido":"⇈ Pesado"} · ${Math.max(0,round(tr.eta-match.t))} s</span></div><div class="travel-bar"><span style="width:${progress}%"></span></div></div>`;}).join(""):"<small>El espacio aéreo está despejado.</small>";
+ const own=A;for(const b of document.querySelectorAll(".act")){const action=b.dataset.act;let price=match.cost(own,action),available=match.can(own,action);b.disabled=botmode||match.ended||!available;b.classList.toggle("select",selectedBuild===action||selectedCommand===action);b.classList.toggle("guide-focus",!botmode&&guideShown&&window.nextGuideAction===action&&!selectedBuild);const cost=$(action+"Cost");if(cost)cost.textContent=price===Infinity?"NIVEL MÁX.":`${money(price)} ◈`;
+  let cooldown=0;if(["sabotage","capture","scan","overdrive"].includes(action))cooldown=Math.max(0,own.cd[action]-match.t);let old=b.querySelector(".badge");if(old)old.remove();if(cooldown>0){const label=document.createElement("b");label.className="badge";label.textContent=Math.ceil(cooldown)+" s";b.appendChild(label);}
+ }
+ for(const qb of document.querySelectorAll(".quickcmd")){const act=qb.dataset.quick; const can=act?match.can(A,act):false; qb.disabled=botmode||match.ended; qb.setAttribute("aria-disabled",(!can).toString()); qb.classList.toggle("locked",!can); qb.classList.toggle("active", selectedBuild===act); qb.classList.toggle("recommended", !botmode&&window.nextGuideAction===act&&!selectedBuild); qb.classList.toggle("action-ready",can&&["small","large","defSmall","defLarge","capture","sabotage"].includes(act)); const prices={small:match.cost(A,"small"),large:match.cost(A,"large"),defSmall:match.cost(A,"defSmall"),defLarge:match.cost(A,"defLarge"),capture:match.cost(A,"capture"),sabotage:match.cost(A,"sabotage"),eco:match.cost(A,"eco"),factory:match.cost(A,"factory")}; if(!qb.closest(".command-dock")){const names={small:"↗ ATACAR",large:"🚀 PESADO",defSmall:"⬡ ESCUDO",defLarge:"⬢ ESCUDO PESADO",capture:"⚑ TOMAR NODO",sabotage:"⌁ SABOTAJE",eco:"⚙ ECONOMÍA",factory:"✦ HANGAR"}; if(names[act])qb.innerHTML=`<span>${names[act]}</span><small style="display:block;margin-top:3px;color:#ffd77d;font-size:9px">${Number.isFinite(prices[act])?money(prices[act])+" ◈":"MAX"}</small>`;}}
+ v152DockOneGlance();
+ const recommendedStats=[ ["bankA", A.bank>=match.cost(A,"eco")], ["incomeA", A.level<4], ["shieldA", match.shield(A)>0] ]; for(const [id,flag] of recommendedStats){ const stat=$(id).parentElement; stat.classList.toggle("can-buy", !!flag); }
+ const battleMiniEl=$("battleMini"); if(battleMiniEl) battleMiniEl.textContent = selectedBuild?"Colocá tu construcción en la grilla de tu base." : (botmode?"Modo simulación automática.":"ATAQUE, ESCUDO, NODO y SABOTAJE se ejecutan con UN TOQUE.");
+ const leftOv=$("tapLeft"), nodeOv=$("tapNode"), rightOv=$("tapRight"); leftOv.className="battle-overlay left"; nodeOv.className="battle-overlay center"; rightOv.className="battle-overlay right";
+ $("ecoDesc").textContent=A.level===4?"Producción máxima":`Nivel ${A.level} → ${A.level+1}: ${GAME_CONFIG.economicLevels[A.level-1]} → ${GAME_CONFIG.economicLevels[A.level]} /s`;
+ $("feed").innerHTML=match.events.filter(e=>e.type!=="state_sample"&&e.type!=="match_start"&&e.type!=="training_step").slice(-12).reverse().map(e=>{
+  const p=e.player==="A"?(botmode?"BOT A":"VOS"):e.player==="B"?"BOT B":"SISTEMA";
+  const descriptions={econ_upgrade:`${p} · economía nivel ${e.level}`,factory_build:`${p} · construyó un hangar`,attack_commit:`${p} · lanzó ataque ${e.size==="small"?"rápido":"pesado"}`,defense_commit:`${p} · activó escudo ${e.size==="small"?"rápido":"pesado"}`,sabotage:`${p} · saboteó al rival`,territory_commit:`${p} · envió drones al nodo`,territory_capture:`${p} · capturó el nodo`,base_damage:`${p} · ${e.damage} daño de núcleo · ${e.absorbed} bloqueado`,overdrive:`${p} · activó SOBRECARGA`,scan:`${p} · realizó un escaneo`,specialization:`${p} · especialización ${(e.branch&&SPECIALIZATIONS[e.branch]?SPECIALIZATIONS[e.branch].name:"DESCONOCIDA")}`,module_start:`${p} · inició ${e.name}`,module_complete:`${p} · completó ${e.name}`,reactive_refund:`${p} · escudo reactivo recuperó ${e.refund} ◈`,match_end:`Fin: ${e.winner||"empate"}`};
+  const group=["attack_commit","base_damage"].includes(e.type)?"attack":["econ_upgrade","factory_build","specialization"].includes(e.type)?"econ":"control";
+  return `<div class="event ${group}"><time>${fmtTime(e.t)}</time><span>${descriptions[e.type]||e.type}</span></div>`;
+ }).join("");
+}
+function diagnosis(m){const r=strategicReview(m);return [r.headline,...r.bullets].slice(0,3);}
+function strategicReview(m){
+ const [a,b]=m.players,ev=m.events,early=90;
+ const sum=(player,type,field="cost")=>ev.filter(e=>e.player===player&&e.type===type&&e.t<=early).reduce((q,e)=>q+(Number(e[field])||0),0);
+ const ecoA=sum("A","econ_upgrade"),ecoB=sum("B","econ_upgrade"),milA=sum("A","attack_commit"),milB=sum("B","attack_commit"),defA=sum("A","defense_commit"),defB=sum("B","defense_commit");
+ const punishedGreed=ev.find(e=>e.player==="A"&&e.type==="econ_upgrade"&&ev.some(x=>x.player==="B"&&x.type==="attack_commit"&&x.t>=e.t&&x.t<=e.t+12));
+ const nodeDelta=a.stats.territorySeconds-b.stats.territorySeconds,effA=a.stats.militarySpend? a.stats.damageDealt/a.stats.militarySpend:0,effB=b.stats.militarySpend?b.stats.damageDealt/b.stats.militarySpend:0;
+ let headline="Partida equilibrada: la diferencia apareció en la conversión de recursos.",turning="No hay un único punto de inflexión claro.",bullets=[];
+ if(m.winner==="B"&&punishedGreed){headline="Greed castigado: invertiste justo antes de una ventana ofensiva rival.";turning=`Economía comprada en ${fmtTime(punishedGreed.t)}; el rival comprometió ataque dentro de los siguientes 12 s.`;}
+ else if(m.winner==="B"&&nodeDelta<-40){headline="Perdiste tempo territorial: el rival financió su ventaja desde el nodo.";turning=`El rival acumuló ${Math.round(-nodeDelta)} s más de control del centro.`;}
+ else if(m.winner==="B"&&milA>ecoA&&effA<.65){headline="Sobreinversión ofensiva: gastaste mucho ejército para poco daño convertido.";turning=`Eficiencia ofensiva aproximada: ${round(effA,2)} daño por recurso militar.`;}
+ else if(m.winner==="A"&&defA>0&&milB>defA*1.3){headline="Defensa eficiente: hiciste gastar más al rival de lo que invertiste en protegerte.";turning=`Primeros ${early}s: rival ${milB} militar vs vos ${defA} defensa.`;}
+ else if(m.winner==="A"&&nodeDelta>40){headline="Ganaste por tempo: el centro amplificó tu economía sin atacar todo el tiempo.";turning=`Controlaste el nodo ${Math.round(nodeDelta)} s más que el rival.`;}
+ bullets.push(`Primeros ${early}s — vos: economía ${ecoA}, militar ${milA}, defensa ${defA}. Rival: economía ${ecoB}, militar ${milB}, defensa ${defB}.`);
+ const mods=Object.keys(a.modules||{}).filter(k=>a.modules[k]);bullets.push(mods.length?`Tu build industrial: ${mods.map(k=>INDUSTRIAL_MODULES[k].name).join(", ")}.`:`Terminaste sin módulos industriales: mantuviste liquidez, pero renunciaste a picos de poder.`);const decRate=a.telemetry.validDecisions/Math.max(.25,m.t/60);bullets.push(`Densidad: ${a.telemetry.validDecisions} decisiones (${decRate.toFixed(1)}/min), ${a.telemetry.invalidInputs} inputs inválidos y máximo ${a.telemetry.maxThreats} amenazas simultáneas.`);
+ if(Math.abs(nodeDelta)>20)bullets.push(`Diferencia territorial: ${Math.round(Math.abs(nodeDelta))} s a favor de ${nodeDelta>0?"vos":"rival"}.`);
+ else bullets.push(`Eficiencia ofensiva: vos ${round(effA,2)} vs rival ${round(effB,2)} daño por recurso militar.`);
+ return {headline,turning,bullets};
+}
+function showEnd(){const m=match,[a,b]=m.players;playSfx(m.winner==="A"?"win":m.winner==="B"?"loss":"node");const earned=grantMatchReward(m),title=m.winner===null?"EMPATE":m.winner==="A"?(settings.mode==="human"?"¡GANASTE!":"VICTORIA BOT A"):(settings.mode==="human"?"DERROTA":"VICTORIA BOT B");const rows=[
+ ["HP final",a.hp,b.hp],["Economía final",a.level,b.level],["Build industrial",moduleSummary(a),moduleSummary(b)],["Decisiones válidas",a.telemetry.validDecisions,b.telemetry.validDecisions],["Inputs inválidos",a.telemetry.invalidInputs,b.telemetry.invalidInputs],["Inversión económica",a.stats.economicSpend,b.stats.economicSpend],["Gasto militar",a.stats.militarySpend,b.stats.militarySpend],["Gasto defensivo",a.stats.defensiveSpend,b.stats.defensiveSpend],["Gasto en sabotaje",a.stats.sabotageSpend,b.stats.sabotageSpend],["Daño infligido",a.stats.damageDealt,b.stats.damageDealt],["Control territorial",Math.round(a.stats.territorySeconds)+" s",Math.round(b.stats.territorySeconds)+" s"],["Primer ataque",a.stats.firstAttack===null?"No atacó":fmtTime(a.stats.firstAttack),b.stats.firstAttack===null?"No atacó":fmtTime(b.stats.firstAttack)]];
+ const ov=$("arenaVictory");if(ov){const win=m.winner==="A",loss=m.winner==="B",draw=m.winner===null;ov.classList.remove('hidden','win','loss','draw');ov.classList.add(win?'win':loss?'loss':'draw');$("victoryKicker").textContent=draw?'TIEMPO AGOTADO':win?'CORE ENEMIGO DESTRUIDO':'TU CORE FUE DESTRUIDO';$("victoryTitle").textContent=draw?'EMPATE':win?'VICTORIA':'DERROTA';$("victorySub").textContent=draw?'Ambas ciudades sobrevivieron al límite.':win?'La fábrica rival perdió energía y producción.':'La ciudad rival convirtió su ventaja en victoria.';}
+ const review=strategicReview(m);const el=$("endPanel");el.classList.remove("hidden");el.innerHTML=`<div class="eyebrow">INFORME POSTPARTIDA</div><h2>${title}</h2><p>${m.endReason} · Duración ${fmtTime(m.t)}. El criterio de desempate es el control territorial acumulado si ambos núcleos tienen el mismo HP.</p>${earned?`<p style="color:#a9ffd8;font-weight:850;margin:8px 0">+${earned} de chatarra para tu megafábrica exterior</p>`:""}<div class="strategic-review"><div class="sr-kicker">LECTURA ESTRATÉGICA</div><h3>${review.headline}</h3><p><strong>Punto de inflexión:</strong> ${review.turning}</p><ul>${review.bullets.map(x=>`<li>${x}</li>`).join("")}</ul></div><div class="end-data"><table><thead><tr><th>Métrica</th><th>${settings.mode==="human"?"VOS":"BOT A"}</th><th>BOT B</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join("")}</tbody></table></div><p style="margin:5px 0 8px"><strong>Para analizar:</strong> ${diagnosis(m).join(" ")}</p><p class="fine">Estas observaciones son descriptivas: no demuestran causalidad. Exportá el JSON para revisar el orden exacto de las decisiones.</p><details class="debug"><summary>Ver telemetría JSON (últimos 8 eventos)</summary><pre>${JSON.stringify(m.events.slice(-8),null,2)}</pre></details><div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="returnCampaign()">VOLVER A MEGAFÁBRICA →</button><button class="btn-secondary" onclick="document.getElementById('resetBtn').click()">OTRA PARTIDA</button></div>`;$("pauseBtn").disabled=true;render();el.scrollIntoView({behavior:"smooth",block:"start"});}
+function runBatch(){if(settings.mode!=="bots")return;const btn=$("batchBtn");btn.disabled=true;btn.textContent="SIMULANDO...";$("batchResults").innerHTML="<small>Calculando simulaciones sin animación. Mismas reglas para humanos y bots.</small>";
+ // Un pequeño salto de ejecución permite actualizar la interfaz antes del cálculo.
+ setTimeout(()=>{try{const N=GAME_CONFIG.batchMatches,results=[],startSeed=(Date.now()>>>0);for(let i=0;i<N;i++){const sim=new Match(settings,(startSeed+i*104729)>>>0);while(!sim.ended){sim.step(.5,true);}results.push({winner:sim.winner,duration:sim.t,players:sim.players.map(p=>({hp:p.hp,level:p.level,income:sim.income(p),firstAttack:p.stats.firstAttack,stats:p.stats}))});}
+ const mean=arr=>arr.length?arr.reduce((s,x)=>s+x,0)/arr.length:null,by=id=>results.map(r=>r.players[id]);const pa=by(0),pb=by(1),avgFirst=p=>{const times=p.map(x=>x.firstAttack).filter(t=>t!==null);return times.length?fmtTime(mean(times)):`Sin ataques`;};
+ batchData={settings:{...settings},config:GAME_CONFIG,startSeed,matches:N,winsA:results.filter(r=>r.winner==="A").length,winsB:results.filter(r=>r.winner==="B").length,draws:results.filter(r=>r.winner===null).length,meanDuration:round(mean(results.map(r=>r.duration))),metrics:{A:{meanHP:round(mean(pa.map(x=>x.hp))),meanIncome:round(mean(pa.map(x=>x.income))),meanEconomyLevel:round(mean(pa.map(x=>x.level)),2),meanFirstAttackSeconds:mean(pa.map(x=>x.firstAttack).filter(t=>t!==null))},B:{meanHP:round(mean(pb.map(x=>x.hp))),meanIncome:round(mean(pb.map(x=>x.income))),meanEconomyLevel:round(mean(pb.map(x=>x.level)),2),meanFirstAttackSeconds:mean(pb.map(x=>x.firstAttack).filter(t=>t!==null))}},results};
+ $("batchResults").innerHTML=`<table><tbody><tr><th>Resultados (${N})</th><th>BOT A</th><th>BOT B</th></tr><tr><td>Victorias</td><td>${batchData.winsA}</td><td>${batchData.winsB}</td></tr><tr><td>HP final promedio</td><td>${batchData.metrics.A.meanHP}</td><td>${batchData.metrics.B.meanHP}</td></tr><tr><td>Producción final media</td><td>${batchData.metrics.A.meanIncome}/s</td><td>${batchData.metrics.B.meanIncome}/s</td></tr><tr><td>Nivel econ. promedio</td><td>${batchData.metrics.A.meanEconomyLevel}</td><td>${batchData.metrics.B.meanEconomyLevel}</td></tr><tr><td>Primer ataque medio*</td><td>${avgFirst(pa)}</td><td>${avgFirst(pb)}</td></tr></tbody></table><p class="batch-note">Empates: ${batchData.draws} · Duración media: ${fmtTime(batchData.meanDuration)}. *Primer ataque: media de las partidas donde ese bot atacó. La muestra permite encontrar tendencias, no garantiza balance.</p>`;
+ }catch(err){$("batchResults").textContent="Error en la simulación: "+err.message;console.error(err);}finally{btn.disabled=false;btn.textContent=`SIMULAR ${GAME_CONFIG.batchMatches} PARTIDAS`;}
+ },20);
+}
+

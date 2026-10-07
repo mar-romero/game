@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "version": 1,
+      "file": "arena_bot_interactions_v1_baseline.json",
+      "simulationComment": "Linea base sin vinculacion persistente de Megafabrica a PvP.",
+      "simulatedMatches": 9720
+    },
+    {
+      "version": 2,
+      "file": "arena_bot_interactions_v2.json",
+      "generatedAt": "2026-10-06T22:51:42.558Z",
+      "simulationComment": "V2: Validacion del enlace de Megafabrica y doctrinas; una repeticion por lado antes de la corrida balanceada.",
+      "simulatedMatches": 4860,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast"
+      ],
+      "changeNote": "Validacion del enlace de Megafabrica y doctrinas; una repeticion por lado antes de la corrida balanceada."
+    },
+    {
+      "version": 3,
+      "file": "arena_bot_interactions_v3.json",
+      "generatedAt": "2026-10-06T22:55:52.812Z",
+      "simulationComment": "V3: Se agregó un vínculo experimental entre la Megafábrica y el PvP: niveles de edificios otorgan reserva inicial limitada; cada doctrina se mide por separado.",
+      "simulatedMatches": 48600,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast"
+      ],
+      "changeNote": "Se agregó un vínculo experimental entre la Megafábrica y el PvP: niveles de edificios otorgan reserva inicial limitada; cada doctrina se mide por separado."
+    },
+    {
+      "version": 4,
+      "file": "arena_bot_interactions_v4.json",
+      "generatedAt": "2026-10-06T23:22:17.456Z",
+      "simulationComment": "V4: Prueba corta de ajustes GREEDY, RANDOM, FORJA y ENJAMBRE antes de elegir balance candidato.",
+      "simulatedMatches": 9720,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast",
+        "greedy_slow_economy",
+        "random_weighted_actions",
+        "bot_rebalance",
+        "civilization_cost_rebalance",
+        "combined_balance_candidate"
+      ],
+      "changeNote": "Prueba corta de ajustes GREEDY, RANDOM, FORJA y ENJAMBRE antes de elegir balance candidato."
+    },
+    {
+      "version": 5,
+      "file": "arena_bot_interactions_v5.json",
+      "generatedAt": "2026-10-06T23:35:15.196Z",
+      "simulationComment": "V5: Rebalance candidates validated with 20 repetitions per side: GREEDY pacing, RANDOM weighted choices, FORJA/ENJAMBRE costs, and combined Megafactory reserve.",
+      "simulatedMatches": 194400,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast",
+        "greedy_slow_economy",
+        "random_weighted_actions",
+        "bot_rebalance",
+        "civilization_cost_rebalance",
+        "combined_balance_candidate"
+      ],
+      "changeNote": "Rebalance candidates validated with 20 repetitions per side: GREEDY pacing, RANDOM weighted choices, FORJA/ENJAMBRE costs, and combined Megafactory reserve."
+    },
+    {
+      "version": 6,
+      "file": "arena_bot_interactions_v6.json",
+      "generatedAt": "2026-10-06T23:41:15.004Z",
+      "simulationComment": "V6: Screening de segunda ronda: GREEDY con menos bola de nieve, RANDOM con elecciones ponderadas, RUSHER con economía/ataques reajustados y civilizaciones aisladas.",
+      "simulatedMatches": 53460,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast",
+        "greedy_slow_economy",
+        "random_weighted_actions",
+        "rusher_more_economy",
+        "bot_rebalance",
+        "civilization_cost_rebalance",
+        "combined_balance_candidate"
+      ],
+      "changeNote": "Screening de segunda ronda: GREEDY con menos bola de nieve, RANDOM con elecciones ponderadas, RUSHER con economía/ataques reajustados y civilizaciones aisladas."
+    },
+    {
+      "version": 7,
+      "file": "arena_bot_interactions_v7.json",
+      "generatedAt": "2026-10-06T23:59:24.093Z",
+      "simulationComment": "V7: Confirmacion de balance: GREEDY moderado, RANDOM ponderado, RUSHER revisado, costos FORJA/ENJAMBRE y candidato combinado con y sin reserva extra de Megafabrica.",
+      "simulatedMatches": 233280,
+      "scenarios": [
+        "baseline",
+        "factory_supply_level_5",
+        "factory_level_5_missile_breaker",
+        "factory_level_5_missile_siege",
+        "factory_level_5_missile_fast",
+        "greedy_slow_economy",
+        "random_weighted_actions",
+        "rusher_more_economy",
+        "bot_rebalance",
+        "civilization_cost_rebalance",
+        "bot_civ_candidate_ranked_start",
+        "combined_balance_candidate"
+      ],
+      "changeNote": "Confirmacion de balance: GREEDY moderado, RANDOM ponderado, RUSHER revisado, costos FORJA/ENJAMBRE y candidato combinado con y sin reserva extra de Megafabrica."
+    }
+  ]
+}

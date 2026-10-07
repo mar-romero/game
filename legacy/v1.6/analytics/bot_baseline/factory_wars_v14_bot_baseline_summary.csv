@@ -1,0 +1,14 @@
+﻿type,name,games,score_rate_pct,mean_duration_sec
+bot,GREEDY,1280,76.95,178.51
+bot,TURTLE,1280,66.02,184.69
+bot,HOARDER,1280,63.91,185.1
+bot,SABOTEUR,1280,58.98,197.77
+bot,BALANCED,1280,48.09,169.8
+bot,ADAPTIVE,1280,47.11,168.97
+bot,TEMPO,1280,46.76,169.13
+bot,RUSHER,1280,40.47,170.69
+bot,RANDOM,1280,1.72,146.85
+civilization,swarm,2880,58.37,162.86
+civilization,nexus,2880,48.61,178.97
+civilization,bastion,2880,48.4,179.18
+civilization,forge,2880,44.62,177.43

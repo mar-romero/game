@@ -1,7 +1,5 @@
 # Factory Wars: guia completa para jugadores
 
-> ¿Buscás código? Empezá por [la guía de arquitectura](docs/ARCHITECTURE.md), [convenciones para crear archivos](docs/FILE_CONVENTIONS.md) y [el plan de migración](docs/MIGRATION_PLAN.md). El snapshot del juego previo está en `legacy/v1.6/`.
-
 Factory Wars es un juego web de estrategia con dos ritmos conectados:
 
 1. **Megafabrica:** producís recursos, mejorás edificios, cumplís contratos e investigás.
@@ -253,7 +251,7 @@ Abrí `http://localhost:8000/`.
 
 ## Supabase y publicación
 
-Para instalación nueva, ejecutá `supabase/schema.sql`. Si ya tenías el esquema de v1.5.x, ejecutá una vez `supabase/migrations/v160_liga10.sql`. Configurá `public/game/adapters/web/config.js` con la URL del proyecto y la publishable key. Nunca pongas una `service_role` en el navegador.
+Para instalación nueva, ejecutá `supabase/schema.sql`. Si ya tenías el esquema de v1.5.x, ejecutá una vez `supabase/migrations/v160_liga10.sql`. Configurá `public/config.js` con la URL del proyecto y la publishable key. Nunca pongas una `service_role` en el navegador.
 
 La guía de despliegue está en [docs/DEPLOY_GITLAB_SUPABASE.md](docs/DEPLOY_GITLAB_SUPABASE.md). El diseño está en [docs/GAME_DESIGN_V15.md](docs/GAME_DESIGN_V15.md) y las reglas de Liga en [docs/V160_LIGA10.md](docs/V160_LIGA10.md).
 

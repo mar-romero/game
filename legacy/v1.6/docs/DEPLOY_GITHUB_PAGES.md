@@ -1,6 +1,6 @@
 # Publicar en GitHub Pages
 
-El workflow `.github/workflows/main.yml` publica el contenido de `public/` cada vez que se actualiza `main`. Tambien se puede iniciar manualmente desde la pestana **Actions**.
+El workflow `.github/workflows/deploy-pages.yml` publica el contenido de `public/` cada vez que se actualiza `main`. Tambien se puede iniciar manualmente desde la pestana **Actions**.
 
 ## Activar Pages una vez
 
@@ -20,4 +20,4 @@ Cuando el workflow termine correctamente, GitHub muestra la URL publicada en **S
 
 ## Modo local y Supabase
 
-Con `public/game/adapters/web/config.js` sin URL ni publishable key de Supabase, el juego funciona en modo local y guarda progreso y partidas en el navegador. Para compartir cuentas, progresos o rankings entre dispositivos, hay que configurar Supabase por separado. No se debe poner una `service_role` en archivos publicos.
+Con `public/config.js` sin URL ni publishable key de Supabase, el juego funciona en modo local y guarda progreso y partidas en el navegador. Para compartir cuentas, progresos o rankings entre dispositivos, hay que configurar Supabase por separado. No se debe poner una `service_role` en archivos publicos.

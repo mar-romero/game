@@ -1,0 +1,9 @@
+create-pages:
+  stage: deploy
+  script:
+    - echo "Factory Wars v1.5 Imperios · publicando GitLab Pages"
+  pages:
+    publish: public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  environment: production

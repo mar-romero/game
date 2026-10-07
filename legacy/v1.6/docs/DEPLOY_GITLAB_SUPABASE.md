@@ -13,7 +13,7 @@ En Windows, doble clic `START_WINDOWS.bat` o ejecutá `python serve.py`. Abrí `
 3. Abrí SQL Editor.
 4. Copiá y ejecutá TODO `supabase/schema.sql`.
 5. En Project Settings/API copiá Project URL y la publishable key (o anon key si tu panel todavía la muestra con ese nombre).
-6. Abrí `public/game/adapters/web/config.js` y pegá ambos valores. NUNCA pongas `service_role` en el navegador.
+6. Abrí `public/config.js` y pegá ambos valores. NUNCA pongas `service_role` en el navegador.
 
 Ejemplo:
 ```js
