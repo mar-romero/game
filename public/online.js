@@ -71,11 +71,11 @@
     };
   }
   async function syncRecord(rec){
-    if(!state.ready||!rec?.id)return;
+    if(!state.ready||!rec?.id||rec.localRewardManaged)return;
     try{
       const {error}=await state.client.from('matches').upsert(normalize(rec),{onConflict:'id'});if(error)throw error;
-      const claim=await state.client.rpc('claim_match_reward',{p_match_id:String(rec.id)});
-      if(!claim.error && claim.data?.claimed){
+      const claim=rec.localRewardManaged?null:await state.client.rpc('claim_match_reward',{p_match_id:String(rec.id)});
+      if(claim&&!claim.error && claim.data?.claimed){
         try{window.parent?.postMessage({type:'factory-wars-match-synced',reward:claim.data.reward||{}},'*');}catch(_){}
       }
     } catch(err){console.warn('sync match failed',err);}
