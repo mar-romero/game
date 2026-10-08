@@ -1,0 +1,1206 @@
+{
+  "title": "Cross-seed validation of next PvP bot generation",
+  "createdAt": "2026-10-08T07:28:35.621Z",
+  "method": "Re-optimized every bot starting from the prior genome using a new training seed family; each candidate faced the previous generation’s tuned opponents. Then compared original, previous tuned, and new tuned policies on two separate paired holdout seed sets: previous validation family and a fresh family. Both sides/civilizations are matched.",
+  "budget": {
+    "elapsedSeconds": 90.55,
+    "maxSeconds": 180,
+    "population": 20,
+    "generations": 5,
+    "trainingRepetitionsPerOpponentAndSide": 2,
+    "validationRepetitionsPerOpponentAndSide": 12,
+    "candidateEvaluations": 900,
+    "searchMatches": 28800,
+    "validationMatches": 10368
+  },
+  "bots": {
+    "GREEDY": {
+      "genome": {
+        "ecoUntil": 137,
+        "ecoFactor": 1.55,
+        "factoryAfter": 41,
+        "defendAfter": 60,
+        "defendValue": 0,
+        "captureAfter": 62,
+        "captureChance": 0.64,
+        "attackAfter": 77,
+        "largeAfter": 106,
+        "largeBank": 256,
+        "sabotageAfter": 91,
+        "sabotageChance": 0.49,
+        "specialization": 0
+      },
+      "validation": {
+        "RUSHER": {
+          "old": {
+            "previous": 0.6667,
+            "fresh": 0.625,
+            "original": 0.5417
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.5833,
+            "original": 0.5
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.4583,
+            "original": 0.75
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.4583,
+            "original": 0.625
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.4583,
+            "original": 0.625
+          },
+          "fresh": {
+            "previous": 0.6667,
+            "fresh": 0.5833,
+            "original": 0.6667
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5,
+            "original": 0.8333
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.4583,
+            "original": 0.7083
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.7083,
+            "original": 0.2917
+          },
+          "fresh": {
+            "previous": 0.9167,
+            "fresh": 0.7083,
+            "original": 0.2917
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.75,
+            "original": 0.625
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.4167,
+            "original": 0.5833
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.4583,
+            "original": 0.5
+          },
+          "fresh": {
+            "previous": 0.5833,
+            "fresh": 0.5417,
+            "original": 0.75
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5417,
+            "original": 0.6667
+          },
+          "fresh": {
+            "previous": 0.7083,
+            "fresh": 0.6667,
+            "original": 0.5
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.572925,
+          "fresh": 0.5624874999999999,
+          "original": 0.604175
+        },
+        "newSeed": {
+          "previous": 0.6041625,
+          "fresh": 0.552075,
+          "original": 0.578125
+        },
+        "transferDelta": -0.0104,
+        "freshVsPriorOld": -0.0104,
+        "freshVsOriginalOld": -0.0417,
+        "freshVsPriorNew": -0.0521,
+        "freshVsOriginalNew": -0.0261
+      }
+    },
+    "RUSHER": {
+      "genome": {
+        "ecoUntil": 55,
+        "ecoFactor": 1.27,
+        "factoryAfter": 46,
+        "defendAfter": 24,
+        "defendValue": 212,
+        "captureAfter": 110,
+        "captureChance": 0.44,
+        "attackAfter": 151,
+        "largeAfter": 146,
+        "largeBank": 642,
+        "sabotageAfter": 141,
+        "sabotageChance": 0.54,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.3333,
+            "fresh": 0.25,
+            "original": 0
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.3333,
+            "fresh": 0.2083,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.3333,
+            "original": 0
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.4583,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.5417,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.5833,
+            "original": 0
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.7083,
+            "fresh": 0.7083,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.5833,
+            "fresh": 0.5833,
+            "original": 0
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.25,
+            "fresh": 0.2083,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.3333,
+            "original": 0
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.4167,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.5417,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.4427125,
+          "fresh": 0.4479125,
+          "original": 0
+        },
+        "newSeed": {
+          "previous": 0.4166625,
+          "fresh": 0.41664999999999996,
+          "original": 0
+        },
+        "transferDelta": -0.0313,
+        "freshVsPriorOld": 0.0052,
+        "freshVsOriginalOld": 0.4479,
+        "freshVsPriorNew": 0,
+        "freshVsOriginalNew": 0.4166
+      }
+    },
+    "TURTLE": {
+      "genome": {
+        "ecoUntil": 130,
+        "ecoFactor": 1.78,
+        "factoryAfter": 42,
+        "defendAfter": 1,
+        "defendValue": 13,
+        "captureAfter": 53,
+        "captureChance": 0.71,
+        "attackAfter": 115,
+        "largeAfter": 130,
+        "largeBank": 399,
+        "sabotageAfter": 140,
+        "sabotageChance": 0.61,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.7083,
+            "fresh": 0.5,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.5417,
+            "fresh": 0.5417,
+            "original": 1
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.6667,
+            "fresh": 0.625,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.5833,
+            "original": 1
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.5417,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.6667,
+            "fresh": 0.5417,
+            "original": 1
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5417,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.7083,
+            "original": 1
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.6667,
+            "fresh": 0.75,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.7917,
+            "fresh": 0.7083,
+            "original": 1
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5833,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.4167,
+            "fresh": 0.5417,
+            "original": 1
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.5,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.7083,
+            "fresh": 0.5417,
+            "original": 1
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.8333,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.7083,
+            "fresh": 0.6667,
+            "original": 1
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.6250000000000001,
+          "fresh": 0.6093750000000001,
+          "original": 1
+        },
+        "newSeed": {
+          "previous": 0.6198000000000001,
+          "fresh": 0.6041749999999999,
+          "original": 1
+        },
+        "transferDelta": -0.0052,
+        "freshVsPriorOld": -0.0156,
+        "freshVsOriginalOld": -0.3906,
+        "freshVsPriorNew": -0.0156,
+        "freshVsOriginalNew": -0.3958
+      }
+    },
+    "TEMPO": {
+      "genome": {
+        "ecoUntil": 75,
+        "ecoFactor": 2.08,
+        "factoryAfter": 37,
+        "defendAfter": 26,
+        "defendValue": 28,
+        "captureAfter": 117,
+        "captureChance": 0.83,
+        "attackAfter": 109,
+        "largeAfter": 129,
+        "largeBank": 618,
+        "sabotageAfter": 54,
+        "sabotageChance": 0.38,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.4583,
+            "original": 0.4583
+          },
+          "fresh": {
+            "previous": 0.5417,
+            "fresh": 0.625,
+            "original": 0.4583
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.6667,
+            "original": 0.4167
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.6667,
+            "original": 0.3333
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.5833,
+            "original": 0.3333
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.4167,
+            "original": 0.375
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5,
+            "original": 0.4583
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.625,
+            "original": 0.4583
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.7083,
+            "original": 0.4167
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.75,
+            "original": 0.375
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.5833,
+            "original": 0.1667
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.3333,
+            "original": 0.2917
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.2083,
+            "fresh": 0.4167,
+            "original": 0.4583
+          },
+          "fresh": {
+            "previous": 0.5417,
+            "fresh": 0.4583,
+            "original": 0.4167
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.6667,
+            "fresh": 0.625,
+            "original": 0.4167
+          },
+          "fresh": {
+            "previous": 0.6667,
+            "fresh": 0.7917,
+            "original": 0.5
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.4843625,
+          "fresh": 0.5677,
+          "original": 0.390625
+        },
+        "newSeed": {
+          "previous": 0.541675,
+          "fresh": 0.5833375,
+          "original": 0.4010375
+        },
+        "transferDelta": 0.0156,
+        "freshVsPriorOld": 0.0833,
+        "freshVsOriginalOld": 0.1771,
+        "freshVsPriorNew": 0.0417,
+        "freshVsOriginalNew": 0.1823
+      }
+    },
+    "ADAPTIVE": {
+      "genome": {
+        "ecoUntil": 155,
+        "ecoFactor": 1.73,
+        "factoryAfter": 28,
+        "defendAfter": 67,
+        "defendValue": 56,
+        "captureAfter": 98,
+        "captureChance": 0.76,
+        "attackAfter": 55,
+        "largeAfter": 144,
+        "largeBank": 446,
+        "sabotageAfter": 112,
+        "sabotageChance": 0.59,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.2917,
+            "fresh": 0.4583,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.3333,
+            "fresh": 0.2917,
+            "original": 0.1667
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.375,
+            "original": 0.2083
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.7083,
+            "original": 0.1667
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.3333,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.4167,
+            "fresh": 0.3333,
+            "original": 0.1667
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5,
+            "original": 0.0833
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.4167,
+            "original": 0.1667
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.625,
+            "original": 0.2083
+          },
+          "fresh": {
+            "previous": 0.4167,
+            "fresh": 0.625,
+            "original": 0.2917
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.375,
+            "original": 0.2083
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.4583,
+            "original": 0.1667
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.5,
+            "original": 0.1667
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.2917,
+            "original": 0.2083
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.625,
+            "original": 0.0833
+          },
+          "fresh": {
+            "previous": 0.5833,
+            "fresh": 0.5417,
+            "original": 0.2083
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.44273750000000006,
+          "fresh": 0.47395,
+          "original": 0.15102500000000002
+        },
+        "newSeed": {
+          "previous": 0.4427,
+          "fresh": 0.4583375,
+          "original": 0.19272499999999998
+        },
+        "transferDelta": -0.0156,
+        "freshVsPriorOld": 0.0312,
+        "freshVsOriginalOld": 0.3229,
+        "freshVsPriorNew": 0.0156,
+        "freshVsOriginalNew": 0.2656
+      }
+    },
+    "RANDOM": {
+      "genome": {
+        "ecoUntil": 150,
+        "ecoFactor": 2.13,
+        "factoryAfter": 10,
+        "defendAfter": 23,
+        "defendValue": 8,
+        "captureAfter": 45,
+        "captureChance": 0.47,
+        "attackAfter": 72,
+        "largeAfter": 167,
+        "largeBank": 594,
+        "sabotageAfter": 49,
+        "sabotageChance": 0.2,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.1667,
+            "fresh": 0.5417,
+            "original": 0.1458
+          },
+          "fresh": {
+            "previous": 0.25,
+            "fresh": 0.4167,
+            "original": 0.0417
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.25,
+            "fresh": 0.5417,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.4167,
+            "fresh": 0.5417,
+            "original": 0.1667
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.2917,
+            "fresh": 0.5,
+            "original": 0.2083
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.4583,
+            "original": 0.0417
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.6667,
+            "original": 0.0833
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.5417,
+            "original": 0.1667
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0.1667
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.5,
+            "original": 0.0833
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.1667,
+            "fresh": 0.5417,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.1667,
+            "fresh": 0.4167,
+            "original": 0.0417
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.5,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.2083,
+            "fresh": 0.625,
+            "original": 0.2083
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.75,
+            "original": 0.2083
+          },
+          "fresh": {
+            "previous": 0.3333,
+            "fresh": 0.5833,
+            "original": 0.25
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.30729999999999996,
+          "fresh": 0.5521,
+          "original": 0.148425
+        },
+        "newSeed": {
+          "previous": 0.291675,
+          "fresh": 0.510425,
+          "original": 0.1250125
+        },
+        "transferDelta": -0.0417,
+        "freshVsPriorOld": 0.2448,
+        "freshVsOriginalOld": 0.4037,
+        "freshVsPriorNew": 0.2188,
+        "freshVsOriginalNew": 0.3854
+      }
+    },
+    "BALANCED": {
+      "genome": {
+        "ecoUntil": 84,
+        "ecoFactor": 1.53,
+        "factoryAfter": 56,
+        "defendAfter": 65,
+        "defendValue": 58,
+        "captureAfter": 58,
+        "captureChance": 0.73,
+        "attackAfter": 132,
+        "largeAfter": 147,
+        "largeBank": 269,
+        "sabotageAfter": 135,
+        "sabotageChance": 0.41,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.5,
+            "original": 0.0833
+          },
+          "fresh": {
+            "previous": 0.4167,
+            "fresh": 0.4167,
+            "original": 0.0833
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.625,
+            "original": 0.25
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.625,
+            "original": 0.2083
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.4583,
+            "original": 0.0833
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0.0833
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.4583,
+            "original": 0.0833
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5417,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.625,
+            "fresh": 0.5833,
+            "original": 0.0833
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.7917,
+            "fresh": 0.7917,
+            "original": 0.125
+          },
+          "fresh": {
+            "previous": 0.8333,
+            "fresh": 0.8333,
+            "original": 0.25
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0.1667
+          },
+          "fresh": {
+            "previous": 0.5417,
+            "fresh": 0.5417,
+            "original": 0.125
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0.3333
+          },
+          "fresh": {
+            "previous": 0.7083,
+            "fresh": 0.7083,
+            "original": 0.2083
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.552075,
+          "fresh": 0.5520875000000001,
+          "original": 0.13019999999999998
+        },
+        "newSeed": {
+          "previous": 0.5729125,
+          "fresh": 0.5677,
+          "original": 0.1406
+        },
+        "transferDelta": 0.0156,
+        "freshVsPriorOld": 0,
+        "freshVsOriginalOld": 0.4219,
+        "freshVsPriorNew": -0.0052,
+        "freshVsOriginalNew": 0.4271
+      }
+    },
+    "HOARDER": {
+      "genome": {
+        "ecoUntil": 165,
+        "ecoFactor": 1.7,
+        "factoryAfter": 40,
+        "defendAfter": 69,
+        "defendValue": 0,
+        "captureAfter": 75,
+        "captureChance": 0.4,
+        "attackAfter": 99,
+        "largeAfter": 145,
+        "largeBank": 500,
+        "sabotageAfter": 105,
+        "sabotageChance": 0.2,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.4167,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.5,
+            "original": 0
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5208,
+            "original": 0.1667
+          },
+          "fresh": {
+            "previous": 0.5833,
+            "fresh": 0.5417,
+            "original": 0.0833
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.4167,
+            "fresh": 0.375,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.4583,
+            "original": 0
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5833,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.5833,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.4167,
+            "original": 0
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.75,
+            "fresh": 0.8333,
+            "original": 0.0417
+          },
+          "fresh": {
+            "previous": 0.75,
+            "fresh": 0.7917,
+            "original": 0
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.7083,
+            "fresh": 0.5833,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.5,
+            "original": 0
+          }
+        },
+        "SABOTEUR": {
+          "old": {
+            "previous": 0.5417,
+            "fresh": 0.5833,
+            "original": 0
+          },
+          "fresh": {
+            "previous": 0.875,
+            "fresh": 0.6667,
+            "original": 0
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.5729124999999999,
+          "fresh": 0.559875,
+          "original": 0.026049999999999997
+        },
+        "newSeed": {
+          "previous": 0.5260375,
+          "fresh": 0.5468875,
+          "original": 0.0104125
+        },
+        "transferDelta": -0.013,
+        "freshVsPriorOld": -0.013,
+        "freshVsOriginalOld": 0.5338,
+        "freshVsPriorNew": 0.0208,
+        "freshVsOriginalNew": 0.5365
+      }
+    },
+    "SABOTEUR": {
+      "genome": {
+        "ecoUntil": 138,
+        "ecoFactor": 1.39,
+        "factoryAfter": 78,
+        "defendAfter": 67,
+        "defendValue": 204,
+        "captureAfter": 45,
+        "captureChance": 0.81,
+        "attackAfter": 99,
+        "largeAfter": 117,
+        "largeBank": 637,
+        "sabotageAfter": 76,
+        "sabotageChance": 0.18,
+        "specialization": 0
+      },
+      "validation": {
+        "GREEDY": {
+          "old": {
+            "previous": 0.3333,
+            "fresh": 0.4167,
+            "original": 0.9583
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0.875
+          }
+        },
+        "RUSHER": {
+          "old": {
+            "previous": 0.5833,
+            "fresh": 0.5833,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.5417,
+            "fresh": 0.5833,
+            "original": 1
+          }
+        },
+        "TURTLE": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.375,
+            "original": 0.7917
+          },
+          "fresh": {
+            "previous": 0.25,
+            "fresh": 0.3958,
+            "original": 0.875
+          }
+        },
+        "TEMPO": {
+          "old": {
+            "previous": 0.5,
+            "fresh": 0.5,
+            "original": 0.9583
+          },
+          "fresh": {
+            "previous": 0.4583,
+            "fresh": 0.4167,
+            "original": 0.9167
+          }
+        },
+        "ADAPTIVE": {
+          "old": {
+            "previous": 0.4583,
+            "fresh": 0.4167,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.375,
+            "fresh": 0.4583,
+            "original": 1
+          }
+        },
+        "RANDOM": {
+          "old": {
+            "previous": 0.625,
+            "fresh": 0.5833,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.75,
+            "fresh": 0.75,
+            "original": 1
+          }
+        },
+        "BALANCED": {
+          "old": {
+            "previous": 0.375,
+            "fresh": 0.5417,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.3333,
+            "fresh": 0.375,
+            "original": 1
+          }
+        },
+        "HOARDER": {
+          "old": {
+            "previous": 0.3333,
+            "fresh": 0.3333,
+            "original": 1
+          },
+          "fresh": {
+            "previous": 0.2917,
+            "fresh": 0.375,
+            "original": 0.9167
+          }
+        }
+      },
+      "summary": {
+        "oldSeed": {
+          "previous": 0.4479,
+          "fresh": 0.46875,
+          "original": 0.9635374999999999
+        },
+        "newSeed": {
+          "previous": 0.421875,
+          "fresh": 0.46613750000000004,
+          "original": 0.947925
+        },
+        "transferDelta": -0.0026,
+        "freshVsPriorOld": 0.0208,
+        "freshVsOriginalOld": -0.4948,
+        "freshVsPriorNew": 0.0443,
+        "freshVsOriginalNew": -0.4818
+      }
+    }
+  }
+}

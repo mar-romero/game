@@ -1,0 +1,775 @@
+{
+  "matches": 2250,
+  "strategies": [
+    "GREEDY",
+    "RUSHER",
+    "TURTLE",
+    "TEMPO",
+    "ADAPTIVE",
+    "RANDOM",
+    "BALANCED",
+    "HOARDER",
+    "SABOTEUR"
+  ],
+  "civilizations": [
+    "forge",
+    "bastion",
+    "swarm",
+    "nexus"
+  ],
+  "gameConfig": {
+    "duration": 240,
+    "coreHP": 700,
+    "startingResources": 240
+  },
+  "repetitionsPerPairAndSide": 25,
+  "seedStart": 20261008,
+  "seedEnd": 20263257,
+  "results": [
+    {
+      "botA": "GREEDY",
+      "botB": "GREEDY",
+      "matches": 50,
+      "winsA": 27,
+      "winsB": 0,
+      "draws": 23,
+      "avgDuration": 240,
+      "avgHpA": 671.5,
+      "avgHpB": 671.5,
+      "avgTerritoryA": 79.7,
+      "avgTerritoryB": 79.7,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "RUSHER",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 65.4,
+      "avgHpA": 0,
+      "avgHpB": 700,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 0,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "TURTLE",
+      "matches": 50,
+      "winsA": 34,
+      "winsB": 15,
+      "draws": 1,
+      "avgDuration": 240,
+      "avgHpA": 689.8,
+      "avgHpB": 651.5,
+      "avgTerritoryA": 85.7,
+      "avgTerritoryB": 76.1,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "TEMPO",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 68.1,
+      "avgHpA": 0,
+      "avgHpB": 700,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 5.3,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "ADAPTIVE",
+      "matches": 50,
+      "winsA": 39,
+      "winsB": 11,
+      "draws": 0,
+      "avgDuration": 109.7,
+      "avgHpA": 123.3,
+      "avgHpB": 154,
+      "avgTerritoryA": 28.5,
+      "avgTerritoryB": 11,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 27,
+      "winsB": 23,
+      "draws": 0,
+      "avgDuration": 95.3,
+      "avgHpA": 102.2,
+      "avgHpB": 322,
+      "avgTerritoryA": 16.6,
+      "avgTerritoryB": 18.6,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 26,
+      "winsB": 24,
+      "draws": 0,
+      "avgDuration": 98.4,
+      "avgHpA": 74.3,
+      "avgHpB": 336,
+      "avgTerritoryA": 20,
+      "avgTerritoryB": 14.6,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 156.5,
+      "avgHpA": 700,
+      "avgHpB": 39.5,
+      "avgTerritoryA": 58.8,
+      "avgTerritoryB": 13.8,
+      "endReasons": {
+        "Núcleo destruido": 40,
+        "Tiempo agotado: HP; desempate por control territorial": 10
+      }
+    },
+    {
+      "botA": "GREEDY",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 46,
+      "winsB": 4,
+      "draws": 0,
+      "avgDuration": 240,
+      "avgHpA": 697.6,
+      "avgHpB": 525.5,
+      "avgTerritoryA": 122.7,
+      "avgTerritoryB": 42.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "RUSHER",
+      "matches": 50,
+      "winsA": 10,
+      "winsB": 0,
+      "draws": 40,
+      "avgDuration": 204.4,
+      "avgHpA": 152.3,
+      "avgHpB": 152.3,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 0,
+      "endReasons": {
+        "Núcleo destruido": 18,
+        "Tiempo agotado: HP; desempate por control territorial": 32
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "TURTLE",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 136.5,
+      "avgHpA": 0,
+      "avgHpB": 700,
+      "avgTerritoryA": 0.2,
+      "avgTerritoryB": 56.4,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "TEMPO",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 126.2,
+      "avgHpA": 0,
+      "avgHpB": 694.4,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 64.9,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "ADAPTIVE",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 165.9,
+      "avgHpA": 0,
+      "avgHpB": 695.4,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 118.6,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 13,
+      "winsB": 37,
+      "draws": 0,
+      "avgDuration": 199,
+      "avgHpA": 138.7,
+      "avgHpB": 429.1,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 40.7,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 21,
+        "Núcleo destruido": 29
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 158.4,
+      "avgHpA": 27.5,
+      "avgHpB": 663.7,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 39,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 10,
+        "Núcleo destruido": 40
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 230.5,
+      "avgHpA": 66.5,
+      "avgHpB": 678.4,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 33.5,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 23,
+        "Núcleo destruido": 27
+      }
+    },
+    {
+      "botA": "RUSHER",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 143.2,
+      "avgHpA": 0,
+      "avgHpB": 700,
+      "avgTerritoryA": 0,
+      "avgTerritoryB": 69.2,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "TURTLE",
+      "matches": 50,
+      "winsA": 22,
+      "winsB": 0,
+      "draws": 28,
+      "avgDuration": 240,
+      "avgHpA": 665,
+      "avgHpB": 665,
+      "avgTerritoryA": 76.6,
+      "avgTerritoryB": 76.6,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "TEMPO",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 142.6,
+      "avgHpA": 641.3,
+      "avgHpB": 0,
+      "avgTerritoryA": 57.1,
+      "avgTerritoryB": 22.5,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "ADAPTIVE",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 150.2,
+      "avgHpA": 692.8,
+      "avgHpB": 0,
+      "avgTerritoryA": 58.3,
+      "avgTerritoryB": 52.4,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 156.8,
+      "avgHpA": 680.5,
+      "avgHpB": 18.2,
+      "avgTerritoryA": 69.6,
+      "avgTerritoryB": 22,
+      "endReasons": {
+        "Núcleo destruido": 47,
+        "Tiempo agotado: HP; desempate por control territorial": 3
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 142.1,
+      "avgHpA": 700,
+      "avgHpB": 0,
+      "avgTerritoryA": 63.5,
+      "avgTerritoryB": 14.8,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 159.4,
+      "avgHpA": 697.4,
+      "avgHpB": 18.7,
+      "avgTerritoryA": 66.3,
+      "avgTerritoryB": 14.8,
+      "endReasons": {
+        "Núcleo destruido": 46,
+        "Tiempo agotado: HP; desempate por control territorial": 4
+      }
+    },
+    {
+      "botA": "TURTLE",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 44,
+      "winsB": 6,
+      "draws": 0,
+      "avgDuration": 240,
+      "avgHpA": 690.4,
+      "avgHpB": 548.9,
+      "avgTerritoryA": 122.5,
+      "avgTerritoryB": 42.7,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "TEMPO",
+      "matches": 50,
+      "winsA": 24,
+      "winsB": 0,
+      "draws": 26,
+      "avgDuration": 161.8,
+      "avgHpA": 280,
+      "avgHpB": 280,
+      "avgTerritoryA": 41.9,
+      "avgTerritoryB": 41.9,
+      "endReasons": {
+        "Núcleo destruido": 41,
+        "Tiempo agotado: HP; desempate por control territorial": 9
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "ADAPTIVE",
+      "matches": 50,
+      "winsA": 36,
+      "winsB": 14,
+      "draws": 0,
+      "avgDuration": 220.2,
+      "avgHpA": 573.1,
+      "avgHpB": 361.4,
+      "avgTerritoryA": 86.1,
+      "avgTerritoryB": 89.1,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 38,
+        "Núcleo destruido": 12
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 38,
+      "winsB": 12,
+      "draws": 0,
+      "avgDuration": 193.9,
+      "avgHpA": 626.2,
+      "avgHpB": 293.2,
+      "avgTerritoryA": 84.4,
+      "avgTerritoryB": 50.9,
+      "endReasons": {
+        "Núcleo destruido": 22,
+        "Tiempo agotado: HP; desempate por control territorial": 28
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 48,
+      "winsB": 2,
+      "draws": 0,
+      "avgDuration": 222.2,
+      "avgHpA": 587.8,
+      "avgHpB": 427.2,
+      "avgTerritoryA": 148.9,
+      "avgTerritoryB": 7.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 37,
+        "Núcleo destruido": 13
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 212.6,
+      "avgHpA": 700,
+      "avgHpB": 266.9,
+      "avgTerritoryA": 124.8,
+      "avgTerritoryB": 5.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 26,
+        "Núcleo destruido": 24
+      }
+    },
+    {
+      "botA": "TEMPO",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 168,
+      "avgHpA": 20.9,
+      "avgHpB": 566.4,
+      "avgTerritoryA": 29.3,
+      "avgTerritoryB": 69.6,
+      "endReasons": {
+        "Núcleo destruido": 47,
+        "Tiempo agotado: HP; desempate por control territorial": 3
+      }
+    },
+    {
+      "botA": "ADAPTIVE",
+      "botB": "ADAPTIVE",
+      "matches": 50,
+      "winsA": 35,
+      "winsB": 0,
+      "draws": 15,
+      "avgDuration": 206.7,
+      "avgHpA": 569.3,
+      "avgHpB": 569.3,
+      "avgTerritoryA": 108.9,
+      "avgTerritoryB": 108.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 34,
+        "Núcleo destruido": 16
+      }
+    },
+    {
+      "botA": "ADAPTIVE",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 35,
+      "winsB": 15,
+      "draws": 0,
+      "avgDuration": 200.1,
+      "avgHpA": 589.8,
+      "avgHpB": 374,
+      "avgTerritoryA": 114.8,
+      "avgTerritoryB": 33.4,
+      "endReasons": {
+        "Núcleo destruido": 20,
+        "Tiempo agotado: HP; desempate por control territorial": 30
+      }
+    },
+    {
+      "botA": "ADAPTIVE",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 20,
+      "winsB": 30,
+      "draws": 0,
+      "avgDuration": 206.7,
+      "avgHpA": 361.1,
+      "avgHpB": 616.4,
+      "avgTerritoryA": 99.9,
+      "avgTerritoryB": 64.8,
+      "endReasons": {
+        "Núcleo destruido": 19,
+        "Tiempo agotado: HP; desempate por control territorial": 31
+      }
+    },
+    {
+      "botA": "ADAPTIVE",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 214.9,
+      "avgHpA": 700,
+      "avgHpB": 492.8,
+      "avgTerritoryA": 170.3,
+      "avgTerritoryB": 2.3,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 38,
+        "Núcleo destruido": 12
+      }
+    },
+    {
+      "botA": "ADAPTIVE",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 3,
+      "winsB": 47,
+      "draws": 0,
+      "avgDuration": 178.7,
+      "avgHpA": 103.5,
+      "avgHpB": 645.3,
+      "avgTerritoryA": 65.4,
+      "avgTerritoryB": 72.5,
+      "endReasons": {
+        "Núcleo destruido": 40,
+        "Tiempo agotado: HP; desempate por control territorial": 10
+      }
+    },
+    {
+      "botA": "RANDOM",
+      "botB": "RANDOM",
+      "matches": 50,
+      "winsA": 25,
+      "winsB": 0,
+      "draws": 25,
+      "avgDuration": 215.9,
+      "avgHpA": 477.5,
+      "avgHpB": 477.5,
+      "avgTerritoryA": 48.3,
+      "avgTerritoryB": 48.3,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 35,
+        "Núcleo destruido": 15
+      }
+    },
+    {
+      "botA": "RANDOM",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 21,
+      "winsB": 28,
+      "draws": 1,
+      "avgDuration": 201.5,
+      "avgHpA": 359.5,
+      "avgHpB": 583.9,
+      "avgTerritoryA": 65.7,
+      "avgTerritoryB": 41.1,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 30,
+        "Núcleo destruido": 20
+      }
+    },
+    {
+      "botA": "RANDOM",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 22,
+      "winsB": 27,
+      "draws": 1,
+      "avgDuration": 227.3,
+      "avgHpA": 380.7,
+      "avgHpB": 597.1,
+      "avgTerritoryA": 94.1,
+      "avgTerritoryB": 11.3,
+      "endReasons": {
+        "Núcleo destruido": 22,
+        "Tiempo agotado: HP; desempate por control territorial": 28
+      }
+    },
+    {
+      "botA": "RANDOM",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 1,
+      "winsB": 49,
+      "draws": 0,
+      "avgDuration": 188.9,
+      "avgHpA": 102,
+      "avgHpB": 670.9,
+      "avgTerritoryA": 13,
+      "avgTerritoryB": 106.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 17,
+        "Núcleo destruido": 33
+      }
+    },
+    {
+      "botA": "BALANCED",
+      "botB": "BALANCED",
+      "matches": 50,
+      "winsA": 23,
+      "winsB": 0,
+      "draws": 27,
+      "avgDuration": 231.6,
+      "avgHpA": 486.4,
+      "avgHpB": 486.4,
+      "avgTerritoryA": 83.7,
+      "avgTerritoryB": 83.7,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 37,
+        "Núcleo destruido": 13
+      }
+    },
+    {
+      "botA": "BALANCED",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 50,
+      "winsB": 0,
+      "draws": 0,
+      "avgDuration": 145.6,
+      "avgHpA": 700,
+      "avgHpB": 36.5,
+      "avgTerritoryA": 72.9,
+      "avgTerritoryB": 1.9,
+      "endReasons": {
+        "Núcleo destruido": 45,
+        "Tiempo agotado: HP; desempate por control territorial": 5
+      }
+    },
+    {
+      "botA": "BALANCED",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 164.2,
+      "avgHpA": 0,
+      "avgHpB": 699.9,
+      "avgTerritoryA": 24.7,
+      "avgTerritoryB": 86.9,
+      "endReasons": {
+        "Núcleo destruido": 50
+      }
+    },
+    {
+      "botA": "HOARDER",
+      "botB": "HOARDER",
+      "matches": 50,
+      "winsA": 27,
+      "winsB": 0,
+      "draws": 23,
+      "avgDuration": 240,
+      "avgHpA": 689.4,
+      "avgHpB": 689.4,
+      "avgTerritoryA": 78.9,
+      "avgTerritoryB": 78.9,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    },
+    {
+      "botA": "HOARDER",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 0,
+      "winsB": 50,
+      "draws": 0,
+      "avgDuration": 165.9,
+      "avgHpA": 18.2,
+      "avgHpB": 700,
+      "avgTerritoryA": 12.5,
+      "avgTerritoryB": 78.2,
+      "endReasons": {
+        "Núcleo destruido": 44,
+        "Tiempo agotado: HP; desempate por control territorial": 6
+      }
+    },
+    {
+      "botA": "SABOTEUR",
+      "botB": "SABOTEUR",
+      "matches": 50,
+      "winsA": 23,
+      "winsB": 0,
+      "draws": 27,
+      "avgDuration": 240,
+      "avgHpA": 567.4,
+      "avgHpB": 567.4,
+      "avgTerritoryA": 78.3,
+      "avgTerritoryB": 78.3,
+      "endReasons": {
+        "Tiempo agotado: HP; desempate por control territorial": 50
+      }
+    }
+  ]
+}

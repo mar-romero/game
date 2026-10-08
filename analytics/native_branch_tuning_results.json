@@ -1,0 +1,3420 @@
+{
+  "title": "Per-strategy native branch tuning",
+  "createdAt": "2026-10-08T07:44:41.028Z",
+  "method": "Each strategy’s existing branch order and personality is preserved. Search changes only parameters used by that branch; opponent pool includes every other strategy in native, calibrated, and current production form. Candidate selection uses a mean/worst-opponent objective and common seed schedules within each generation. Validation uses a prior and a fresh held-out seed family.",
+  "budget": {
+    "elapsedSeconds": 101.94,
+    "maxSeconds": 180,
+    "population": 10,
+    "generations": 4,
+    "trainingRepetitionsPerOpponentPolicyAndSide": 2,
+    "validationRepetitionsPerOpponentPolicyAndSide": 6,
+    "candidateEvaluations": 360,
+    "searchMatches": 34560,
+    "validationMatches": 20736
+  },
+  "bots": {
+    "GREEDY": {
+      "genome": {
+        "greedyGrowth": 1.96,
+        "greedyEcoUntil": 140,
+        "greedyFactoryAfter": 70,
+        "greedyCaptureAfter": 74,
+        "greedyCaptureChance": 0.45,
+        "greedyAttackAfter": 125,
+        "greedySabotageAfter": 121,
+        "greedySabotageChance": 0.45,
+        "greedyLateAttackAfter": 160
+      },
+      "searchMean": 0.59375,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.5052104166666667,
+          "calibrated": 0.5052104166666667,
+          "current": 0.8975749999999997,
+          "tuned": 0.5017375000000001
+        },
+        "perOpponent": {
+          "RUSHER": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "TURTLE": {
+            "native": 0.7777833333333333,
+            "calibrated": 0.7777833333333333,
+            "current": 0.7638833333333334,
+            "tuned": 0.75
+          },
+          "TEMPO": {
+            "native": 0.08331666666666666,
+            "calibrated": 0.08331666666666666,
+            "current": 0.9027666666666666,
+            "tuned": 0.013883333333333333
+          },
+          "ADAPTIVE": {
+            "native": 0.3611166666666667,
+            "calibrated": 0.3611166666666667,
+            "current": 0.9722333333333334,
+            "tuned": 0.3611166666666667
+          },
+          "RANDOM": {
+            "native": 0.4583333333333333,
+            "calibrated": 0.4583333333333333,
+            "current": 0.8750333333333332,
+            "tuned": 0.4583333333333333
+          },
+          "BALANCED": {
+            "native": 0.4305666666666667,
+            "calibrated": 0.4305666666666667,
+            "current": 0.8750166666666667,
+            "tuned": 0.4305666666666667
+          },
+          "HOARDER": {
+            "native": 0.9444500000000001,
+            "calibrated": 0.9444500000000001,
+            "current": 0.8055499999999999,
+            "tuned": 1
+          },
+          "SABOTEUR": {
+            "native": 0.9861166666666668,
+            "calibrated": 0.9861166666666668,
+            "current": 0.9861166666666668,
+            "tuned": 1
+          }
+        }
+      },
+      "matchups": {
+        "RUSHER": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.75,
+            "tuned": 0.75
+          },
+          "native_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.6667
+          },
+          "calibrated_prior": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.75
+          },
+          "calibrated_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.75
+          },
+          "current_prior": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.9167,
+            "tuned": 0.8333
+          },
+          "current_heldout": {
+            "native": 0.6667,
+            "calibrated": 0.6667,
+            "current": 0.5833,
+            "tuned": 0.75
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 1,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 1,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0.3333,
+            "calibrated": 0.3333,
+            "current": 0.8333,
+            "tuned": 0.0833
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0.8333,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.9167,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0.8333,
+            "tuned": 0
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 1,
+            "tuned": 0.5
+          },
+          "native_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 1,
+            "tuned": 0.75
+          },
+          "calibrated_prior": {
+            "native": 0.1667,
+            "calibrated": 0.1667,
+            "current": 0.9167,
+            "tuned": 0.1667
+          },
+          "calibrated_heldout": {
+            "native": 0.25,
+            "calibrated": 0.25,
+            "current": 1,
+            "tuned": 0.25
+          },
+          "current_prior": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 1,
+            "tuned": 0.0833
+          },
+          "current_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.6667,
+            "calibrated": 0.6667,
+            "current": 0.9167,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0.5833,
+            "calibrated": 0.5833,
+            "current": 0.9167,
+            "tuned": 0.5833
+          },
+          "calibrated_prior": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.6667,
+            "tuned": 0.0833
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          },
+          "current_prior": {
+            "native": 0.5833,
+            "calibrated": 0.5833,
+            "current": 0.9167,
+            "tuned": 0.5833
+          },
+          "current_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 1,
+            "tuned": 0.5
+          },
+          "native_heldout": {
+            "native": 0.25,
+            "calibrated": 0.25,
+            "current": 1,
+            "tuned": 0.25
+          },
+          "calibrated_prior": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 0.6667,
+            "tuned": 0.5
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          },
+          "current_prior": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          },
+          "current_heldout": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 0.75,
+            "tuned": 0.5
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.8333,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 0.75,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 0.5,
+            "tuned": 1
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        }
+      }
+    },
+    "RUSHER": {
+      "genome": {
+        "rusherFactoryAfter": 29,
+        "rusherDefendHP": 465,
+        "rusherEcoAfter": 30,
+        "rusherEcoReserve": 147,
+        "rusherGrowth": 1.42,
+        "rusherCaptureShield": 198,
+        "rusherLargeAfter": 149,
+        "rusherLargeReserve": 246,
+        "rusherCaptureAfter": 86
+      },
+      "searchMean": 0.13541666666666666,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.10243124999999999,
+          "calibrated": 0.19704791666666668,
+          "current": 0.19704791666666668,
+          "tuned": 0.12326666666666665
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.6666666666666666,
+            "calibrated": 0.6666666666666666,
+            "current": 0.6666666666666666,
+            "tuned": 0.5972333333333333
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "TEMPO": {
+            "native": 0,
+            "calibrated": 0.08331666666666666,
+            "current": 0.08331666666666666,
+            "tuned": 0
+          },
+          "ADAPTIVE": {
+            "native": 0,
+            "calibrated": 0.23609999999999998,
+            "current": 0.23609999999999998,
+            "tuned": 0
+          },
+          "RANDOM": {
+            "native": 0.15278333333333335,
+            "calibrated": 0.3055666666666667,
+            "current": 0.3055666666666667,
+            "tuned": 0.20833333333333334
+          },
+          "BALANCED": {
+            "native": 0,
+            "calibrated": 0.06945,
+            "current": 0.06945,
+            "tuned": 0
+          },
+          "HOARDER": {
+            "native": 0,
+            "calibrated": 0.21528333333333335,
+            "current": 0.21528333333333335,
+            "tuned": 0.18056666666666665
+          },
+          "SABOTEUR": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.4167,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.5
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.0833
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.625,
+            "current": 0.625,
+            "tuned": 0.4167
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        }
+      }
+    },
+    "TURTLE": {
+      "genome": {
+        "turtleGrowth": 1.47,
+        "turtleEcoUntil": 107,
+        "turtleShieldBelow": 63,
+        "turtleShieldBank": 99,
+        "turtleShieldAfter": 29,
+        "turtleFactoryAfter": 77,
+        "turtleCaptureAfter": 55,
+        "turtleAttackAfter": 150,
+        "turtleSabotageAfter": 94,
+        "turtleSabotageChance": 0.59
+      },
+      "searchMean": 1,
+      "searchWorst": 1,
+      "summary": {
+        "means": {
+          "native": 0.8871541666666666,
+          "calibrated": 0.8871541666666666,
+          "current": 0.8871541666666666,
+          "tuned": 0.9791666666666666
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.27776666666666666,
+            "calibrated": 0.27776666666666666,
+            "current": 0.27776666666666666,
+            "tuned": 0.8472166666666667
+          },
+          "RUSHER": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "TEMPO": {
+            "native": 0.9444500000000001,
+            "calibrated": 0.9444500000000001,
+            "current": 0.9444500000000001,
+            "tuned": 1
+          },
+          "ADAPTIVE": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "RANDOM": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "BALANCED": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "HOARDER": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "SABOTEUR": {
+            "native": 0.8750166666666667,
+            "calibrated": 0.8750166666666667,
+            "current": 0.8750166666666667,
+            "tuned": 0.9861166666666666
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0.3333,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.8333
+          },
+          "native_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.8333
+          },
+          "calibrated_prior": {
+            "native": 0.25,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.9167
+          },
+          "current_prior": {
+            "native": 0.25,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.5833
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 1
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.9167
+          },
+          "current_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 1
+          }
+        }
+      }
+    },
+    "TEMPO": {
+      "genome": {
+        "tempoFactoryAfter": 30,
+        "tempoPunishEconomyCount": 2,
+        "tempoGrowth": 1.89,
+        "tempoEcoUntil": 84,
+        "tempoCaptureAfter": 31,
+        "tempoCaptureChance": 0.64,
+        "tempoAttackAfter": 132,
+        "tempoSabotageAfter": 121,
+        "tempoSabotageChance": 0.51
+      },
+      "searchMean": 0.6145833333333334,
+      "searchWorst": 0.16666666666666666,
+      "summary": {
+        "means": {
+          "native": 0.49131875,
+          "calibrated": 0.6180583333333333,
+          "current": 0.6180583333333333,
+          "tuned": 0.6250041666666667
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.6527833333333334,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.18056666666666665
+          },
+          "RUSHER": {
+            "native": 0.9583499999999999,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0.02778333333333333,
+            "current": 0.02778333333333333,
+            "tuned": 0.16666666666666666
+          },
+          "ADAPTIVE": {
+            "native": 0.6944333333333333,
+            "calibrated": 0.7222166666666667,
+            "current": 0.7222166666666667,
+            "tuned": 0.8194666666666667
+          },
+          "RANDOM": {
+            "native": 0.5555666666666667,
+            "calibrated": 0.8472333333333332,
+            "current": 0.8472333333333332,
+            "tuned": 0.9027666666666666
+          },
+          "BALANCED": {
+            "native": 0.7083166666666667,
+            "calibrated": 0.7916666666666666,
+            "current": 0.7916666666666666,
+            "tuned": 0.8888833333333332
+          },
+          "HOARDER": {
+            "native": 0.3611,
+            "calibrated": 0.5416666666666666,
+            "current": 0.5416666666666666,
+            "tuned": 0.7639
+          },
+          "SABOTEUR": {
+            "native": 0,
+            "calibrated": 0.2639,
+            "current": 0.2639,
+            "tuned": 0.2777833333333333
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.1667
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.1667
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.25
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.25
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.0833
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.3333
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.25
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.1667
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.25
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0.5833,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.9167
+          },
+          "native_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.9167
+          },
+          "calibrated_prior": {
+            "native": 0.6667,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.6667
+          },
+          "current_prior": {
+            "native": 0.75,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.6667
+          },
+          "current_heldout": {
+            "native": 0.5833,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.8333
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.75,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.8333
+          },
+          "native_heldout": {
+            "native": 0.75,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.5833,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.6667,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0.1667,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.75
+          },
+          "current_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.3333,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.8333
+          },
+          "calibrated_heldout": {
+            "native": 0.5,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0.5833,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.9167
+          },
+          "current_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.75
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.0833,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.6667
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.6667
+          },
+          "current_prior": {
+            "native": 0.0833,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.6667
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.5833
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.25
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.0833
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.5
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.25
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.4167
+          }
+        }
+      }
+    },
+    "ADAPTIVE": {
+      "genome": {
+        "adaptiveDefenseLead": 2,
+        "adaptiveDefenseGrowth": 1.89,
+        "adaptiveGrowth": 1.27,
+        "adaptiveEcoUntil": 119,
+        "adaptiveFactoryAfter": 0,
+        "adaptiveCaptureChance": 0.39,
+        "adaptiveAttackAfter": 105,
+        "adaptiveLargeAfter": 84,
+        "adaptiveSabotageChance": 0.37
+      },
+      "searchMean": 0.2916666666666667,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.2569395833333333,
+          "calibrated": 0.43055625000000003,
+          "current": 0.43055625000000003,
+          "tuned": 0.2743104166666666
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.16665,
+            "calibrated": 0.4722166666666667,
+            "current": 0.4722166666666667,
+            "tuned": 0.13888333333333333
+          },
+          "RUSHER": {
+            "native": 0.6389,
+            "calibrated": 0.9166666666666665,
+            "current": 0.9166666666666665,
+            "tuned": 0.6389
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "TEMPO": {
+            "native": 0.11111666666666666,
+            "calibrated": 0.2638833333333333,
+            "current": 0.2638833333333333,
+            "tuned": 0.1666833333333333
+          },
+          "RANDOM": {
+            "native": 0.43055,
+            "calibrated": 0.7361333333333334,
+            "current": 0.7361333333333334,
+            "tuned": 0.5139
+          },
+          "BALANCED": {
+            "native": 0.33331666666666665,
+            "calibrated": 0.625,
+            "current": 0.625,
+            "tuned": 0.3889
+          },
+          "HOARDER": {
+            "native": 0.31945,
+            "calibrated": 0.3333333333333333,
+            "current": 0.3333333333333333,
+            "tuned": 0.2916666666666667
+          },
+          "SABOTEUR": {
+            "native": 0.05553333333333333,
+            "calibrated": 0.09721666666666667,
+            "current": 0.09721666666666667,
+            "tuned": 0.055549999999999995
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0.3333,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.3333
+          },
+          "native_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.0833
+          },
+          "calibrated_prior": {
+            "native": 0.25,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.25
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.1667
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.4167,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.4167
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5
+          },
+          "current_prior": {
+            "native": 0.5,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.5
+          },
+          "current_heldout": {
+            "native": 0.5,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          },
+          "native_heldout": {
+            "native": 0.25,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.25
+          },
+          "calibrated_prior": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          },
+          "calibrated_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.1667
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.25
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.6667,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.75
+          },
+          "calibrated_prior": {
+            "native": 0.25,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.5
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.4167
+          },
+          "current_prior": {
+            "native": 0.1667,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.3333
+          },
+          "current_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.4167
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 0.4167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.4167
+          },
+          "native_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.5
+          },
+          "calibrated_prior": {
+            "native": 0.3333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.4167
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.4167
+          },
+          "current_prior": {
+            "native": 0.25,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.3333
+          },
+          "current_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.25
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.0833
+          },
+          "native_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.0833
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.1667
+          },
+          "calibrated_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0.0833,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        }
+      }
+    },
+    "RANDOM": {
+      "genome": {
+        "randomActionChance": 0.37
+      },
+      "searchMean": 0.3020833333333333,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.21007083333333332,
+          "calibrated": 0.39756875,
+          "current": 0.39756875,
+          "tuned": 0.25173333333333325
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.27776666666666666,
+            "calibrated": 0.4722166666666667,
+            "current": 0.4722166666666667,
+            "tuned": 0.08331666666666666
+          },
+          "RUSHER": {
+            "native": 0.5416666666666666,
+            "calibrated": 0.9444499999999999,
+            "current": 0.9444499999999999,
+            "tuned": 0.6527666666666666
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "TEMPO": {
+            "native": 0.15278333333333333,
+            "calibrated": 0.34723333333333334,
+            "current": 0.34723333333333334,
+            "tuned": 0.20835
+          },
+          "ADAPTIVE": {
+            "native": 0.3055666666666667,
+            "calibrated": 0.5416500000000001,
+            "current": 0.5416500000000001,
+            "tuned": 0.3680666666666667
+          },
+          "BALANCED": {
+            "native": 0.16666666666666666,
+            "calibrated": 0.43055,
+            "current": 0.43055,
+            "tuned": 0.3958166666666667
+          },
+          "HOARDER": {
+            "native": 0.20833333333333334,
+            "calibrated": 0.3333333333333333,
+            "current": 0.3333333333333333,
+            "tuned": 0.2777833333333333
+          },
+          "SABOTEUR": {
+            "native": 0.02778333333333333,
+            "calibrated": 0.11111666666666666,
+            "current": 0.11111666666666666,
+            "tuned": 0.027766666666666665
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0.5,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.0833
+          },
+          "native_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.3333
+          },
+          "calibrated_prior": {
+            "native": 0.4167,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.0833
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 0.75,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0.5833,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "calibrated_prior": {
+            "native": 0.5,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.5833
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.5833
+          },
+          "current_prior": {
+            "native": 0.25,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.6667
+          },
+          "current_heldout": {
+            "native": 0.75,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5833
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0.1667,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.1667
+          },
+          "native_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.4167
+          },
+          "calibrated_prior": {
+            "native": 0.0833,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.1667
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.0833
+          },
+          "current_prior": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          },
+          "current_heldout": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.25
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0.5,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.4167
+          },
+          "native_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.4167
+          },
+          "calibrated_prior": {
+            "native": 0.1667,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.3333
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.4167
+          },
+          "current_prior": {
+            "native": 0.1667,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.25
+          },
+          "current_heldout": {
+            "native": 0.25,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.375
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 0.1667,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.8333
+          },
+          "native_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.3333
+          },
+          "calibrated_prior": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.4583
+          },
+          "calibrated_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.5
+          },
+          "current_prior": {
+            "native": 0.1667,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.25
+          },
+          "current_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 0.4167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.75
+          },
+          "native_heldout": {
+            "native": 0.8333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.0833
+          },
+          "native_heldout": {
+            "native": 0.1667,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.0833
+          }
+        }
+      }
+    },
+    "BALANCED": {
+      "genome": {
+        "balancedGrowth": 2.27,
+        "balancedEcoUntil": 154,
+        "balancedEcoMaxLevel": 2,
+        "balancedFactoryAfter": 25,
+        "balancedCaptureAfter": 88,
+        "balancedCaptureChance": 0.46,
+        "balancedAttackAfter": 88,
+        "balancedLargeReserve": 86,
+        "balancedSabotageChance": 0.09,
+        "balancedFallbackGrowth": 1.84
+      },
+      "searchMean": 0.3958333333333333,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.3533,
+          "calibrated": 0.4192708333333334,
+          "current": 0.4192708333333334,
+          "tuned": 0.33680416666666674
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.41665,
+            "calibrated": 0.3055666666666667,
+            "current": 0.3055666666666667,
+            "tuned": 0
+          },
+          "RUSHER": {
+            "native": 0.9444500000000001,
+            "calibrated": 0.9583333333333335,
+            "current": 0.9583333333333335,
+            "tuned": 0.9583333333333334
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0.013883333333333333,
+            "current": 0.013883333333333333,
+            "tuned": 0
+          },
+          "TEMPO": {
+            "native": 0.08333333333333333,
+            "calibrated": 0.33331666666666665,
+            "current": 0.33331666666666665,
+            "tuned": 0.5486
+          },
+          "ADAPTIVE": {
+            "native": 0.5278,
+            "calibrated": 0.6944666666666667,
+            "current": 0.6944666666666667,
+            "tuned": 0.3611166666666667
+          },
+          "RANDOM": {
+            "native": 0.5208333333333334,
+            "calibrated": 0.5902833333333334,
+            "current": 0.5902833333333334,
+            "tuned": 0.46528333333333327
+          },
+          "HOARDER": {
+            "native": 0.3333333333333333,
+            "calibrated": 0.40276666666666666,
+            "current": 0.40276666666666666,
+            "tuned": 0.3611
+          },
+          "SABOTEUR": {
+            "native": 0,
+            "calibrated": 0.055549999999999995,
+            "current": 0.055549999999999995,
+            "tuned": 0
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0.8333,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0.5833,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0.5,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0.5833,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.8333
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0.9167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "current_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 1
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0.1667,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 0.1667,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.0833,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.4583
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.1667
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.3333
+          },
+          "current_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.3333
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0.75,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.75
+          },
+          "native_heldout": {
+            "native": 0.6667,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.8333
+          },
+          "calibrated_prior": {
+            "native": 0.5,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.25
+          },
+          "calibrated_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0.4167,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.1667
+          },
+          "current_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.1667
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.5833,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.5417
+          },
+          "native_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.6667
+          },
+          "calibrated_prior": {
+            "native": 0.5417,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.3333
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 0.2917,
+            "current": 0.2917,
+            "tuned": 0.5
+          },
+          "current_prior": {
+            "native": 0.5,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.3333
+          },
+          "current_heldout": {
+            "native": 0.4167,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.4167
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.0833
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.0833
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        }
+      }
+    },
+    "HOARDER": {
+      "genome": {
+        "hoarderFactoryAfter": 13,
+        "hoarderFactoryBank": 458,
+        "hoarderHoldBank": 329,
+        "hoarderHoldUntil": 138,
+        "hoarderEcoMaxLevel": 4,
+        "hoarderGrowth": 2.02,
+        "hoarderCaptureAfter": 74,
+        "hoarderCaptureChance": 0.13
+      },
+      "searchMean": 0.5729166666666666,
+      "searchWorst": 0,
+      "summary": {
+        "means": {
+          "native": 0.10242916666666667,
+          "calibrated": 0.6597208333333334,
+          "current": 0.6597208333333334,
+          "tuned": 0.5920145833333335
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0,
+            "calibrated": 0.09723333333333334,
+            "current": 0.09723333333333334,
+            "tuned": 0.36113333333333336
+          },
+          "RUSHER": {
+            "native": 0.5694333333333333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.7222
+          },
+          "TURTLE": {
+            "native": 0,
+            "calibrated": 0.013883333333333333,
+            "current": 0.013883333333333333,
+            "tuned": 0
+          },
+          "TEMPO": {
+            "native": 0.027766666666666665,
+            "calibrated": 0.7777666666666666,
+            "current": 0.7777666666666666,
+            "tuned": 0.7083499999999999
+          },
+          "ADAPTIVE": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "RANDOM": {
+            "native": 0.2222333333333333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9861166666666666
+          },
+          "BALANCED": {
+            "native": 0,
+            "calibrated": 0.8611166666666666,
+            "current": 0.8611166666666666,
+            "tuned": 0.8611166666666666
+          },
+          "SABOTEUR": {
+            "native": 0,
+            "calibrated": 0.5277666666666666,
+            "current": 0.5277666666666666,
+            "tuned": 0.0972
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.4167
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.4167
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.5
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.25
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.1667
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.4167,
+            "current": 0.4167,
+            "tuned": 0.4167
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.3333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5833
+          },
+          "calibrated_heldout": {
+            "native": 0.3333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5833
+          },
+          "current_prior": {
+            "native": 0.4167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5833
+          },
+          "current_heldout": {
+            "native": 0.3333,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.5833
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 0.0833,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.5
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.6667
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.4167
+          },
+          "current_heldout": {
+            "native": 0.0833,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.75
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 0.4167,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 0.6667,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0.1667,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0.0833,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.5
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.9167
+          }
+        },
+        "SABOTEUR": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 0.25
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.0833
+          },
+          "calibrated_prior": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.0833
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.0833
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0.3333,
+            "current": 0.3333,
+            "tuned": 0.0833
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0
+          }
+        }
+      }
+    },
+    "SABOTEUR": {
+      "genome": {
+        "saboteurGrowth": 1.64,
+        "saboteurEcoUntil": 150,
+        "saboteurSabotageAfter": 33,
+        "saboteurFactoryAfter": 31,
+        "saboteurCaptureAfter": 77,
+        "saboteurCaptureChance": 0.7,
+        "saboteurAttackAfter": 129
+      },
+      "searchMean": 0.9583333333333334,
+      "searchWorst": 0.8333333333333334,
+      "summary": {
+        "means": {
+          "native": 0.6996562499999999,
+          "calibrated": 0.6996562499999999,
+          "current": 0.6996562499999999,
+          "tuned": 0.8706645833333333
+        },
+        "perOpponent": {
+          "GREEDY": {
+            "native": 0.06945,
+            "calibrated": 0.06945,
+            "current": 0.06945,
+            "tuned": 0.7222333333333332
+          },
+          "RUSHER": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "TURTLE": {
+            "native": 0.041666666666666664,
+            "calibrated": 0.041666666666666664,
+            "current": 0.041666666666666664,
+            "tuned": 0.6805666666666667
+          },
+          "TEMPO": {
+            "native": 0.9166666666666666,
+            "calibrated": 0.9166666666666666,
+            "current": 0.9166666666666666,
+            "tuned": 0.7916500000000001
+          },
+          "ADAPTIVE": {
+            "native": 0.9722166666666667,
+            "calibrated": 0.9722166666666667,
+            "current": 0.9722166666666667,
+            "tuned": 0.9444499999999999
+          },
+          "RANDOM": {
+            "native": 0.8889,
+            "calibrated": 0.8889,
+            "current": 0.8889,
+            "tuned": 0.9305666666666667
+          },
+          "BALANCED": {
+            "native": 0.9722333333333332,
+            "calibrated": 0.9722333333333332,
+            "current": 0.9722333333333332,
+            "tuned": 0.9444499999999999
+          },
+          "HOARDER": {
+            "native": 0.7361166666666666,
+            "calibrated": 0.7361166666666666,
+            "current": 0.7361166666666666,
+            "tuned": 0.9514
+          }
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native_prior": {
+            "native": 0.1667,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.6667
+          },
+          "native_heldout": {
+            "native": 0.1667,
+            "calibrated": 0.1667,
+            "current": 0.1667,
+            "tuned": 0.6667
+          },
+          "calibrated_prior": {
+            "native": 0.0833,
+            "calibrated": 0.0833,
+            "current": 0.0833,
+            "tuned": 0.6667
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.75
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.8333
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.75
+          }
+        },
+        "RUSHER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          }
+        },
+        "TURTLE": {
+          "native_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.5
+          },
+          "native_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.75
+          },
+          "calibrated_prior": {
+            "native": 0.25,
+            "calibrated": 0.25,
+            "current": 0.25,
+            "tuned": 0.4167
+          },
+          "calibrated_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.75
+          },
+          "current_heldout": {
+            "native": 0,
+            "calibrated": 0,
+            "current": 0,
+            "tuned": 0.6667
+          }
+        },
+        "TEMPO": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.5833
+          },
+          "calibrated_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.5833
+          },
+          "current_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.75
+          }
+        },
+        "ADAPTIVE": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "current_heldout": {
+            "native": 0.8333,
+            "calibrated": 0.8333,
+            "current": 0.8333,
+            "tuned": 0.9167
+          }
+        },
+        "RANDOM": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.6667,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.9167
+          },
+          "current_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "current_heldout": {
+            "native": 0.75,
+            "calibrated": 0.75,
+            "current": 0.75,
+            "tuned": 0.9167
+          }
+        },
+        "BALANCED": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 0.8333
+          },
+          "current_prior": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 1
+          },
+          "current_heldout": {
+            "native": 0.9167,
+            "calibrated": 0.9167,
+            "current": 0.9167,
+            "tuned": 0.9167
+          }
+        },
+        "HOARDER": {
+          "native_prior": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "native_heldout": {
+            "native": 1,
+            "calibrated": 1,
+            "current": 1,
+            "tuned": 1
+          },
+          "calibrated_prior": {
+            "native": 0.6667,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.9167
+          },
+          "calibrated_heldout": {
+            "native": 0.5833,
+            "calibrated": 0.5833,
+            "current": 0.5833,
+            "tuned": 1
+          },
+          "current_prior": {
+            "native": 0.5,
+            "calibrated": 0.5,
+            "current": 0.5,
+            "tuned": 0.875
+          },
+          "current_heldout": {
+            "native": 0.6667,
+            "calibrated": 0.6667,
+            "current": 0.6667,
+            "tuned": 0.9167
+          }
+        }
+      }
+    }
+  }
+}

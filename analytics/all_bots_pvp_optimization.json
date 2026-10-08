@@ -1,0 +1,387 @@
+{
+  "title": "All built-in bots PvP optimization",
+  "createdAt": "2026-10-08T07:20:55.884Z",
+  "method": "Cada bot se optimizó independientemente contra los otros ocho mediante búsqueda evolutiva acotada. Los candidatos ajustados comparten un mismo orden de decisiones parametrizado; la lógica original de los bots se conserva para rivales y comparación de base. Motor de dominio, sin extensiones web; lados alternados y civilizaciones rotativas; semillas separadas para validar.",
+  "budget": {
+    "elapsedSeconds": 54.13,
+    "maxSeconds": 180,
+    "population": 20,
+    "generations": 5,
+    "repetitionsPerOpponentPerCandidateAndSide": 2,
+    "holdoutRepetitionsPerOpponentAndSide": 12,
+    "candidateEvaluations": 900,
+    "searchMatches": 28800,
+    "validationMatches": 3456
+  },
+  "bots": {
+    "GREEDY": {
+      "bestGenome": {
+        "ecoUntil": 138,
+        "ecoFactor": 1.55,
+        "factoryAfter": 40,
+        "defendAfter": 75,
+        "defendValue": 0,
+        "captureAfter": 62,
+        "captureChance": 0.62,
+        "attackAfter": 85,
+        "largeAfter": 106,
+        "largeBank": 230,
+        "sabotageAfter": 92,
+        "sabotageChance": 0.53,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.75,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.6562,
+      "baselineHoldoutMean": 0.5365,
+      "holdoutByOpponent": {
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.625,
+        "ADAPTIVE": 0.8333,
+        "RANDOM": 0.875,
+        "BALANCED": 0.875,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0417
+      },
+      "baselineByOpponent": {
+        "RUSHER": 0,
+        "TURTLE": 0.7917,
+        "TEMPO": 0.0417,
+        "ADAPTIVE": 0.6667,
+        "RANDOM": 0.625,
+        "BALANCED": 0.3333,
+        "HOARDER": 1,
+        "SABOTEUR": 0.8333
+      }
+    },
+    "RUSHER": {
+      "bestGenome": {
+        "ecoUntil": 55,
+        "ecoFactor": 1.27,
+        "factoryAfter": 46,
+        "defendAfter": 33,
+        "defendValue": 212,
+        "captureAfter": 91,
+        "captureChance": 0.44,
+        "attackAfter": 151,
+        "largeAfter": 146,
+        "largeBank": 638,
+        "sabotageAfter": 136,
+        "sabotageChance": 0.54,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.7188,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.5417,
+      "baselineHoldoutMean": 0.1719,
+      "holdoutByOpponent": {
+        "GREEDY": 0.375,
+        "TURTLE": 0,
+        "TEMPO": 0.4583,
+        "ADAPTIVE": 0.8333,
+        "RANDOM": 0.7917,
+        "BALANCED": 0.8333,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0417
+      },
+      "baselineByOpponent": {
+        "GREEDY": 1,
+        "TURTLE": 0,
+        "TEMPO": 0,
+        "ADAPTIVE": 0,
+        "RANDOM": 0.375,
+        "BALANCED": 0,
+        "HOARDER": 0,
+        "SABOTEUR": 0
+      }
+    },
+    "TURTLE": {
+      "bestGenome": {
+        "ecoUntil": 130,
+        "ecoFactor": 1.9,
+        "factoryAfter": 48,
+        "defendAfter": 10,
+        "defendValue": 0,
+        "captureAfter": 64,
+        "captureChance": 0.82,
+        "attackAfter": 139,
+        "largeAfter": 125,
+        "largeBank": 350,
+        "sabotageAfter": 128,
+        "sabotageChance": 0.5,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.7813,
+      "searchWorstOpponentRate": 0.25,
+      "holdoutMean": 0.7344,
+      "baselineHoldoutMean": 0.9062,
+      "holdoutByOpponent": {
+        "GREEDY": 0.2917,
+        "RUSHER": 1,
+        "TEMPO": 0.75,
+        "ADAPTIVE": 0.9583,
+        "RANDOM": 0.875,
+        "BALANCED": 0.9167,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0833
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0.3333,
+        "RUSHER": 1,
+        "TEMPO": 1,
+        "ADAPTIVE": 1,
+        "RANDOM": 1,
+        "BALANCED": 1,
+        "HOARDER": 1,
+        "SABOTEUR": 0.9167
+      }
+    },
+    "TEMPO": {
+      "bestGenome": {
+        "ecoUntil": 75,
+        "ecoFactor": 2.08,
+        "factoryAfter": 37,
+        "defendAfter": 27,
+        "defendValue": 84,
+        "captureAfter": 117,
+        "captureChance": 0.83,
+        "attackAfter": 109,
+        "largeAfter": 121,
+        "largeBank": 598,
+        "sabotageAfter": 69,
+        "sabotageChance": 0.38,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.6875,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.6406,
+      "baselineHoldoutMean": 0.6771,
+      "holdoutByOpponent": {
+        "GREEDY": 0.4167,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "ADAPTIVE": 0.8333,
+        "RANDOM": 0.9583,
+        "BALANCED": 0.875,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0417
+      },
+      "baselineByOpponent": {
+        "GREEDY": 1,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "ADAPTIVE": 0.7917,
+        "RANDOM": 0.6667,
+        "BALANCED": 0.9583,
+        "HOARDER": 1,
+        "SABOTEUR": 0
+      }
+    },
+    "ADAPTIVE": {
+      "bestGenome": {
+        "ecoUntil": 144,
+        "ecoFactor": 1.15,
+        "factoryAfter": 72,
+        "defendAfter": 65,
+        "defendValue": 93,
+        "captureAfter": 49,
+        "captureChance": 0.21,
+        "attackAfter": 153,
+        "largeAfter": 127,
+        "largeBank": 270,
+        "sabotageAfter": 60,
+        "sabotageChance": 0.2,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.6875,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.5781,
+      "baselineHoldoutMean": 0.4531,
+      "holdoutByOpponent": {
+        "GREEDY": 0.3333,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.4583,
+        "RANDOM": 0.9167,
+        "BALANCED": 0.875,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0417
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0.2917,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.2917,
+        "RANDOM": 0.5417,
+        "BALANCED": 0.4583,
+        "HOARDER": 1,
+        "SABOTEUR": 0.0417
+      }
+    },
+    "RANDOM": {
+      "bestGenome": {
+        "ecoUntil": 110,
+        "ecoFactor": 1.55,
+        "factoryAfter": 21,
+        "defendAfter": 30,
+        "defendValue": 73,
+        "captureAfter": 25,
+        "captureChance": 0.83,
+        "attackAfter": 58,
+        "largeAfter": 154,
+        "largeBank": 300,
+        "sabotageAfter": 128,
+        "sabotageChance": 0.33,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.75,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.6354,
+      "baselineHoldoutMean": 0.3594,
+      "holdoutByOpponent": {
+        "GREEDY": 0.7083,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.8333,
+        "ADAPTIVE": 0.7917,
+        "BALANCED": 0.75,
+        "HOARDER": 1,
+        "SABOTEUR": 0
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0.4583,
+        "RUSHER": 0.75,
+        "TURTLE": 0,
+        "TEMPO": 0.2083,
+        "ADAPTIVE": 0.4792,
+        "BALANCED": 0.3542,
+        "HOARDER": 0.5417,
+        "SABOTEUR": 0.0833
+      }
+    },
+    "BALANCED": {
+      "bestGenome": {
+        "ecoUntil": 86,
+        "ecoFactor": 1.53,
+        "factoryAfter": 56,
+        "defendAfter": 66,
+        "defendValue": 58,
+        "captureAfter": 58,
+        "captureChance": 0.73,
+        "attackAfter": 132,
+        "largeAfter": 147,
+        "largeBank": 269,
+        "sabotageAfter": 135,
+        "sabotageChance": 0.41,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.6563,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.5886,
+      "baselineHoldoutMean": 0.4766,
+      "holdoutByOpponent": {
+        "GREEDY": 0.25,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.625,
+        "ADAPTIVE": 0.9167,
+        "RANDOM": 0.9167,
+        "HOARDER": 1,
+        "SABOTEUR": 0
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0.5833,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.0417,
+        "ADAPTIVE": 0.5417,
+        "RANDOM": 0.6458,
+        "HOARDER": 1,
+        "SABOTEUR": 0
+      }
+    },
+    "HOARDER": {
+      "bestGenome": {
+        "ecoUntil": 165,
+        "ecoFactor": 1.7,
+        "factoryAfter": 40,
+        "defendAfter": 65,
+        "defendValue": 0,
+        "captureAfter": 75,
+        "captureChance": 0.4,
+        "attackAfter": 99,
+        "largeAfter": 120,
+        "largeBank": 500,
+        "sabotageAfter": 114,
+        "sabotageChance": 0.2,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.6875,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.5625,
+      "baselineHoldoutMean": 0.1875,
+      "holdoutByOpponent": {
+        "GREEDY": 0.375,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.5,
+        "ADAPTIVE": 0.8333,
+        "RANDOM": 0.9583,
+        "BALANCED": 0.8333,
+        "SABOTEUR": 0
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.0417,
+        "ADAPTIVE": 0,
+        "RANDOM": 0.4583,
+        "BALANCED": 0,
+        "SABOTEUR": 0
+      }
+    },
+    "SABOTEUR": {
+      "bestGenome": {
+        "ecoUntil": 136,
+        "ecoFactor": 1.31,
+        "factoryAfter": 78,
+        "defendAfter": 74,
+        "defendValue": 204,
+        "captureAfter": 45,
+        "captureChance": 0.81,
+        "attackAfter": 89,
+        "largeAfter": 117,
+        "largeBank": 637,
+        "sabotageAfter": 76,
+        "sabotageChance": 0.18,
+        "specialization": 0
+      },
+      "searchScoreRate": 0.8125,
+      "searchWorstOpponentRate": 0,
+      "holdoutMean": 0.6563,
+      "baselineHoldoutMean": 0.7604,
+      "holdoutByOpponent": {
+        "GREEDY": 0.2917,
+        "RUSHER": 1,
+        "TURTLE": 0,
+        "TEMPO": 0.4583,
+        "ADAPTIVE": 0.875,
+        "RANDOM": 0.875,
+        "BALANCED": 0.7917,
+        "HOARDER": 0.9583
+      },
+      "baselineByOpponent": {
+        "GREEDY": 0.0833,
+        "RUSHER": 1,
+        "TURTLE": 0.0833,
+        "TEMPO": 1,
+        "ADAPTIVE": 0.9583,
+        "RANDOM": 0.9583,
+        "BALANCED": 1,
+        "HOARDER": 1
+      }
+    }
+  }
+}

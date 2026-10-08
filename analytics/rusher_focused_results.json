@@ -1,0 +1,417 @@
+{
+  "title": "Focused RUSHER native-branch optimization",
+  "createdAt": "2026-10-08T07:53:10.336Z",
+  "method": "Search targets RUSHER only. The candidate retains the RUSHER factory-first identity and adapts economy, attack, defense, capture, and sabotage thresholds. It faces all eight other strategies in native, calibrated, and current forms; paired sides and rotating civilizations. Validation uses the previous held-out seed family plus a fresh family.",
+  "budget": {
+    "elapsedSeconds": 83.85,
+    "maxSeconds": 180,
+    "population": 32,
+    "generations": 8,
+    "trainingRepetitionsPerOpponentModeAndSide": 3,
+    "validationRepetitionsPerOpponentModeAndSide": 16,
+    "candidateEvaluations": 256,
+    "searchMatches": 36864,
+    "validationMatches": 4608
+  },
+  "genome": {
+    "factoryAfter": 13,
+    "preFactoryEcoUntil": 12,
+    "growthFactor": 1.68,
+    "ecoAfterFactory": 56,
+    "ecoUntil": 137,
+    "ecoMaxLevel": 3,
+    "attackAfter": 90,
+    "largeAfter": 92,
+    "largeBank": 261,
+    "defendHP": 398,
+    "defendThreshold": 10,
+    "captureAfter": 71,
+    "captureChance": 0.44,
+    "captureShield": 272,
+    "counterEcoDelay": 13,
+    "counterEcoChance": 0.79,
+    "sabotageAfter": 61,
+    "sabotageChance": 0.52
+  },
+  "search": {
+    "mean": 0.5868055555555556,
+    "worst": 0,
+    "byOpponent": {
+      "GREEDY": 0.7222222222222222,
+      "TURTLE": 0,
+      "TEMPO": 0.8888888888888888,
+      "ADAPTIVE": 0.9444444444444444,
+      "RANDOM": 0.6666666666666666,
+      "BALANCED": 0.8055555555555556,
+      "HOARDER": 0.2222222222222222,
+      "SABOTEUR": 0.4444444444444444
+    }
+  },
+  "validation": {
+    "mean": {
+      "native": 0.09570416666666666,
+      "current": 0.1884875,
+      "candidate": 0.5638166666666669
+    },
+    "bySeed": {
+      "prior": {
+        "native": 0.09375,
+        "current": 0.1842583333333333,
+        "candidate": 0.569675
+      },
+      "fresh": {
+        "native": 0.09765833333333333,
+        "current": 0.19271666666666665,
+        "candidate": 0.5579583333333333
+      }
+    },
+    "perOpponent": {
+      "GREEDY": {
+        "native": 0.6666666666666666,
+        "current": 0.6666666666666666,
+        "candidate": 0.6770999999999999
+      },
+      "TURTLE": {
+        "native": 0,
+        "current": 0,
+        "candidate": 0
+      },
+      "TEMPO": {
+        "native": 0,
+        "current": 0.06253333333333333,
+        "candidate": 0.8698166666666666
+      },
+      "ADAPTIVE": {
+        "native": 0,
+        "current": 0.23699999999999996,
+        "candidate": 0.9323
+      },
+      "RANDOM": {
+        "native": 0.09896666666666666,
+        "current": 0.2317833333333333,
+        "candidate": 0.5781499999999999
+      },
+      "BALANCED": {
+        "native": 0,
+        "current": 0.0625,
+        "candidate": 0.8020999999999999
+      },
+      "HOARDER": {
+        "native": 0,
+        "current": 0.2422,
+        "candidate": 0.21355000000000002
+      },
+      "SABOTEUR": {
+        "native": 0,
+        "current": 0.005216666666666667,
+        "candidate": 0.4375166666666666
+      }
+    },
+    "matchups": {
+      "GREEDY": {
+        "native": {
+          "prior": {
+            "native": 1,
+            "current": 1,
+            "candidate": 1
+          },
+          "fresh": {
+            "native": 1,
+            "current": 1,
+            "candidate": 0.9688
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 1,
+            "current": 1,
+            "candidate": 0.9688
+          },
+          "fresh": {
+            "native": 1,
+            "current": 1,
+            "candidate": 1
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.0625
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.0625
+          }
+        }
+      },
+      "TURTLE": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        }
+      },
+      "TEMPO": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0.0938,
+            "candidate": 0.9688
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0625,
+            "candidate": 1
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0.0313,
+            "candidate": 0.7813
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0313,
+            "candidate": 0.8438
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0.0625,
+            "candidate": 0.9375
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0938,
+            "candidate": 0.6875
+          }
+        }
+      },
+      "ADAPTIVE": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0.4063,
+            "candidate": 0.9375
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.5625,
+            "candidate": 1
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0.0625,
+            "candidate": 0.9688
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.1094,
+            "candidate": 0.8125
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0.1563,
+            "candidate": 0.9375
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.125,
+            "candidate": 0.9375
+          }
+        }
+      },
+      "RANDOM": {
+        "native": {
+          "prior": {
+            "native": 0.25,
+            "current": 0.5313,
+            "candidate": 0.7188
+          },
+          "fresh": {
+            "native": 0.3438,
+            "current": 0.5,
+            "candidate": 0.75
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0.125,
+            "candidate": 0.5625
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0938,
+            "candidate": 0.6563
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0.0781,
+            "candidate": 0.5
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0625,
+            "candidate": 0.2813
+          }
+        }
+      },
+      "BALANCED": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0.0781,
+            "candidate": 1
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.125,
+            "candidate": 1
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0.0313,
+            "candidate": 0.625
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0625,
+            "candidate": 0.7813
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.75
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.0781,
+            "candidate": 0.6563
+          }
+        }
+      },
+      "HOARDER": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0.7344,
+            "candidate": 0.6094
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0.7188,
+            "candidate": 0.6719
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        }
+      },
+      "SABOTEUR": {
+        "native": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.6563
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.625
+          }
+        },
+        "calibrated": {
+          "prior": {
+            "native": 0,
+            "current": 0.0313,
+            "candidate": 0.6875
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0.6563
+          }
+        },
+        "current": {
+          "prior": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          },
+          "fresh": {
+            "native": 0,
+            "current": 0,
+            "candidate": 0
+          }
+        }
+      }
+    }
+  }
+}

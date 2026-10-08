@@ -1,0 +1,153 @@
+{
+  "title": "GREEDY bounded PvP policy search",
+  "createdAt": "2026-10-08T07:16:58.719Z",
+  "method": "Evolutionary random search on base Match engine; no web overlays, industrial modules, doctrines, or persistent empire bonuses. Fitness = 75% overall score rate + 25% weakest-opponent score rate. Each candidate faces all eight non-GREEDY strategies with paired side swaps and rotating civilizations.",
+  "budget": {
+    "elapsedSeconds": 97.74,
+    "maxSeconds": 180,
+    "population": 80,
+    "generations": 10,
+    "repsPerOpponentPerCandidate": 4,
+    "candidateEvaluations": 800,
+    "searchMatches": 51200,
+    "holdoutRepsPerOpponentAndSide": 20
+  },
+  "search": {
+    "generations": [
+      {
+        "generation": 1,
+        "topMean": 0.7031,
+        "topWorst": 0,
+        "bestSoFar": 0.7031
+      },
+      {
+        "generation": 2,
+        "topMean": 0.6875,
+        "topWorst": 0,
+        "bestSoFar": 0.7031
+      },
+      {
+        "generation": 3,
+        "topMean": 0.7031,
+        "topWorst": 0,
+        "bestSoFar": 0.7031
+      },
+      {
+        "generation": 4,
+        "topMean": 0.7188,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 5,
+        "topMean": 0.7031,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 6,
+        "topMean": 0.7188,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 7,
+        "topMean": 0.7188,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 8,
+        "topMean": 0.7188,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 9,
+        "topMean": 0.7188,
+        "topWorst": 0,
+        "bestSoFar": 0.7188
+      },
+      {
+        "generation": 10,
+        "topMean": 0.7344,
+        "topWorst": 0,
+        "bestSoFar": 0.7344
+      }
+    ],
+    "bestSearchScoreRate": 0.7344,
+    "bestSearchWorstOpponentRate": 0,
+    "bestGenome": {
+      "ecoUntil": 100,
+      "ecoFactor": 1.95,
+      "factoryAfter": 35,
+      "defendAfter": 2,
+      "defendHP": 30,
+      "captureAfter": 73,
+      "captureChance": 0.64,
+      "attackAfter": 55,
+      "largeAfter": 113,
+      "largeBank": 321,
+      "sabotageAfter": 79,
+      "sabotageChance": 0.2,
+      "specialization": 0
+    },
+    "trainingOpponentScores": {
+      "RUSHER": 1,
+      "TURTLE": 0,
+      "TEMPO": 0.875,
+      "ADAPTIVE": 1,
+      "RANDOM": 1,
+      "BALANCED": 1,
+      "HOARDER": 1,
+      "SABOTEUR": 0
+    }
+  },
+  "holdout": {
+    "GREEDY": {
+      "games": 40,
+      "points": 14,
+      "scoreRate": 0.35
+    },
+    "RUSHER": {
+      "games": 40,
+      "points": 40,
+      "scoreRate": 1
+    },
+    "TURTLE": {
+      "games": 40,
+      "points": 1,
+      "scoreRate": 0.025
+    },
+    "TEMPO": {
+      "games": 40,
+      "points": 23,
+      "scoreRate": 0.575
+    },
+    "ADAPTIVE": {
+      "games": 40,
+      "points": 38,
+      "scoreRate": 0.95
+    },
+    "RANDOM": {
+      "games": 40,
+      "points": 37,
+      "scoreRate": 0.925
+    },
+    "BALANCED": {
+      "games": 40,
+      "points": 34,
+      "scoreRate": 0.85
+    },
+    "HOARDER": {
+      "games": 40,
+      "points": 40,
+      "scoreRate": 1
+    },
+    "SABOTEUR": {
+      "games": 40,
+      "points": 2,
+      "scoreRate": 0.05
+    }
+  }
+}

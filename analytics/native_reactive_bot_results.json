@@ -1,0 +1,2196 @@
+{
+  "title": "Native reactive PvP bot optimization",
+  "createdAt": "2026-10-08T07:37:37.660Z",
+  "method": "Preserved each target bot’s native decision function. The candidate adds a reactive tail only when the native policy takes no action, using recent public opponent actions and in-flight attack telemetry. Evolutionary search optimized reactive thresholds against every other strategy in both native and previous calibrated forms. Validation used two separate paired seed families and compared native, previous, and reactive policies.",
+  "budget": {
+    "elapsedSeconds": 91.76,
+    "maxSeconds": 180,
+    "population": 12,
+    "generations": 4,
+    "trainingRepetitionsPerOpponentAndPolicyAndSide": 2,
+    "validationRepetitionsPerOpponentAndPolicyAndSide": 8,
+    "candidateEvaluations": 432,
+    "searchMatches": 27648,
+    "validationMatches": 13824
+  },
+  "bots": {
+    "GREEDY": {
+      "genome": {
+        "reactWindow": 24,
+        "dangerThreshold": 42,
+        "economyDelay": 31,
+        "economyPunishChance": 0.87,
+        "counterAttackChance": 0.32,
+        "captureAfter": 80,
+        "captureChance": 0.6,
+        "largeAttackBank": 410,
+        "sabotageAfterDefenseChance": 0.68
+      },
+      "searchMean": 0.96875,
+      "searchWorst": 0.875,
+      "summary": {
+        "nativeMean": 0.5390625,
+        "previousMean": 0.5390625,
+        "reactiveMean": 0.89453125,
+        "deltaVsNative": 0.35546875,
+        "deltaVsPrevious": 0.35546875,
+        "perOpponent": {
+          "RUSHER": 1,
+          "TURTLE": 0.703125,
+          "TEMPO": 0.921875,
+          "ADAPTIVE": 0.984375,
+          "RANDOM": 0.890625,
+          "BALANCED": 0.890625,
+          "HOARDER": 0.828125,
+          "SABOTEUR": 0.9375
+        }
+      },
+      "matchups": {
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 1
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0.75,
+              "previous": 0.75,
+              "reactive": 0.75
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 0.8125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 0.625
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 0.625
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 0.0625,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.125,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.125,
+              "reactive": 0.75
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0.5,
+              "previous": 0.5,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.25,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.375,
+              "reactive": 1
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.75,
+              "previous": 0.75,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 0.5625,
+              "previous": 0.5625,
+              "reactive": 0.9375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.5,
+              "previous": 0.5,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 0.5625,
+              "previous": 0.5625,
+              "reactive": 0.75
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 0.4375,
+              "previous": 0.4375,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.375,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.625,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 0.875
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.625
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 0.875,
+              "previous": 0.875,
+              "reactive": 0.9375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            }
+          }
+        }
+      }
+    },
+    "RUSHER": {
+      "genome": {
+        "reactWindow": 32,
+        "dangerThreshold": 51,
+        "economyDelay": 3,
+        "economyPunishChance": 0.47,
+        "counterAttackChance": 0.41,
+        "captureAfter": 30,
+        "captureChance": 0.28,
+        "largeAttackBank": 385,
+        "sabotageAfterDefenseChance": 0.11
+      },
+      "searchMean": 0.171875,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.142578125,
+        "previousMean": 0.281253125,
+        "reactiveMean": 0.148440625,
+        "deltaVsNative": 0.005862499999999993,
+        "deltaVsPrevious": -0.1328125,
+        "perOpponent": {
+          "GREEDY": 1,
+          "TURTLE": 0,
+          "TEMPO": 0,
+          "ADAPTIVE": 0,
+          "RANDOM": 0.187525,
+          "BALANCED": 0,
+          "HOARDER": 0,
+          "SABOTEUR": 0
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.5625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.5,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.5,
+              "reactive": 0.4063
+            },
+            "fresh": {
+              "native": 0.3125,
+              "previous": 0.6563,
+              "reactive": 0.3438
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.7188,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.6875,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "TURTLE": {
+      "genome": {
+        "reactWindow": 11,
+        "dangerThreshold": 163,
+        "economyDelay": 17,
+        "economyPunishChance": 0.55,
+        "counterAttackChance": 0.8,
+        "captureAfter": 40,
+        "captureChance": 0.5,
+        "largeAttackBank": 416,
+        "sabotageAfterDefenseChance": 0.73
+      },
+      "searchMean": 0.9375,
+      "searchWorst": 0.75,
+      "summary": {
+        "nativeMean": 0.908203125,
+        "previousMean": 0.908203125,
+        "reactiveMean": 0.8818375,
+        "deltaVsNative": -0.026365624999999948,
+        "deltaVsPrevious": -0.026365624999999948,
+        "perOpponent": {
+          "GREEDY": 0.601575,
+          "RUSHER": 1,
+          "TEMPO": 0.90625,
+          "ADAPTIVE": 1,
+          "RANDOM": 0.96875,
+          "BALANCED": 0.953125,
+          "HOARDER": 0.9375,
+          "SABOTEUR": 0.6875
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0.375,
+              "previous": 0.375,
+              "reactive": 0.8125
+            },
+            "fresh": {
+              "native": 0.4375,
+              "previous": 0.4375,
+              "reactive": 0.6563
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.25,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.3125,
+              "previous": 0.3125,
+              "reactive": 0.5
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.875,
+              "previous": 0.875,
+              "reactive": 0.75
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.875
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.875
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.875
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.875
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.625
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.8125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.5
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.8125
+            }
+          }
+        }
+      }
+    },
+    "TEMPO": {
+      "genome": {
+        "reactWindow": 30,
+        "dangerThreshold": 139,
+        "economyDelay": 30,
+        "economyPunishChance": 0.41,
+        "counterAttackChance": 0.29,
+        "captureAfter": 88,
+        "captureChance": 0.57,
+        "largeAttackBank": 660,
+        "sabotageAfterDefenseChance": 0.64
+      },
+      "searchMean": 0.5625,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.579103125,
+        "previousMean": 0.689453125,
+        "reactiveMean": 0.516603125,
+        "deltaVsNative": -0.0625,
+        "deltaVsPrevious": -0.17284999999999995,
+        "perOpponent": {
+          "GREEDY": 1,
+          "RUSHER": 0.96875,
+          "TURTLE": 0,
+          "ADAPTIVE": 0.53125,
+          "RANDOM": 0.453125,
+          "BALANCED": 0.6797,
+          "HOARDER": 0.5,
+          "SABOTEUR": 0
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 0.8125,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 0.9375,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 1,
+              "reactive": 0.875
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0.8125,
+              "previous": 0.9375,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.5625,
+              "previous": 0.875,
+              "reactive": 0.5625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.75,
+              "reactive": 0.5625
+            },
+            "fresh": {
+              "native": 0.75,
+              "previous": 0.8125,
+              "reactive": 0.3125
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.8125,
+              "previous": 1,
+              "reactive": 0.375
+            },
+            "fresh": {
+              "native": 0.75,
+              "previous": 0.9375,
+              "reactive": 0.6875
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.5625,
+              "previous": 0.9375,
+              "reactive": 0.3125
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.625,
+              "reactive": 0.4375
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9063
+            },
+            "fresh": {
+              "native": 0.9688,
+              "previous": 1,
+              "reactive": 0.75
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.875,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.625,
+              "previous": 0.875,
+              "reactive": 0.375
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 0.25,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.375,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.3125,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.375,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.1875,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "ADAPTIVE": {
+      "genome": {
+        "reactWindow": 29,
+        "dangerThreshold": 83,
+        "economyDelay": 2,
+        "economyPunishChance": 0.89,
+        "counterAttackChance": 0.34,
+        "captureAfter": 18,
+        "captureChance": 0.76,
+        "largeAttackBank": 290,
+        "sabotageAfterDefenseChance": 0.15
+      },
+      "searchMean": 0.34375,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.318359375,
+        "previousMean": 0.4834,
+        "reactiveMean": 0.3046875,
+        "deltaVsNative": -0.013671875,
+        "deltaVsPrevious": -0.1787125,
+        "perOpponent": {
+          "GREEDY": 0.390625,
+          "RUSHER": 0.703125,
+          "TURTLE": 0,
+          "TEMPO": 0.171875,
+          "RANDOM": 0.390625,
+          "BALANCED": 0.265625,
+          "HOARDER": 0.5,
+          "SABOTEUR": 0.015625
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0.3125,
+              "previous": 0.8125,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.25,
+              "previous": 0.8125,
+              "reactive": 0.3125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.9375,
+              "reactive": 0.3125
+            },
+            "fresh": {
+              "native": 0.5,
+              "previous": 0.8125,
+              "reactive": 0.5
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.4375,
+              "previous": 0.875,
+              "reactive": 0.375
+            },
+            "fresh": {
+              "native": 0.5,
+              "previous": 0.75,
+              "reactive": 0.4375
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.1875,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.25,
+              "reactive": 0.125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 0.1875,
+              "reactive": 0.125
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.25,
+              "reactive": 0.25
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.75,
+              "previous": 0.8125,
+              "reactive": 0.5625
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.625,
+              "reactive": 0.5
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.375,
+              "previous": 0.625,
+              "reactive": 0.25
+            },
+            "fresh": {
+              "native": 0.3125,
+              "previous": 0.625,
+              "reactive": 0.25
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 0.4375,
+              "previous": 0.7813,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.6875,
+              "reactive": 0.3125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.3125,
+              "previous": 0.5,
+              "reactive": 0.125
+            },
+            "fresh": {
+              "native": 0.25,
+              "previous": 0.5,
+              "reactive": 0.1875
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 0.0625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0.0625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.1875,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "RANDOM": {
+      "genome": {
+        "reactWindow": 24,
+        "dangerThreshold": 26,
+        "economyDelay": 23,
+        "economyPunishChance": 0.24,
+        "counterAttackChance": 0.62,
+        "captureAfter": 69,
+        "captureChance": 0.45,
+        "largeAttackBank": 384,
+        "sabotageAfterDefenseChance": 0.49
+      },
+      "searchMean": 0.3046875,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.25390625,
+        "previousMean": 0.442384375,
+        "reactiveMean": 0.234378125,
+        "deltaVsNative": -0.019528125000000007,
+        "deltaVsPrevious": -0.20800625,
+        "perOpponent": {
+          "GREEDY": 0.390625,
+          "RUSHER": 0.664075,
+          "TURTLE": 0,
+          "TEMPO": 0.140625,
+          "ADAPTIVE": 0.203125,
+          "BALANCED": 0.21875,
+          "HOARDER": 0.25782499999999997,
+          "SABOTEUR": 0
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0.375,
+              "previous": 0.3125,
+              "reactive": 0.375
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.5,
+              "reactive": 0.4375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.4375,
+              "previous": 0.5,
+              "reactive": 0.3125
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.5,
+              "reactive": 0.4375
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 0.6875,
+              "previous": 1,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.625,
+              "previous": 1,
+              "reactive": 0.625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.6875,
+              "previous": 0.9375,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.8125,
+              "reactive": 0.6563
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0.4375,
+              "previous": 0.5,
+              "reactive": 0.25
+            },
+            "fresh": {
+              "native": 0.25,
+              "previous": 0.5,
+              "reactive": 0.25
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.125,
+              "previous": 0.25,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.1875,
+              "reactive": 0.0625
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0.25,
+              "previous": 0.8125,
+              "reactive": 0.25
+            },
+            "fresh": {
+              "native": 0.3125,
+              "previous": 0.75,
+              "reactive": 0.3125
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.3125,
+              "previous": 0.5625,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.5,
+              "reactive": 0.0625
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 0.375,
+              "previous": 0.5625,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.75,
+              "reactive": 0.25
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.1875,
+              "previous": 0.25,
+              "reactive": 0.125
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.375,
+              "reactive": 0.0625
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 0.5,
+              "previous": 0.9688,
+              "reactive": 0.4688
+            },
+            "fresh": {
+              "native": 0.5625,
+              "previous": 1,
+              "reactive": 0.5625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.125,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.125,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.25,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "BALANCED": {
+      "genome": {
+        "reactWindow": 38,
+        "dangerThreshold": 176,
+        "economyDelay": 6,
+        "economyPunishChance": 0.78,
+        "counterAttackChance": 0.64,
+        "captureAfter": 37,
+        "captureChance": 0.86,
+        "largeAttackBank": 303,
+        "sabotageAfterDefenseChance": 0.43
+      },
+      "searchMean": 0.484375,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.37793125,
+        "previousMean": 0.486328125,
+        "reactiveMean": 0.40136875,
+        "deltaVsNative": 0.0234375,
+        "deltaVsPrevious": -0.084959375,
+        "perOpponent": {
+          "GREEDY": 0.65625,
+          "RUSHER": 0.953125,
+          "TURTLE": 0,
+          "TEMPO": 0.15625,
+          "ADAPTIVE": 0.4375,
+          "RANDOM": 0.42969999999999997,
+          "HOARDER": 0.5,
+          "SABOTEUR": 0.078125
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.625,
+              "reactive": 0.5625
+            },
+            "fresh": {
+              "native": 0.4375,
+              "previous": 0.625,
+              "reactive": 0.625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.5625,
+              "reactive": 0.6875
+            },
+            "fresh": {
+              "native": 0.6875,
+              "previous": 0.375,
+              "reactive": 0.75
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 1,
+              "reactive": 0.875
+            },
+            "fresh": {
+              "native": 0.8125,
+              "previous": 0.9375,
+              "reactive": 0.9375
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.375,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.4375,
+              "reactive": 0.25
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.25,
+              "reactive": 0.125
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.4375,
+              "reactive": 0.0625
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0.75,
+              "previous": 0.9375,
+              "reactive": 0.625
+            },
+            "fresh": {
+              "native": 0.625,
+              "previous": 0.75,
+              "reactive": 0.5625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.3125,
+              "previous": 0.625,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0.375,
+              "previous": 0.6875,
+              "reactive": 0.375
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.75,
+              "previous": 0.9375,
+              "reactive": 0.625
+            },
+            "fresh": {
+              "native": 0.5,
+              "previous": 0.6875,
+              "reactive": 0.4063
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.3125,
+              "previous": 0.625,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0.2813,
+              "previous": 0.5,
+              "reactive": 0.5
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.1875
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.0625
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.0625,
+              "reactive": 0.0625
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "HOARDER": {
+      "genome": {
+        "reactWindow": 37,
+        "dangerThreshold": 135,
+        "economyDelay": 16,
+        "economyPunishChance": 0.79,
+        "counterAttackChance": 0.27,
+        "captureAfter": 69,
+        "captureChance": 0.71,
+        "largeAttackBank": 645,
+        "sabotageAfterDefenseChance": 0.5
+      },
+      "searchMean": 0.21875,
+      "searchWorst": 0,
+      "summary": {
+        "nativeMean": 0.109375,
+        "previousMean": 0.650390625,
+        "reactiveMean": 0.162109375,
+        "deltaVsNative": 0.052734375,
+        "deltaVsPrevious": -0.48828125,
+        "perOpponent": {
+          "GREEDY": 0.484375,
+          "RUSHER": 0.609375,
+          "TURTLE": 0,
+          "TEMPO": 0,
+          "ADAPTIVE": 0,
+          "RANDOM": 0.203125,
+          "BALANCED": 0,
+          "SABOTEUR": 0
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.5
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.5
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.5
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.25,
+              "previous": 1,
+              "reactive": 0.25
+            },
+            "fresh": {
+              "native": 0.25,
+              "previous": 1,
+              "reactive": 0.1875
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 0.0625,
+              "previous": 1,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.5625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.5625,
+              "reactive": 0
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 0.5,
+              "previous": 1,
+              "reactive": 0.375
+            },
+            "fresh": {
+              "native": 0.4375,
+              "previous": 1,
+              "reactive": 0.4375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 1,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.875,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.625,
+              "reactive": 0
+            }
+          }
+        },
+        "SABOTEUR": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0.5625,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.4375,
+              "reactive": 0
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0.5,
+              "reactive": 0
+            },
+            "fresh": {
+              "native": 0,
+              "previous": 0.6875,
+              "reactive": 0
+            }
+          }
+        }
+      }
+    },
+    "SABOTEUR": {
+      "genome": {
+        "reactWindow": 11,
+        "dangerThreshold": 67,
+        "economyDelay": 8,
+        "economyPunishChance": 0.2,
+        "counterAttackChance": 0.29,
+        "captureAfter": 48,
+        "captureChance": 0.63,
+        "largeAttackBank": 286,
+        "sabotageAfterDefenseChance": 0.21
+      },
+      "searchMean": 0.8125,
+      "searchWorst": 0.5,
+      "summary": {
+        "nativeMean": 0.705078125,
+        "previousMean": 0.705078125,
+        "reactiveMean": 0.717775,
+        "deltaVsNative": 0.012696875000000052,
+        "deltaVsPrevious": 0.012696875000000052,
+        "perOpponent": {
+          "GREEDY": 0.3125,
+          "RUSHER": 1,
+          "TURTLE": 0.30469999999999997,
+          "TEMPO": 0.8125,
+          "ADAPTIVE": 0.921875,
+          "RANDOM": 0.734375,
+          "BALANCED": 0.90625,
+          "HOARDER": 0.75
+        }
+      },
+      "matchups": {
+        "GREEDY": {
+          "native": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.125
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.0625,
+              "reactive": 0.375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.125,
+              "previous": 0.125,
+              "reactive": 0.3125
+            }
+          }
+        },
+        "RUSHER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 1
+            }
+          }
+        },
+        "TURTLE": {
+          "native": {
+            "previous": {
+              "native": 0.1875,
+              "previous": 0.1875,
+              "reactive": 0.25
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.0625,
+              "reactive": 0.2813
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0,
+              "previous": 0,
+              "reactive": 0.3125
+            },
+            "fresh": {
+              "native": 0.0625,
+              "previous": 0.0625,
+              "reactive": 0.375
+            }
+          }
+        },
+        "TEMPO": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.625,
+              "previous": 0.625,
+              "reactive": 0.625
+            },
+            "fresh": {
+              "native": 0.75,
+              "previous": 0.75,
+              "reactive": 0.6875
+            }
+          }
+        },
+        "ADAPTIVE": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.875
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.9375
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.9375
+            }
+          }
+        },
+        "RANDOM": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.875
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.875,
+              "previous": 0.875,
+              "reactive": 0.625
+            }
+          }
+        },
+        "BALANCED": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 0.8125
+            },
+            "fresh": {
+              "native": 0.9375,
+              "previous": 0.9375,
+              "reactive": 0.8125
+            }
+          }
+        },
+        "HOARDER": {
+          "native": {
+            "previous": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            },
+            "fresh": {
+              "native": 1,
+              "previous": 1,
+              "reactive": 1
+            }
+          },
+          "previous": {
+            "previous": {
+              "native": 0.6875,
+              "previous": 0.6875,
+              "reactive": 0.4375
+            },
+            "fresh": {
+              "native": 0.4375,
+              "previous": 0.4375,
+              "reactive": 0.5625
+            }
+          }
+        }
+      }
+    }
+  }
+}
