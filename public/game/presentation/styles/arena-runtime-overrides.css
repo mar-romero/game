@@ -353,6 +353,64 @@ body.show-match #factoryResearchPvP{height:auto!important;max-height:none!import
 .production-strip .prod-explainer{color:#b7cbd3!important;font-size:9px!important;line-height:1.35}
 .production-strip .prod-queue{max-width:42%!important;white-space:normal!important;line-height:1.5}
 body.show-match #guideCard:not(.hidden){display:block!important;position:sticky!important;top:112px!important;z-index:9!important}
+
+/* Compact match mode: keep the playable arena and every primary control in one viewport. */
+body.show-match,body.show-match .shell,body.show-match #game{box-sizing:border-box!important;width:100%!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow:hidden!important}
+body.show-match .shell{padding:0!important;margin:0!important;max-width:none!important}
+body.show-match #game{position:relative!important;padding:0!important}
+body.show-match .matchtop{position:absolute!important;z-index:80!important;top:0!important;left:0!important;right:0!important;margin:0!important;border-radius:0!important;max-height:76px;overflow:auto;backdrop-filter:blur(12px)}
+body.show-match .matchtop .toolbar{gap:6px!important;padding:5px 9px!important}
+body.show-match .matchtop .toolbar:first-child{flex:0 0 auto!important}
+body.show-match .matchtop .toolbar:last-child{flex:1 1 auto!important;justify-content:flex-end!important;flex-wrap:wrap!important}
+body.show-match .prototype-controls{gap:4px!important;flex-wrap:wrap!important;justify-content:flex-end!important}
+body.show-match .prototype-controls .arena-select{max-width:105px!important}
+body.show-match .guide,body.show-match .combat-radar,body.show-match .arena,body.show-match .under,body.show-match .command-feedback{display:none!important}
+body.show-match #battlefield.arena08{position:absolute!important;inset:0!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;margin:0!important;border:0!important;border-radius:0!important;overflow:hidden!important;display:block!important}
+body.show-match .arena08-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;border-radius:0!important}
+body.show-match .arena08-stage canvas{width:100%!important;height:100%!important}
+body.show-match .arena-hud.enemy-hud{top:82px!important;right:12px!important}
+body.show-match .arena-hud.player-hud{bottom:230px!important;left:12px!important}
+body.show-match .node-hud{top:42%!important}
+body.show-match .threat-hud{top:82px!important;left:50%!important;transform:translateX(-50%)!important}
+body.show-match .command-dock{position:absolute!important;z-index:70!important;left:50%!important;right:auto!important;bottom:max(8px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(980px,calc(100% - 24px))!important;max-height:32dvh!important;overflow:auto!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;padding:8px!important;margin:0!important;background:linear-gradient(180deg,#101d2aee,#08121eef)!important;border:1px solid #456176!important;border-radius:12px!important;box-shadow:0 8px 30px #0009!important}
+body.show-match .command-dock:before{font-size:8px!important;padding:0 2px!important}
+body.show-match .command-dock .quickcmd{min-height:68px!important;padding:6px!important;grid-template-columns:20px minmax(0,1fr)!important;grid-template-rows:auto auto!important;gap:4px!important}
+body.show-match .command-dock .cmd-icon{grid-column:1!important;grid-row:1/3!important;font-size:18px!important}
+body.show-match .command-dock .cmd-copy{grid-column:2!important;grid-row:1!important;gap:1px!important}
+body.show-match .command-dock .cmd-copy b{font-size:8px!important}
+body.show-match .command-dock .cmd-copy small{font-size:7px!important}
+body.show-match .command-dock .cmd-effect{display:none!important}
+body.show-match .command-dock .quickcmd em{grid-column:2!important;grid-row:2!important;padding-top:3px!important;font-size:7px!important}
+body.show-match #factoryResearchPvP{position:absolute!important;z-index:100!important;inset:82px 12px 34dvh!important;overflow:auto!important;margin:0!important;background:#0b1724f5!important;border-radius:12px!important;box-shadow:0 12px 48px #000b!important}
+body.show-match #factoryResearchPvP.hidden{display:none!important}
+body.show-match #moduleSheet{z-index:110!important;max-height:85dvh!important}
+body.show-match #decisionLab{position:absolute!important;z-index:105!important;top:82px!important;right:12px!important;max-width:min(420px,calc(100% - 24px))!important}
+body.show-match .validation-note,body.show-match .factory-legend,body.show-match #moduleReadout{display:none!important}
+@media(max-width:760px){
+ body.show-match .matchtop{max-height:92px!important}
+ body.show-match .matchtop .toolbar{padding:4px 6px!important}
+ body.show-match .matchtop .toolbar:last-child{justify-content:flex-start!important}
+ body.show-match .matchtop .toolbar:last-child>.btn-secondary{padding:5px 7px!important;font-size:8px!important}
+ body.show-match .prototype-controls .industry-trigger{min-width:92px!important}
+ body.show-match .arena-hud{width:38%!important;padding:6px!important}
+ body.show-match .arena-hud.player-hud{bottom:240px!important}
+ body.show-match .command-dock{width:calc(100% - 12px)!important;max-height:37dvh!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:6px!important;bottom:max(5px,env(safe-area-inset-bottom))!important}
+ body.show-match .command-dock .quickcmd{min-height:55px!important}
+ body.show-match .command-dock .cmd-icon{font-size:15px!important}
+ body.show-match .command-dock .cmd-copy b{font-size:7px!important}
+ body.show-match .command-dock .cmd-copy small{font-size:6px!important}
+ body.show-match #factoryResearchPvP{inset:98px 6px 39dvh!important}
+}
+@media(max-width:420px){
+ body.show-match .clock{font-size:15px!important}
+ body.show-match .prototype-controls .arena-select{max-width:66px!important;min-width:0!important}
+ body.show-match .prototype-controls{gap:3px!important}
+ body.show-match .arena-hud{width:42%!important}
+ body.show-match .hud-stats span:last-child{display:none!important}
+ body.show-match .command-dock{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42dvh!important}
+ body.show-match .command-dock .quickcmd{min-height:48px!important}
+ body.show-match #factoryResearchPvP{inset:98px 6px 44dvh!important}
+}
 @media(max-width:650px){body.show-match #guideCard:not(.hidden){top:82px!important}}
 .evo-alert{font:inherit!important;cursor:pointer!important;text-align:center!important;line-height:1.4!important}
 .evo-alert:hover{filter:brightness(1.18);border-color:#ffe08a!important}
