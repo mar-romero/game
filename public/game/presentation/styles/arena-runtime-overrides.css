@@ -352,3 +352,7 @@ body.show-match #factoryResearchPvP{height:auto!important;max-height:none!import
 .command-dock .shield-large .queue-readiness{color:#ffd47d!important}
 .production-strip .prod-explainer{color:#b7cbd3!important;font-size:9px!important;line-height:1.35}
 .production-strip .prod-queue{max-width:42%!important;white-space:normal!important;line-height:1.5}
+body.show-match #guideCard:not(.hidden){display:block!important;position:sticky!important;top:112px!important;z-index:9!important}
+@media(max-width:650px){body.show-match #guideCard:not(.hidden){top:82px!important}}
+.evo-alert{font:inherit!important;cursor:pointer!important;text-align:center!important;line-height:1.4!important}
+.evo-alert:hover{filter:brightness(1.18);border-color:#ffe08a!important}
