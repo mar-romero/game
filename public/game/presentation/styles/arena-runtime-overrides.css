@@ -324,3 +324,10 @@
 .guardian-drawer .guardian-controls{margin:0!important;border:0!important;border-top:1px solid #293d47!important}
 @media(max-width:700px){.production-strip{flex-wrap:wrap!important}.production-strip .prod-head{flex:1 0 100%!important}.production-strip .prod-slots{grid-template-columns:repeat(2,minmax(0,1fr))!important}.production-strip .prod-queue{flex:1 1 100%;max-width:none}}
 @media(max-width:390px){.production-strip .prod-slots{grid-template-columns:1fr!important}.production-strip .prod-slot>span{font-size:7px!important}}
+
+/* Let the arena page grow with its controls and research panels. */
+body.show-match,
+body.show-match .shell,
+body.show-match #game{height:auto!important;min-height:100vh;max-height:none!important;overflow:visible!important}
+body.show-match #battlefield.arena08{height:auto!important;max-height:none!important;overflow:visible!important}
+body.show-match #factoryResearchPvP{height:auto!important;max-height:none!important;overflow:visible!important}
