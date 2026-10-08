@@ -93,3 +93,6 @@ Las dependencias deben apuntar hacia el dominio. El dominio no debe importar el 
 - **Compatibilidad de saves:** cada cambio de formato conserva una migración desde las claves actuales de `localStorage` y los registros Supabase.
 
 Para el procedimiento de creación de archivos, dependencias y revisión de cambios, seguir `docs/FILE_CONVENTIONS.md`. Para el orden de migración y criterios de paridad, ver `docs/MIGRATION_PLAN.md`.
+
+
+El plan de migración a Android e iOS está en [sprints de migración móvil](sprint/SPRINTS_MIGRACION_MOBILE.md); la tarea y sus criterios de aceptación están en [TAREA_MIGRACION_MOBILE.md](tarea/TAREA_MIGRACION_MOBILE.md).

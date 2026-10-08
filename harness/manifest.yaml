@@ -1,0 +1,45 @@
+name: factory-wars-engineering-harness
+version: 2
+source_of_truth:
+  instructions: AGENTS.md
+  policy: AI_POLICY.md
+  roles: .agents/roles
+  skills: .agents/skills
+workflow:
+  - REQUEST
+  - EXPLORE
+  - RDD_IF_NEEDED
+  - SDD
+  - BDD_TDD_MODE
+  - IMPLEMENT
+  - CHECKS
+  - REVIEW
+  - VERIFY
+  - CLOSE
+rdd:
+  default: off
+  trigger: material uncertainty in product, domain, architecture, or external contracts
+sdd:
+  required: before non-trivial implementation
+  output: outcome, scope, acceptance criteria, risks, and verification plan
+tdd_modes:
+  - tdd_required
+  - characterization_then_tdd
+  - spike_then_tdd
+  - tdd_preferred
+  - test_after_allowed
+  - not_applicable
+delegation:
+  default: no
+  writer_count_per_file_set: 1
+risk:
+  R0: diff review
+  R1: relevant checks and independent review when available
+  R2: explicit criteria, checks, review, and verification
+  R3: security review and human approval before external effects
+excluded:
+  - worktrees
+  - task registry
+  - sprint planning
+  - provider-specific agent generation
+  - mandatory formal planning artifacts for routine changes
