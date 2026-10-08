@@ -331,3 +331,24 @@ body.show-match .shell,
 body.show-match #game{height:auto!important;min-height:100vh;max-height:none!important;overflow:visible!important}
 body.show-match #battlefield.arena08{height:auto!important;max-height:none!important;overflow:visible!important}
 body.show-match #factoryResearchPvP{height:auto!important;max-height:none!important;overflow:visible!important}
+
+/* Make defensive choice readable at a glance: quick response vs. heavy absorption. */
+.command-dock .quickcmd.shield-small{border:1px solid #55d8c2!important;background:linear-gradient(145deg,#123d3b,#102631)!important;box-shadow:inset 0 0 0 1px #55d8c233!important}
+.command-dock .quickcmd.shield-small .cmd-icon{color:#78f0d5!important}
+.command-dock .quickcmd.shield-large{border:1px solid #f0bc58!important;background:linear-gradient(145deg,#49371c,#2a2930)!important;box-shadow:inset 0 0 0 1px #f0bc5833!important}
+.command-dock .quickcmd.shield-large .cmd-icon{color:#ffd47d!important}
+.act[data-act="defSmall"]{border-left:4px solid #55d8c2!important;background:linear-gradient(145deg,#123d3b,#102631)!important}
+.act[data-act="defLarge"]{border-left:4px solid #f0bc58!important;background:linear-gradient(145deg,#49371c,#2a2930)!important}
+.guide-badges #guidePhase.first-action{background:linear-gradient(110deg,#15463f,#176b58);border-color:#69e7b6;color:#d7ffed;box-shadow:0 0 18px #59e3b330}
+.guide-badges #guidePhase.urgent{background:linear-gradient(110deg,#761d2d,#a32e32);border-color:#ff806f;color:#fff0e9;box-shadow:0 0 18px #ff4c4c40}
+.threat-banner.preparing{background:linear-gradient(90deg,rgba(103,73,28,.94),rgba(129,91,43,.88));border-color:rgba(255,203,104,.65);color:#fff3d0;box-shadow:0 8px 24px rgba(184,139,54,.16)}
+.threat-banner.urgent{background:linear-gradient(90deg,#761d2d,#b93639);border-color:#ff806f;color:#fff4ed;box-shadow:0 0 0 2px rgba(255,93,89,.16),0 10px 32px rgba(200,54,61,.35);animation:arena-threat-pulse 1.15s ease-in-out infinite alternate}
+.threat-banner.covered{background:linear-gradient(90deg,rgba(24,75,67,.94),rgba(37,91,75,.88));border-color:rgba(112,224,169,.55);color:#e3fff0;box-shadow:0 8px 24px rgba(56,165,117,.14)}
+@keyframes arena-threat-pulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+.command-dock .queue-readiness{display:block!important;grid-column:1/-1!important;width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;color:#8de0bf!important;font-size:7px!important;font-weight:950!important;letter-spacing:.035em;white-space:nowrap}
+.command-dock .queue-readiness.will-queue{color:#ffd27a!important}
+.command-dock .queue-readiness.unavailable{color:#ffad9f!important}
+.command-dock .shield-small .queue-readiness{color:#8ce8d5!important}
+.command-dock .shield-large .queue-readiness{color:#ffd47d!important}
+.production-strip .prod-explainer{color:#b7cbd3!important;font-size:9px!important;line-height:1.35}
+.production-strip .prod-queue{max-width:42%!important;white-space:normal!important;line-height:1.5}
