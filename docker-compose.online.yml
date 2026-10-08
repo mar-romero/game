@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: factory_wars
+      POSTGRES_USER: factory_wars
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - factory_wars_db:/var/lib/postgresql/data
+      - ./supabase/online_schema.sql:/docker-entrypoint-initdb.d/001-online-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U factory_wars -d factory_wars"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  game-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 4s
+      retries: 5
+      start_period: 20s
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      PUBLIC_DIR: /app/public
+      DATABASE_URL: ${DATABASE_URL_OVERRIDE:-postgres://factory_wars:${POSTGRES_PASSWORD}@db:5432/factory_wars}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      ALLOW_LOCAL_SAVE_IMPORT: ${ALLOW_LOCAL_SAVE_IMPORT:-false}
+      SUPABASE_URL: ${SUPABASE_URL:?Set SUPABASE_URL in .env}
+      SUPABASE_BROWSER_URL: ${SUPABASE_BROWSER_URL:-}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY in .env}
+      SEASON_ID: ${SEASON_ID:-BETA-ONLINE-01}
+      SEASON_ROSTER_SIZE: ${SEASON_ROSTER_SIZE:-12}
+      ADMIN_USER_IDS: ${ADMIN_USER_IDS:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8080}
+      BOT_FILL_DELAY_MS: ${BOT_FILL_DELAY_MS:-12000}
+      MAX_WEBSOCKET_CONNECTIONS: ${MAX_WEBSOCKET_CONNECTIONS:-1200}
+      PLAYER_ACTIONS_PER_SECOND: ${PLAYER_ACTIONS_PER_SECOND:-12}
+      PLAYER_ACTION_BURST: ${PLAYER_ACTION_BURST:-20}
+      PLAYER_HTTP_REQUESTS_PER_MINUTE: ${PLAYER_HTTP_REQUESTS_PER_MINUTE:-300}
+      MATCH_TICK_INTERVAL_MS: ${MATCH_TICK_INTERVAL_MS:-200}
+      MATCH_EVENT_PERSIST_INTERVAL_MS: ${MATCH_EVENT_PERSIST_INTERVAL_MS:-5000}
+      STATE_BROADCAST_INTERVAL_MS: ${STATE_BROADCAST_INTERVAL_MS:-250}
+    ports:
+      - "${GAME_SERVER_BIND:-127.0.0.1}:8080:8080"
+
+volumes:
+  factory_wars_db:

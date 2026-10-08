@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Factory Wars · Prueba Online</title>
+  <link rel="stylesheet" href="./game/presentation/styles/online.css">
+</head>
+<body>
+  <header class="online-header">
+    <div><small>FACTORY WARS · ONLINE TEST</small><h1>Imperio compartido</h1></div>
+    <div class="account"><span id="connection">Conectando…</span><label>Nombre <input id="nickname" maxlength="20"><button id="saveNickname">Guardar</button></label><code id="playerId"></code></div>
+  </header>
+  <main>
+    <section class="panel account-panel"><div><small>GUARDAR TU CUENTA</small><p id="accountStatus">Cuenta de prueba anónima. Vinculala para recuperar tu imperio desde otro navegador.</p></div><div class="account-fields"><label>Correo <input id="accountEmail" type="email" autocomplete="email" maxlength="254"></label><label>Contraseña <input id="accountPassword" type="password" autocomplete="new-password" minlength="6" maxlength="72"></label><button id="linkAccount" class="primary">VINCULAR ESTA CUENTA</button><button id="signInAccount">ENTRAR A MI CUENTA</button><button id="recoverAccount">RECUPERAR CONTRASEÑA</button></div></section>
+    <section class="panel season-panel"><div><small>TEMPORADA</small><h2 id="seasonName">—</h2><p id="seasonStatus">Entrá a la temporada para aparecer en el ranking.</p></div><div class="season-buttons"><button id="joinSeason" class="primary">UNIRME A LA LIGA</button><button id="refreshLeaderboard">ACTUALIZAR RANKING</button></div><div id="leaderboard" class="leaderboard"></div></section>
+    <div class="columns">
+      <section class="panel"><div class="section-title"><div><small>PROGRESO PERSISTENTE</small><h2>Megafábrica</h2></div><select id="civilization"><option value="">Elegí civilización</option><option value="forge">FORJA</option><option value="bastion">BASTIÓN</option><option value="swarm">ENJAMBRE</option><option value="nexus">NEXO</option></select><button id="chooseCivilization">Elegir</button></div>
+        <div class="resources" id="resources"></div><div class="buildings" id="buildings"></div>
+        <div class="subpanel"><h3>Contrato industrial</h3><p id="contractInfo">Cargando oferta…</p><button id="startContract">INICIAR CONTRATO</button></div>
+        <div class="subpanel"><h3>Investigación</h3><p class="hint">Hasta cuatro mejoras por rama. El servidor valida el costo y los requisitos.</p><div id="research" class="research"></div><div class="doctrine-controls"><select id="doctrine" aria-label="Doctrina de misiles"></select><button id="equipDoctrine">EQUIPAR DOCTRINA</button></div></div>
+        <div class="subpanel prestige"><div><h3>Prestigio</h3><p id="prestigeInfo">—</p></div><select id="nextCivilization" aria-label="Civilización del próximo ciclo"><option value="forge">FORJA</option><option value="bastion">BASTIÓN</option><option value="swarm">ENJAMBRE</option><option value="nexus">NEXO</option></select><button id="prestige">ASCENDER</button></div>
+      </section>
+      <section class="panel arena-panel"><div class="section-title"><div><small>PVP EN TIEMPO REAL</small><h2>Arena</h2></div><span id="arenaStatus" class="pill">Fuera de partida</span></div>
+        <p class="hint">El servidor crea la partida, ejecuta las reglas y guarda las acciones. Si nadie está esperando, te asigna un bot tras unos segundos.</p>
+        <button id="queueMatch" class="primary queue-button">BUSCAR RIVAL</button>
+        <div id="arenaViewport" class="arena-viewport hidden"><iframe id="arenaFrame" title="Arena Factory Wars en línea" allow="autoplay"></iframe></div>
+        <div class="match-summary" id="matchSummary"><div><small>RELOJ</small><b id="matchClock">04:00</b></div><div><small>NODO</small><b id="nodeOwner">Neutral</b></div></div>
+        <div id="players" class="players"></div>
+        <div class="actions" id="actions"><button data-action="eco">Mejorar economía</button><button data-action="small">Cohete rápido</button><button data-action="large">Cohete pesado</button><button data-action="defSmall">Escudo rápido</button><button data-action="defLarge">Escudo pesado</button><button data-action="sabotage">Sabotaje</button><button data-action="capture">Capturar nodo</button><button data-action="overdrive">Overdrive</button><button data-action="scan">Escaneo</button></div>
+        <div class="node-controls"><label>Guardianes por oleada <input id="guardianCount" type="number" min="1" max="300" value="100"></label><button id="retreatGuardians" data-special-action="retreat" disabled>Retirar guardianes</button><button id="emergencyShield" data-special-action="emergency-shield" disabled>Escudo de emergencia</button></div>
+        <div class="subpanel"><h3>Mejoras de Arena</h3><p class="hint">Elegí una mejora habilitada por tu investigación de Megafábrica. La compra y sus requisitos se validan en el servidor.</p><div id="moduleControls" class="module-controls">Esperando partida…</div></div>
+        <pre id="combatLog" class="combat-log">Esperando una partida…</pre>
+        <div class="subpanel analytics"><h3>Datos de análisis</h3><p id="analyticsSummary">Todavía no hay partidas registradas.</p><button id="refreshAnalytics">VER MIS ESTADÍSTICAS</button> <button id="exportTelemetry">DESCARGAR MIS DATOS JSON</button><div id="adminAnalytics" class="admin-analytics hidden"><h4>Administración de temporada</h4><p>Incluye fábricas, clasificación, partidas, participantes, eventos y economía de todos los jugadores.</p><button id="exportSeasonTelemetry" class="primary">DESCARGAR DATOS DE TODA LA TEMPORADA</button></div></div>
+      </section>
+    </div>
+    <p id="toast" class="toast" role="status"></p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/online-config.js"></script>
+  <script src="./game/domain/empire/catalog.js"></script><script src="./game/domain/empire/economy.js"></script><script src="./game/domain/empire/progression.js"></script>
+  <script src="./game/adapters/web/online-client.js"></script>
+</body></html>

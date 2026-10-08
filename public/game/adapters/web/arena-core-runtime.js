@@ -38,7 +38,7 @@ function industrialCap(p){const level=p?.level||1;return Math.min(4,Math.max(0,l
 function moduleUsed(p){return Object.keys(p?.modules||{}).filter(k=>p.modules[k]).length+(p?.moduleBuild?1:0)}
 function hasModule(p,k){return !!(p&&p.modules&&p.modules[k])}
 const MODULE_BLUEPRINTS={armory2:'blueprint_armory',refinery2:'blueprint_refinery',shield2:'blueprint_shield',control2:'blueprint_control'};
-function missingModuleBlueprint(p,key){if(!p||p.id!=='A'||settings.mode!=='human')return null;const module=INDUSTRIAL_MODULES[key],blueprintKey=MODULE_BLUEPRINTS[module?.requires||key];if(!blueprintKey)return null;let research=p.factoryProgress?.research;if(!research){try{const state=JSON.parse(localStorage.getItem('factory-wars-v15-imperios-local')||'{}');research=state.research||[];}catch{research=[];}}return research.includes(blueprintKey)?null:blueprintKey;}
+function missingModuleBlueprint(p,key){const serverSideHuman=Boolean(window.__fwOnlineArenaServer)&&p?.id==='B'&&!p.bot;if(!p||settings.mode!=='human'||(p.id!=='A'&&!serverSideHuman))return null;const module=INDUSTRIAL_MODULES[key],blueprintKey=MODULE_BLUEPRINTS[module?.requires||key];if(!blueprintKey)return null;let research=p.factoryProgress?.research;if(!research&&!window.__fwOnlineArena){try{const state=JSON.parse(localStorage.getItem('factory-wars-v15-imperios-local')||'{}');research=state.research||[];}catch{research=[];}}return (research||[]).includes(blueprintKey)?null:blueprintKey;}
 function moduleFamilyLabel(k){const m=INDUSTRIAL_MODULES[k];return m?m.name:k}
 function moduleSummary(p){if(!p)return "GENERALISTA";const arr=Object.keys(p.modules||{}).filter(k=>p.modules[k]);if(p.moduleBuild)arr.push("⏳ "+INDUSTRIAL_MODULES[p.moduleBuild.key].name);return arr.length?arr.map(k=>k.startsWith("⏳")?k:INDUSTRIAL_MODULES[k].name.replace("ARMERÍA ","ARM ").replace("REFINERÍA ","REF ").replace("ESCUDOS ","ESC ").replace("CONTROL ","CTRL ")).join(" · "):"GENERALISTA"}
 
@@ -69,6 +69,7 @@ Match.prototype.botDecision=function(p){if(!p.moduleBuild&&moduleUsed(p)<industr
 const __report=Match.prototype.report;
 Match.prototype.report=function(){const r=__report.call(this);r.modules=INDUSTRIAL_MODULES;r.players=this.players.map(p=>({id:p.id,civilization:p.civ,bot:p.bot,final:{bank:round(p.bank,1),income:round(this.income(p),2),hp:p.hp,level:p.level,shield:this.shield(p),modules:Object.keys(p.modules).filter(k=>p.modules[k])},stats:{...p.stats,territorySeconds:round(p.stats.territorySeconds)},telemetry:{...p.telemetry}}));return r;};
 
+/* FACTORY_WARS_HEADLESS_RULES_END */
 let settings={mode:"human",civA:"forge",civB:"swarm",botA:"GREEDY",botB:"RUSHER"};
 let soundEnabled=true,audioCtx=null;
 let match=null,selectedBuild=null,selectedCommand=null,paused=false,speed=1,loopHandle=null,lastFrame=0,batchData=null,lastVisibleEventIndex=0,lastFxEventIndex=0;

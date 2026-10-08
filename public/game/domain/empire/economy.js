@@ -1,5 +1,8 @@
 /* Pure Megafactory production rules. The browser controller supplies state. */
 (function attachEmpireEconomy(root) {
+  const buildingRates = Object.freeze({ generator: 0.75, refinery: 0.42, lab: 0.04, automation: 0.18 });
+  const buildingResources = Object.freeze({ generator: 'energy', refinery: 'steel', lab: 'intel', automation: 'credits' });
+
   function legacyEfficiency(state) {
     const prestige = state.prestigeCount || 0;
     return 1
@@ -21,10 +24,10 @@
       * civilizationProductionMultiplier(state)
       * researchProductionMultiplier(state);
     return {
-      energy: 0.75 * state.buildings.generator * multiplier,
-      steel: 0.42 * state.buildings.refinery * multiplier,
-      intel: 0.04 * state.buildings.lab * multiplier,
-      credits: 0.18 * state.buildings.automation * multiplier,
+      energy: buildingRates.generator * state.buildings.generator * multiplier,
+      steel: buildingRates.refinery * state.buildings.refinery * multiplier,
+      intel: buildingRates.lab * state.buildings.lab * multiplier,
+      credits: buildingRates.automation * state.buildings.automation * multiplier,
     };
   }
 
@@ -32,12 +35,10 @@
     const multiplier = legacyEfficiency(state)
       * civilizationProductionMultiplier(state)
       * researchProductionMultiplier(state);
-    const rates = { generator: 0.75, refinery: 0.42, lab: 0.018, automation: 0.18 };
-    const resources = { generator: 'energy', refinery: 'steel', lab: 'intel', automation: 'credits' };
-    const rate = rates[key];
+    const rate = buildingRates[key];
     const level = state.buildings[key];
     return {
-      resource: resources[key],
+      resource: buildingResources[key],
       gain: rate * multiplier,
       current: rate * level * multiplier,
       next: rate * (level + 1) * multiplier,

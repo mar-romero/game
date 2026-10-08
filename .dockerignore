@@ -1,0 +1,13 @@
+.git
+.codex
+.agents
+.env
+.env.*
+**/node_modules
+legacy
+docs
+README.md
+*.log
+*.dump
+*.backup
+factory-wars-*-telemetry-*.json

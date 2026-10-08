@@ -2,6 +2,8 @@
 
 > ¿Buscás código? Empezá por [la guía de arquitectura](docs/ARCHITECTURE.md), [convenciones para crear archivos](docs/FILE_CONVENTIONS.md) y [el plan de migración](docs/MIGRATION_PLAN.md). El snapshot del juego previo está en `legacy/v1.6/`.
 
+Para levantar la primera prueba online con API, Liga compartida, bots y PostgreSQL, seguir [ONLINE_LOCAL_SETUP.md](docs/ONLINE_LOCAL_SETUP.md) y abrir `/online.html`.
+
 Factory Wars es un juego web de estrategia con dos ritmos conectados:
 
 1. **Megafabrica:** producís recursos, mejorás edificios, cumplís contratos e investigás.
@@ -41,7 +43,7 @@ La producción base por segundo depende del nivel del edificio:
 
 - Generadores: `0,75 × nivel` de Energía.
 - Refinerías: `0,42 × nivel` de Acero.
-- Laboratorios: `0,018 × nivel` de Intel.
+- Laboratorios: `0,04 × nivel` de Intel.
 - Automatización: `0,18 × nivel` de Créditos.
 
 La producción se multiplica por la eficiencia de Legado, el bonus industrial de BASTIÓN y Logística cuando corresponda. Los recursos se acumulan localmente; al volver después de un tiempo, el cálculo de producción offline tiene un tope de cuatro horas por actualización.
@@ -228,7 +230,7 @@ La Liga muestra cuatro vistas:
 - **Imperio:** 60% percentil Arena y 40% percentil Industrial.
 - **Civilizaciones:** combina contribuciones de PvP, Industria y Operaciones; los contratos aportan Operaciones y el Prestigio aporta Industria.
 
-La temporada local se guarda en el navegador. Con Supabase configurado, perfiles, estados y rankings pueden compartirse según las tablas habilitadas. La Liga actualiza su estado online por usuario y temporada.
+La ruta `/` sigue siendo la experiencia local: guarda la temporada en el navegador y conserva el adaptador Supabase anterior, que sincroniza desde el cliente. La ruta `/online.html` es la primera versión autoritativa: usa la API Node, Supabase Auth y PostgreSQL para compartir Megafábrica, Arena, partidas y clasificación. El servidor acredita recompensas de Arena y guarda el evento junto con el resultado; las partidas contra bots también recompensan al jugador, pero solo el PvP humano contra humano cambia Elo, puntos y récord competitivo.
 
 ## Qué está conectado y qué no
 
@@ -236,10 +238,10 @@ La temporada local se guarda en el navegador. Con Supabase configurado, perfiles
 - Intel de Megafábrica investiga doctrinas de misiles y planos de módulos. Las doctrinas cambian cohetes; los planos desbloquean opciones que luego se pagan y construyen dentro de Arena.
 - Los módulos de Arena afectan solo la partida actual y requieren recursos, tiempo y slots industriales.
 - La maestría persistente de la civilización sí ajusta su multiplicador PvP, crece con Prestigio y se limita a 10 puntos por civilización.
-- La partida de Liga da Créditos e Intel para la Megafábrica en modo local; Arena directa se limita al combate y sus resultados.
+- La partida de Liga da Créditos, Intel, Fragmentos, Dominio y contribución PvP para la Megafábrica. La beta autoritativa aplica esas recompensas del lado servidor y las registra como eventos económicos.
 - El Dominio sube un contador de Maestría. Aunque un tooltip dice que desbloquea mejoras de guerra, en el código actual no existe todavía una compra/desbloqueo concreto ligado a ese nivel.
 - Algunas descripciones de bonus PvP en las tarjetas de civilización están desactualizadas frente a los multiplicadores del motor Arena. Los multiplicadores activos están documentados arriba.
-- Los resultados online y la Liga son una beta cliente-autoritativa. No usar el ranking para premios monetarios hasta validar partidas en servidor.
+- `/online.html` ejecuta y valida partidas en el servidor; la ruta local `/` mantiene el adaptador anterior cliente-autoritativo. El modo autoritativo funciona en una instancia y aún no está probado para 1.000 conexiones; para escalar horizontalmente hay que agregar coordinación compartida de colas y partidas.
 
 ## Probar localmente
 
