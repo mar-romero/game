@@ -5,7 +5,7 @@ description: Flujo de ingeniería con discovery, especificación, TDD adaptativo
 
 # Harness de ingeniería
 
-El flujo completo está en [`docs/AGENT_WORKFLOW.md`](../../../docs/AGENT_WORKFLOW.md). Usálo de forma proporcional al riesgo: la disciplina debe reducir errores, no producir papeleo.
+El flujo completo está en [`docs/AGENT_WORKFLOW.md`](../../../docs/AGENT_WORKFLOW.md). Usalo de forma proporcional al riesgo: la disciplina debe reducir errores, no producir papeleo.
 
 ## Ciclo principal
 
@@ -22,13 +22,15 @@ El flujo completo está en [`docs/AGENT_WORKFLOW.md`](../../../docs/AGENT_WORKFL
 9. Realizá review independiente cuando esté disponible y autorizada. Verificá el comportamiento pedido, que es distinto de revisar el código.
 10. Cerrá con cambios, comandos/resultados, revisión/verify realmente hechos y limitaciones.
 
+El hook `UserPromptSubmit` llama `scripts/harness_orchestrator.py` y agrega un route compacto al contexto. También se puede consultar manualmente con `python scripts/harness_orchestrator.py route "pedido"`. El route es una sugerencia determinista; el agente principal confirma la clasificación con el repo/usuario, lee las skills indicadas y pasa los overrides model/effort al invocar cada agente. No inventes disponibilidad: si el modelo preferido no está disponible, hereda el del principal y registra el fallback.
+
 ## Roles
 
-Los contratos están en `.agents/roles/`. Explorer, planner, test-designer, reviewer, verifier y security-reviewer son roles de solo lectura; implementer es el único escritor. Un archivo de rol no crea una subagente: no delegues ni crees agentes salvo que el usuario o instrucciones aplicables lo pidan explícitamente y la herramienta lo permita. Si no hay revisor independiente, declaralo con claridad.
+Los contratos están en `.agents/roles/` y sus perfiles invocables por Codex están en `.codex/agents/`. Explorer, planner, test-designer, reviewer, verifier y security-reviewer son de solo lectura; implementer es el único escritor. Seguí el route de roles definido en `harness/manifest.yaml` si la herramienta permite delegación. Si no hay agente/revisor independiente, declaralo con claridad.
 
 ## Proporcionalidad
 
-- **R0:** change pequeño y diff review; check dirigido si existe.
+- **R0:** cambio pequeño y revisión del diff; check dirigido si existe.
 - **R1:** criterios claros, pruebas/checks pertinentes y review cuando se solicitó o el flujo lo ofrece.
 - **R2:** SDD explícito, casos negativos/límite, pruebas pertinentes, reviewer/verifier y seguridad especializada según superficie.
 - **R3:** análisis adversarial/seguridad y aprobación humana antes de despliegues, borrados u otros efectos irreversibles.

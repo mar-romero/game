@@ -1,9 +1,9 @@
 # Skills
 
-- `harness-mvp/`: workflow, riesgo y reglas para delegar.
-- `sdd/`: especificación previa a implementación.
+- `harness-mvp/`: flujo, roles y proporcionalidad de riesgo.
 - `rdd/`: investigación y discovery solo ante incertidumbre material.
-- `adaptive-tdd/`: selección y evidencia de modo de pruebas.
+- `sdd/`: contrato mínimo previo a cambios no triviales.
+- `adaptive-tdd/`: selección y evidencia del modo de pruebas.
 - `test-strategy/`: escenarios BDD, fallos, límites y oráculos.
 - `software-engineering/`: criterios técnicos y referencias.
 - `implementation-loop/`: ciclo de edición, checks y evidencia.

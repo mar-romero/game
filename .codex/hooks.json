@@ -1,0 +1,18 @@
+{
+  "description": "Route each user request through the repository harness and recommend skills, roles, TDD mode, risk, and per-role models.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/harness_orchestrator.py\" hook",
+            "commandWindows": "py -3 \"$(git rev-parse --show-toplevel)\\scripts\\harness_orchestrator.py\" hook",
+            "timeout": 10,
+            "statusMessage": "Routing request through Factory Wars harness"
+          }
+        ]
+      }
+    ]
+  }
+}

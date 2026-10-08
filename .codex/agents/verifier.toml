@@ -1,0 +1,4 @@
+name = "verifier"
+description = "Verify acceptance criteria through observable behavior and evidence."
+sandbox_mode = "read-only"
+developer_instructions = "Read .agents/roles/verifier.md and .agents/skills/verification/SKILL.md. For each criterion, identify the check or user-visible behavior, execute/reproduce when feasible, and report result and uncertainty. Verification is separate from code review. Do not edit or delegate. Prefer a model different from the implementer when available."

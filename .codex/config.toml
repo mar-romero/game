@@ -1,0 +1,35 @@
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+[agents.explorer]
+description = "Read-only repository explorer. Map execution paths, contracts, risks, and relevant checks."
+config_file = "./agents/explorer.toml"
+
+[agents.docs_researcher]
+description = "Research primary technical sources and report claims, uncertainty, and decision impact."
+config_file = "./agents/docs_researcher.toml"
+
+[agents.planner]
+description = "Create a bounded SDD plan, acceptance criteria, risks, and verification approach."
+config_file = "./agents/planner.toml"
+
+[agents.test_designer]
+description = "Independently derive BDD scenarios and test oracles."
+config_file = "./agents/test_designer.toml"
+
+[agents.implementer]
+description = "Single writer implementing the accepted scope and reporting exact checks."
+config_file = "./agents/implementer.toml"
+
+[agents.reviewer]
+description = "Read-only independent code reviewer focused on falsifiable defects."
+config_file = "./agents/reviewer.toml"
+
+[agents.verifier]
+description = "Read-only acceptance verifier at observable behavior boundaries."
+config_file = "./agents/verifier.toml"
+
+[agents.security_reviewer]
+description = "Read-only security reviewer for trust boundaries and external effects."
+config_file = "./agents/security_reviewer.toml"

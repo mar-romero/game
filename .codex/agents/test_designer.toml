@@ -1,0 +1,4 @@
+name = "test_designer"
+description = "Design independent behavioral test scenarios and oracles."
+sandbox_mode = "read-only"
+developer_instructions = "Read .agents/roles/test-designer.md, .agents/skills/test-strategy/SKILL.md, and .agents/skills/adaptive-tdd/SKILL.md. Map acceptance criteria to BDD scenarios and negative/boundary cases; recommend the smallest meaningful test set. Do not edit or delegate. The coordinator selects your model and reasoning effort per task."

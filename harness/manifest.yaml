@@ -5,6 +5,10 @@ source_of_truth:
   policy: AI_POLICY.md
   roles: .agents/roles
   skills: .agents/skills
+  model_routing: harness/model-routing.json
+  orchestrator: scripts/harness_orchestrator.py
+  codex_agents: .codex/agents
+  codex_hooks: .codex/hooks.json
 workflow:
   - REQUEST
   - EXPLORE
@@ -30,8 +34,16 @@ tdd_modes:
   - test_after_allowed
   - not_applicable
 delegation:
-  default: no
+  default: conditional_by_risk_route
   writer_count_per_file_set: 1
+  risk_routes:
+    R0: []
+    R1: [explorer, implementer, reviewer]
+    R2: [explorer, planner, test_designer, implementer, reviewer, verifier]
+    R3: [explorer, planner, test_designer, implementer, reviewer, verifier, security_reviewer]
+  conditional_roles:
+    RDD: [docs_researcher]
+    security_signal: [security_reviewer]
 risk:
   R0: diff review
   R1: relevant checks and independent review when available

@@ -1,3 +1,3 @@
 # Roles
 
-Contratos provider-neutral del MVP: explorer, planner, implementer, reviewer y verifier. Son guías de responsabilidades, no ejecutables ni agentes de proveedor registrados.
+Contratos de roles provider-neutral: explorer, planner, test-designer, implementer, reviewer, verifier y security-reviewer. Son guías de responsabilidades, no ejecutables ni agentes de proveedor registrados.

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "availability": "Runtime availability is authoritative. These are preferences only; if unavailable, inherit the parent model and report fallback.",
+  "classes": {
+    "fast": {"preferred_model": "gpt-6-luna", "reasoning_effort": "medium"},
+    "coding": {"preferred_model": "gpt-6.1-sol", "reasoning_effort": "high"},
+    "reasoning": {"preferred_model": "gpt-6-astra", "reasoning_effort": "high"},
+    "verification": {"preferred_model": "gpt-6-astra", "reasoning_effort": "high"}
+  },
+  "role_class": {
+    "explorer": "fast",
+    "docs_researcher": "reasoning",
+    "planner": "reasoning",
+    "test_designer": "reasoning",
+    "implementer": "coding",
+    "reviewer": "reasoning",
+    "verifier": "verification",
+    "security_reviewer": "reasoning"
+  },
+  "risk_overrides": {
+    "R2": {
+      "implementer": {"preferred_model": "gpt-6.1-sol", "reasoning_effort": "high"},
+      "reviewer": {"preferred_model": "gpt-6-astra", "reasoning_effort": "high"},
+      "verifier": {"preferred_model": "gpt-6-sol", "reasoning_effort": "high"}
+    },
+    "R3": {
+      "implementer": {"preferred_model": "gpt-6-astra", "reasoning_effort": "high"},
+      "reviewer": {"preferred_model": "gpt-6.1-sol", "reasoning_effort": "high"},
+      "verifier": {"preferred_model": "gpt-6-sol", "reasoning_effort": "high"},
+      "security_reviewer": {"preferred_model": "gpt-6.1-sol", "reasoning_effort": "high"}
+    }
+  },
+  "independence": {
+    "reviewer_should_differ_from_implementer": true,
+    "prefer_different_model": true,
+    "if_not_available": "record_same_model_limitation"
+  }
+}
