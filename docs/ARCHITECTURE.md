@@ -50,7 +50,7 @@ supabase/                            Esquema, vistas, RPC y migraciones
 tests/                               Lugar para pruebas automatizadas futuras
 ```
 
-Las páginas HTML siguen en la raíz de `public/` para que no cambien las URLs usadas por Pages, el iframe y las simulaciones. Los estilos y scripts ya viven bajo `public/game/`, agrupados por responsabilidad. Las carpetas que todavía no tienen implementación están marcadas con una guía `README.md`; son espacios de destino, no funcionalidades ya migradas.
+Las páginas HTML siguen en la raíz de `public/` para que no cambien las URLs usadas por Pages, el iframe y las simulaciones. Los estilos y scripts ya viven bajo `public/game/`, agrupados por responsabilidad. La entrada web incluye una PWA instalable (`public/manifest.webmanifest` y `public/service-worker.js`); el manifest, el service worker y sus assets usan rutas relativas para que funcionen bajo el prefijo de GitHub Pages. Esto comparte la interfaz web en navegador y pantalla de inicio, pero no crea un binario nativo ni una publicación en tiendas. Las carpetas que todavía no tienen implementación están marcadas con una guía `README.md`; son espacios de destino, no funcionalidades ya migradas.
 
 ## Dependencias objetivo
 
@@ -80,7 +80,7 @@ Las dependencias deben apuntar hacia el dominio. El dominio no debe importar el 
 - `arena-experience-lab.js` y `arena-league-bridge.js` conservan telemetría y mensajes de integración dentro del adaptador web.
 - `empire-controller.js` combina estado, reglas y renderizado de la Megafábrica.
 - La sincronización online está repartida entre el controlador del Imperio, el sincronizador de Arena y el cliente Supabase. Debe converger en adaptadores de persistencia.
-- No hay hoy un build TypeScript, app móvil, app Steam ni servidor autoritativo. Las carpetas de plataforma reservan esos límites para el crecimiento futuro.
+- No hay hoy un build TypeScript, app móvil nativa, app Steam ni servidor autoritativo. La PWA cubre la instalación de la web; Capacitor y las compilaciones nativas siguen reservados para trabajo futuro.
 
 ## Contratos que deben guiar el diseño
 

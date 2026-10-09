@@ -294,3 +294,39 @@
  #home .home-activity-value b{font-size:20px}
  #home .home-activity>button{min-height:34px}
 }
+
+/* Hub mobile-first: composición vertical y arte de isla en formato retrato. */
+#home .home-stage{grid-template-columns:minmax(0,1fr);gap:14px;max-width:760px;min-height:0;margin-inline:auto}
+#home .home-commander{order:1;align-self:stretch;margin:0}
+#home .home-island{order:2;width:min(100%,460px);aspect-ratio:9/16;min-height:0;margin-inline:auto;background:#0877b3}
+#home .home-island-art{position:absolute;z-index:0;inset:0;width:100%;height:100%;min-height:0;object-fit:cover;object-position:center;transform-origin:center 58%;animation:island-camera-drift 18s ease-in-out infinite alternate}
+#home .home-island:before{position:absolute;z-index:1;inset:-20%;content:"";pointer-events:none;background:linear-gradient(112deg,transparent 35%,#a9ffff3b 49%,transparent 62%),radial-gradient(ellipse at 50% 46%,#4cffff22,transparent 55%);background-size:220% 100%,100% 100%;animation:island-light-drift 12s ease-in-out infinite}
+#home .home-map-label,#home .home-map-production{z-index:2}
+#home .home-action-panel{order:3;grid-column:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;max-width:760px;margin-inline:auto}
+#home .home-next{grid-row:auto}
+#home .home-arena{min-height:66px}
+#home .home-activities{grid-template-columns:minmax(0,1fr);max-width:760px;margin:14px auto 0}
+#home .home-activity{min-height:148px}
+@keyframes island-light-drift{0%,100%{background-position:100% 0,50% 50%;opacity:.55}50%{background-position:0 0,50% 50%;opacity:1}}
+@keyframes island-camera-drift{from{transform:scale(1.015) translate3d(0,0,0)}to{transform:scale(1.055) translate3d(.35%,-.45%,0)}}
+@media(max-width:640px){
+  .shell{padding:calc(8px + env(safe-area-inset-top)) 10px calc(18px + env(safe-area-inset-bottom))}
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:8px;padding:9px;border-radius:14px}
+  .topbar>div{min-width:0}
+  .topbar>div:nth-child(2){font-size:12px}
+  .resource-strip{display:flex;justify-content:flex-start;width:100%;max-width:none;gap:7px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:2px}
+  .resource-strip::-webkit-scrollbar{display:none}
+  .resource-pill,.resource-pill:last-child{flex:0 0 148px;min-height:62px;grid-column:auto;scroll-snap-align:start}
+  .nav{margin:8px 0 10px}
+  #home .home-stage{gap:9px}
+  #home .home-commander{padding:11px;grid-template-columns:50px minmax(0,1fr)}
+  #home .home-island{width:100%;border-radius:15px}
+  #home .home-map-label{top:9px;left:9px;padding:6px 8px}
+  #home .home-map-production{left:7px;right:7px;bottom:7px;gap:4px}
+  #home .home-map-production span{padding:5px 7px;font-size:9px}
+  #home .home-action-panel{gap:8px}
+  #home .home-arena{min-height:58px}
+  #home .home-activities{gap:8px;margin-top:9px}
+  #home .home-activity{min-height:142px;padding:12px}
+}
+@media(prefers-reduced-motion:reduce){#home .home-island:before{animation:none;opacity:.45}#home .home-island-art{animation:none;transform:none}}

@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Factory Wars · Liga de 14 días</title><link rel="stylesheet" href="./game/presentation/styles/empire.css"></head><body>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Factory Wars · Liga de 14 días</title><meta name="description" content="Desarrollá tu Megafábrica, elegí una civilización y competí en Arena."><meta name="theme-color" content="#071018"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"><link rel="stylesheet" href="./game/presentation/styles/empire.css"></head><body>
 <div class="shell"><header class="topbar"><div class="brand"><b>FACTORY WARS · IMPERIOS</b><div><small id="onlineStatus">Inicializando…</small></div></div><div><b id="nickname">Factory-Local</b> · <span id="civName" class="muted">SIN CIVILIZACIÓN</span></div><div class="resources resource-strip" aria-label="Recursos del Imperio">
 <span class="resource-pill credits" data-tip="CRÉDITOS: los genera Automatización; también llegan por contratos y Arena. Se usan para mejorar edificios de la Megafábrica."><i>◈</i><span><small>CRÉDITOS</small><b id="rCredits">0</b><em id="rateCredits">+0/s</em><strong class="resource-use">MEJORAS</strong></span></span>
 <span class="resource-pill energy" data-tip="ENERGÍA: la producen los Generadores. Se entrega en contratos energéticos para convertir producción en recompensas."><i>⚡</i><span><small>ENERGÍA</small><b id="rEnergy">0</b><em id="rateEnergy">+0/s</em><strong class="resource-use">CONTRATOS</strong></span></span>
@@ -20,35 +20,7 @@
       <button id="prestigeBtn" class="btn warn" type="button" disabled>PRESTIGIO 0%</button>
     </section>
     <div class="home-island" aria-hidden="true">
-      <svg class="home-island-art" viewBox="0 0 900 500" role="presentation" focusable="false">
-        <defs>
-          <linearGradient id="islandWater" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#167fbd"/><stop offset=".5" stop-color="#12c7e8"/><stop offset="1" stop-color="#075c9f"/></linearGradient>
-          <linearGradient id="islandLand" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8ae5a6"/><stop offset=".52" stop-color="#3a9e84"/><stop offset="1" stop-color="#1c6676"/></linearGradient>
-          <linearGradient id="islandRock" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d8e8e8"/><stop offset=".3" stop-color="#718fa5"/><stop offset="1" stop-color="#243e5f"/></linearGradient>
-          <linearGradient id="islandGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e6ffff"/><stop offset=".35" stop-color="#59dfff"/><stop offset="1" stop-color="#187ebd"/></linearGradient>
-          <filter id="islandGlow" x="-.5" y="-.5" width="2" height="2"><feGaussianBlur stdDeviation="9"/></filter>
-        </defs>
-        <rect width="900" height="500" rx="24" fill="url(#islandWater)"/>
-        <path d="M0 85 155 24l68 33 74-46 89 24 88-30 82 35 87-15 78 43 91-21 88 42v40l-103 24-93-16-92 46-112-22-92 21-88-29-90 26-100-39L0 177z" fill="#7de4f2" opacity=".28"/>
-        <path d="m102 277 136-102 113 14 78-74 151 13 105 95 91 39-66 116-159 61-167-20-145 43-125-65-82-74z" fill="#063c73" opacity=".55" filter="url(#islandGlow)"/>
-        <path d="m70 256 113-100 133 16 88-71 145 12 95 56 113 28 80 79-55 95-140 54-166-18-131 38-129-57-94-78z" fill="url(#islandRock)" stroke="#d8fbff" stroke-width="5"/>
-        <path d="m92 246 98-77 124 17 91-67 128 16 93 51 99 25 61 63-46 42-132 36-161-16-128 35-111-48-78-62z" fill="url(#islandLand)" stroke="#a4ffd1" stroke-width="3"/>
-        <path d="m180 219 120 15 100-72 127 15 67 44-73 37-161-9-90 54-102-41z" fill="none" stroke="#d1e9c8" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
-        <path d="m325 328 52-56 138-4 98-55M351 166l18 105m164-94-18 92" fill="none" stroke="#b8d4d6" stroke-width="11" stroke-linecap="round" opacity=".8"/>
-        <g fill="#185a55" stroke="#a7edbd" stroke-width="2"><path d="m125 222 17-46 18 46z"/><path d="m154 244 14-38 15 38z"/><path d="m211 183 15-41 16 41z"/><path d="m245 195 13-36 14 36z"/><path d="m582 173 17-48 18 48z"/><path d="m615 189 14-40 16 40z"/><path d="m704 228 16-44 16 44z"/><path d="m676 238 13-36 14 36z"/><path d="m536 327 15-41 16 41z"/><path d="m191 297 14-38 15 38z"/></g>
-        <ellipse cx="436" cy="241" rx="105" ry="75" fill="#24dfff" opacity=".48" filter="url(#islandGlow)"/>
-        <g stroke="#e9fcff" stroke-width="4" stroke-linejoin="round">
-          <path d="m361 246 78-48 81 47-81 48z" fill="#4e7891"/><path d="m361 246 78 47v-78l-78 31z" fill="#c9e5ed"/><path d="m439 293 81-48v-78l-81 48z" fill="#819eb3"/>
-          <path d="m397 216 42-26 45 26-45 26z" fill="#f7ffff"/><path d="m397 216 42 26v-33l-42-26z" fill="#2da1d1"/><path d="m439 242 45-26v-33l-45 26z" fill="url(#islandGlass)"/>
-          <path d="m420 190 19-57 20 57z" fill="#eaffff"/><path d="m439 133v57l20-57z" fill="#56dfff"/><path d="M434 131h10v-21h-10z" fill="#fff"/>
-          <path d="m303 249 37-23 38 23-38 23z" fill="#7793a7"/><path d="m303 249 37 23v-45z" fill="#c7dce2"/><path d="m340 272 38-23v-46l-38 24z" fill="#54768c"/>
-          <path d="m501 196 29-18 30 18-30 18z" fill="#819bae"/><path d="m501 196 29 18v-38z" fill="#e5f8fb"/><path d="m530 214 30-18v-36l-30 16z" fill="#48c9ed"/>
-          <path d="m558 277 31-20 32 20-32 19z" fill="#819bae"/><path d="m558 277 31 19v-39z" fill="#d8edf1"/><path d="m589 296 32-19v-39l-32 19z" fill="#51c8ee"/>
-          <path d="m265 278 28-18 29 18-29 17z" fill="#819bae"/><path d="m265 278 28 17v-35z" fill="#d8edf1"/><path d="m293 295 29-17v-35l-29 17z" fill="#51c8ee"/>
-        </g>
-        <g fill="#fff" stroke="#32dfff" stroke-width="4"><path d="m215 222 12-21 12 21v23h-24z"/><path d="m648 223 13-23 13 23v24h-26z"/><path d="m453 336 12-21 12 21v23h-24z"/></g>
-        <g fill="#ffe072"><circle cx="439" cy="151" r="5"/><circle cx="529" cy="191" r="4"/><circle cx="588" cy="271" r="4"/><circle cx="293" cy="273" r="4"/></g>
-      </svg>
+      <img class="home-island-art" src="./game/presentation/assets/empire-island-mobile.jpg" alt="" loading="eager" decoding="async">
       <div class="home-map-label"><span>MEGAFÁBRICA</span><small>PROGRESO PERSISTENTE</small></div>
       <div class="home-map-production"><span>⚡ <b id="homeEnergyRate">+0/s</b></span><span>◈ <b id="homeCreditsRate">+0/s</b></span><span>⌁ <b id="homeIntelRate">+0/s</b></span></div>
     </div>
@@ -96,4 +68,4 @@
 <section id="profile" class="view"><div class="grid"><div class="card span6"><h2>Perfil</h2><label class="fine">Nickname</label><input id="nicknameInput" maxlength="20"><button id="saveNickname" class="btn primary">GUARDAR NOMBRE</button><p class="fine">En la beta usamos Auth anónimo. Si borrás datos del navegador o cambiás de dispositivo, la cuenta anónima puede no recuperarse; antes de premios reales habrá que vincular email/OAuth.</p></div><div class="card span6"><h2>Legados de civilización</h2><div id="legacyGrid" class="legacy"></div><p id="imperialCycle" class="fine"></p></div><div class="card span12"><h2>Regla de integridad competitiva</h2><p>Prestigio, producción idle e investigación horizontal pueden mejorar preparación, Intel, variedad de loadouts y progreso industrial. <b>No aumentan directamente daño, vida, recursos iniciales ni velocidad económica en Ranked.</b></p><button id="resetLocal" class="btn danger">REINICIAR MEGAFÁBRICA LOCAL</button> <button id="resetLeague" class="btn danger">REINICIAR LIGA</button> <button id="resetEverything" class="btn danger">BORRAR CIVILIZACIÓN Y HISTORIAL</button></div></div></section>
 </main></div>
 <div id="prestigeModal" class="modal"><div class="modal-card"><h2>ASCENSIÓN INDUSTRIAL</h2><p>Tu ciclo llegó al 100%. Ganás <b>+1 Legado</b> de tu civilización actual y un incremento industrial permanente según tu cantidad total de prestigios.</p><div class="warning">Se reinician edificios, recursos comunes, contratos del ciclo e investigación no archivada. Se conserva cuenta, rankings históricos, Legados, lealtad y parte de Intel/fragmentos.</div><h3>Elegí el próximo ciclo</h3><div id="prestigeChoices" class="civ-grid"></div><button id="closePrestige" class="btn">CANCELAR</button></div></div><div id="toast" class="toast"></div><div id="holdTooltip" class="hold-tooltip" role="tooltip" aria-hidden="true"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./game/adapters/web/config.js"></script><script src="./game/domain/empire/catalog.js"></script><script src="./game/domain/empire/economy.js"></script><script src="./game/domain/empire/progression.js"></script><script src="./game/adapters/web/empire-controller.js"></script></body></html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./game/adapters/web/config.js"></script><script src="./game/domain/empire/catalog.js"></script><script src="./game/domain/empire/economy.js"></script><script src="./game/domain/empire/progression.js"></script><script src="./game/adapters/web/empire-controller.js"></script><script src="./game/adapters/web/pwa-register.js"></script></body></html>

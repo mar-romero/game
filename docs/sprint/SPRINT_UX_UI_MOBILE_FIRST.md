@@ -4,7 +4,7 @@
 
 Empezar la migración progresiva de la experiencia actual hacia las referencias visuales de `docs/image`, manteniendo Factory Wars como sitio web estático compatible con GitHub Pages y haciendo que la navegación principal funcione primero en teléfonos.
 
-Este sprint cubre el shell de navegación y la pantalla inicial de Imperio. No migra todas las pantallas ni cambia reglas de juego. La iniciativa es de UX/UI web responsive; no incorpora Capacitor ni builds nativas, que siguen en [el plan de migración móvil](SPRINTS_MIGRACION_MOBILE.md).
+Este sprint cubre el shell de navegación y la pantalla inicial de Imperio. No migra todas las pantallas ni cambia reglas de juego. Por pedido del usuario, esta pasada incluye además la instalación de la misma web como PWA con orientación retrato; no incorpora Capacitor ni builds nativas, que siguen en [el plan de migración móvil](SPRINTS_MIGRACION_MOBILE.md).
 
 ## Alcance
 
@@ -44,7 +44,7 @@ Este sprint cubre el shell de navegación y la pantalla inicial de Imperio. No m
 ### 4. Hub de Imperio
 
 - Reorganizar la vista `home` siguiendo `imageMenuPVP.png`: estado del comandante/progreso, siguiente paso, acceso destacado a Arena y tarjetas compactas de contratos, investigaciones y recompensas/progreso disponible.
-- Priorizar lectura vertical y acciones de toque en móvil; conservar la composición amplia en escritorio.
+- Priorizar lectura vertical y acciones de toque en móvil; conservar el contenido y el orden retrato en escritorio, centrando el hub cuando sobre espacio horizontal.
 - Reusar los datos y botones que ya alimentan la vista actual, sin inventar recompensas ni alterar progresión.
 
 **Aceptación:** desde Imperio se entiende el progreso actual y se puede entrar a Arena y abrir Megafábrica; los datos visibles cambian con el estado existente y ningún botón nuevo simula una acción que el juego no soporta.
@@ -61,6 +61,7 @@ Este sprint cubre el shell de navegación y la pantalla inicial de Imperio. No m
 
 - El shell y el hub de Imperio están adaptados a móvil y escritorio.
 - Las seis vistas existentes siguen accesibles y el flujo de Arena conserva sus contratos.
+- La URL publicada se puede instalar como PWA cuando el navegador y el sistema lo permiten, con manifest/iconos servidos bajo el prefijo del repositorio.
 - No se cambian reglas, balance, formato de guardado ni integración online.
 - Se documentan los tamaños y estados revisados, junto con defectos visuales pendientes.
 - La implementación sigue siendo estática y publicable desde `public/` en GitHub Pages.
@@ -71,11 +72,12 @@ Este sprint cubre el shell de navegación y la pantalla inicial de Imperio. No m
 - **Dado** un jugador que abre Rankings, Civilizaciones o Perfil desde el menú secundario, **cuando** vuelve a Imperio, **entonces** la navegación y el estado de la vista funcionan como antes.
 - **Dado** un jugador con progreso local, **cuando** abre el nuevo hub, **entonces** los valores y acciones reflejan el estado real guardado y no modifican progreso por el mero renderizado.
 - **Dado** el acceso a Arena desde Imperio, **cuando** se inicia la vista, **entonces** `arena.html` carga en el iframe existente y sus controles de partida continúan disponibles.
+- **Dado** que un navegador móvil compatible abre la URL HTTPS de Pages, **cuando** el jugador elige instalar/agregar Factory Wars a inicio, **entonces** la web puede abrirse en modo independiente y mantiene la orientación retrato solicitada.
 
 ## Fuera de alcance
 
 - Rediseño completo de Megafábrica, partida en Arena, Perfil, Rankings y Civilizaciones; quedan para sprints siguientes.
-- Instalación como app, Capacitor, TypeScript, SDKs nativos o publicación en tiendas.
+- Empaquetado nativo con Capacitor, TypeScript, SDKs nativos o publicación en tiendas. La PWA instalable de esta pasada no es una app nativa.
 - Cambios de autenticación, economía, PvP, reglas, persistencia o sincronización.
 - Publicar o desplegar el sitio como parte de este sprint.
 
