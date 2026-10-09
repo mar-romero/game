@@ -12,6 +12,7 @@ source_of_truth:
 workflow:
   - REQUEST
   - EXPLORE
+  - DOMAIN_SPECIALISTS_IF_ROUTED
   - RDD_IF_NEEDED
   - SDD
   - BDD_TDD_MODE
@@ -44,6 +45,10 @@ delegation:
   conditional_roles:
     RDD: [docs_researcher]
     security_signal: [security_reviewer]
+    game_domain_signal: [gameplay_specialist]
+    browser_ui_signal: [web_game_ui_specialist]
+    persistence_signal: [supabase_specialist]
+    balance_signal: [balance_specialist]
 risk:
   R0: diff review
   R1: relevant checks and independent review when available

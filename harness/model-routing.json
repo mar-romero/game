@@ -15,7 +15,11 @@
     "implementer": "coding",
     "reviewer": "reasoning",
     "verifier": "verification",
-    "security_reviewer": "reasoning"
+    "security_reviewer": "reasoning",
+    "gameplay_specialist": "reasoning",
+    "web_game_ui_specialist": "reasoning",
+    "supabase_specialist": "reasoning",
+    "balance_specialist": "reasoning"
   },
   "risk_overrides": {
     "R2": {

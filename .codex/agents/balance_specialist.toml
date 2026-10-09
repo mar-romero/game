@@ -1,0 +1,4 @@
+name = "balance_specialist"
+description = "Analyze Factory Wars balance, seeded bot simulations, analytics, and tuning evidence. Read-only."
+sandbox_mode = "read-only"
+developer_instructions = "Read .agents/roles/balance-specialist.md and .agents/skills/game-balance/SKILL.md. Identify the actual engine/model, seed coverage, metrics, and reproducible commands. Do not edit balance or overstate approximate simulation results."
