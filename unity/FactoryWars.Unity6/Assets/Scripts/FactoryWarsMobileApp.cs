@@ -12,7 +12,7 @@ namespace FactoryWars.Unity6
     public sealed class IntegrationEvent : UnityEvent<string> { }
 
     [DefaultExecutionOrder(-100)]
-    public sealed class FactoryWarsMobileApp : MonoBehaviour
+    public sealed partial class FactoryWarsMobileApp : MonoBehaviour
     {
         [Header("Integration seams")]
         [Tooltip("Connect this event to the future identity, matchmaking, save, or leaderboard adapters.")]
@@ -39,6 +39,12 @@ namespace FactoryWars.Unity6
         private float toastUntil;
         private bool arenaScene;
         private Material waterMaterial;
+        private FactoryWarsApiClient apiClient;
+        private FactoryWarsApiConfiguration apiConfiguration;
+        private FactoryWarsMeResponse onlineProfile;
+        private InputField emailInput, passwordInput;
+        private Text connectionStatus;
+        private bool apiBusy;
 
         private static readonly Civilization[] Civilizations = {
             new Civilization("forge", "FORJA", "F", "Expansión industrial.", "Edificios 10% más baratos.", "Mejoras económicas -7% costo · ataques +8% costo", new Color32(232, 133, 69, 255)),
@@ -65,6 +71,7 @@ namespace FactoryWars.Unity6
 
         private void Awake()
         {
+            apiConfiguration = Resources.Load<FactoryWarsApiConfiguration>("FactoryWarsApiConfiguration");
             Application.targetFrameRate = 60;
             Screen.orientation = ScreenOrientation.Portrait;
             BuildWorld();
@@ -101,7 +108,7 @@ namespace FactoryWars.Unity6
             var header = Panel("Top Bar", safe.transform, new Color32(8, 18, 31, 246));
             Anchor(header, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, 0), new Vector2(0, -70));
             PlacedLabel(header.transform, "FACTORY WARS", 18, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, .5f), new Vector2(.58f, .5f), new Vector2(16, -15), new Vector2(-4, 15));
-            PlacedLabel(header.transform, "CLIENTE UNITY · DEMO", 9, cyan, FontStyle.Bold, TextAnchor.MiddleRight, new Vector2(.58f, .5f), new Vector2(1, .5f), new Vector2(0, -15), new Vector2(-15, 15));
+            PlacedLabel(header.transform, "FACTORY WARS · UNITY 6", 9, cyan, FontStyle.Bold, TextAnchor.MiddleRight, new Vector2(.58f, .5f), new Vector2(1, .5f), new Vector2(0, -15), new Vector2(-15, 15));
 
             var scrollRoot = new GameObject("Screen Scroll", typeof(RectTransform), typeof(ScrollRect), typeof(Image));
             scrollRoot.transform.SetParent(safe.transform, false);
@@ -181,26 +188,6 @@ namespace FactoryWars.Unity6
             }
         }
 
-        private void BuildFactoryScreen()
-        {
-            Hero("MEGAFÁBRICA", "CRECÉ · PRODUCÍ · INVESTIGÁ", "Progreso persistente", new Color32(33, 156, 189, 255));
-            var top = Card("CENTRO INDUSTRIAL", "La fábrica está lista para conectar tu partida.", 260);
-            var stats = CardBody(top.transform);
-            StatRow(stats, "PRODUCCIÓN", "Esperando perfil", "Sin datos locales conectados");
-            StatRow(stats, "RECURSOS", "No disponibles", "Conectá el adaptador de partida");
-            StatRow(stats, "CIVILIZACIÓN", "Sin seleccionar", "La selección requiere guardar el perfil");
-            var modules = Card("TU COMPLEJO", "Vista de módulos · los niveles se cargarán desde el estado de Megafábrica.");
-            LayoutElement(modules).preferredHeight = 350;
-            var moduleList = CardBody(modules.transform);
-            ModuleRow(moduleList, "GEN", "Generadores", "Energía industrial", "-");
-            ModuleRow(moduleList, "REF", "Refinerías", "Acero industrial", "-");
-            ModuleRow(moduleList, "LAB", "Laboratorios", "Investigación", "-");
-            ModuleRow(moduleList, "AUT", "Automatización", "Créditos", "-");
-            var research = Card("INVESTIGACIÓN", "Desbloqueos y rutas de progreso", 205);
-            BodyCopy(research.transform, "La biblioteca y sus requisitos se muestran al conectar el catálogo y el perfil de juego.");
-            ActionButton(research.transform, "ABRIR INVESTIGACIÓN", cyan, () => RequestIntegration("empire.open_research"));
-        }
-
         private void BuildPvpScreen()
         {
             Hero("ARENA", "PVP · VISTA DE PARTIDA", "Combate táctico · cámara vertical", new Color32(32, 125, 186, 255));
@@ -249,12 +236,25 @@ namespace FactoryWars.Unity6
                 PlacedLabel(card.transform, civ.FactoryBonus, 12, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, 1), new Vector2(1, 1), new Vector2(14, -76), new Vector2(-28, -54));
                 PlacedLabel(card.transform, "ARENA", 9, gold, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, 1), new Vector2(1, 1), new Vector2(14, -98), new Vector2(-28, -80));
                 PlacedLabel(card.transform, civ.ArenaBonus, 11, muted, FontStyle.Normal, TextAnchor.MiddleLeft, new Vector2(0, 1), new Vector2(1, 1), new Vector2(14, -120), new Vector2(-28, -101));
-                var pick = ActionButton(card.transform, selectedCivilization == i ? "VISTA PREVIA ACTIVA · NO GUARDADA" : "VER FICHA", civ.Accent, () =>
+                bool connected = onlineProfile != null && onlineProfile.empire != null && onlineProfile.empire.state != null;
+                bool current = connected && onlineProfile.empire.state.currentCiv == civ.Id;
+                bool locked = connected && onlineProfile.empire.state.civLocked && !current;
+                string action = HasAmbiguousCommand ? "ORDEN PENDIENTE"
+                    : connected ? (current ? "CIVILIZACIÓN ACTIVA" : locked ? "BLOQUEADA HASTA PRESTIGIO" : "ELEGIR CIVILIZACIÓN")
+                    : (selectedCivilization == i ? "VISTA PREVIA ACTIVA · NO GUARDADA" : "VER FICHA");
+                var pick = ActionButton(card.transform, action, civ.Accent, () =>
                 {
+                    if (HasAmbiguousCommand) return;
+                    if (connected)
+                    {
+                        if (!locked && !current) SendEmpireCommand("select-civilization", null, civ.Id);
+                        return;
+                    }
                     selectedCivilization = index;
                     ShowSection(HubSection.Civilizations);
-                    Notice("Vista local seleccionada. Para guardar la civilización hace falta conectar el perfil.");
+                    Notice("Vista previa local seleccionada; no modifica tu partida.");
                 });
+                pick.interactable = !locked && !current && !HasAmbiguousCommand;
             }
         }
 
