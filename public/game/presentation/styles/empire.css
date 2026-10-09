@@ -314,7 +314,7 @@
   .topbar{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:8px;padding:9px;border-radius:14px}
   .topbar>div{min-width:0}
   .topbar>div:nth-child(2){font-size:12px}
-  .resource-strip{display:flex;justify-content:flex-start;width:100%;max-width:none;gap:7px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:2px}
+  .resource-strip{display:flex;flex-wrap:nowrap;justify-content:flex-start;width:100%;max-width:none;gap:7px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:2px}
   .resource-strip::-webkit-scrollbar{display:none}
   .resource-pill,.resource-pill:last-child{flex:0 0 148px;min-height:62px;grid-column:auto;scroll-snap-align:start}
   .nav{margin:8px 0 10px}
