@@ -7,9 +7,55 @@
 <span class="resource-pill fragments" data-tip="DOMINIO: se gana en PvP y sirve para subir nivel de maestría militar y desbloquear mejoras de guerra que intensifican la producción y el escalado del imperio."><i>◆</i><span><small>DOMINIO</small><b id="rDominion">0</b><em>Guerra</em><strong class="resource-use">MAESTRÍA</strong></span></span>
 <span class="resource-pill fragments" data-tip="FRAGMENTOS: se consiguen principalmente jugando Arena. En esta beta se acumulan para el futuro sistema de Núcleos; todavía no se gastan."><i>✦</i><span><small>FRAGMENTOS</small><b id="rFragments">0</b><em>ARENA</em><strong class="resource-use">AÚN NO SE GASTA</strong></span></span>
 </div></header>
-<nav class="nav"><button class="active" data-view="home">IMPERIO</button><button data-view="factory">MEGAFÁBRICA</button><button data-view="arena">ARENA</button><button data-view="rankings">RANKINGS</button><button data-view="factions">CIVILIZACIONES</button><button data-view="profile">PERFIL</button></nav>
+<nav class="nav" aria-label="Navegación principal"><div class="nav-primary"><button type="button" class="active" data-view="home" aria-current="page">IMPERIO</button><button type="button" data-view="factory">MEGAFÁBRICA</button><button type="button" data-view="arena">ARENA</button></div><details class="nav-secondary" id="navSecondary" open><summary aria-controls="navSecondaryPanel"><span>OTRAS VISTAS</span><span id="navSecondaryCurrent"></span><span class="nav-secondary-chevron" aria-hidden="true">⌄</span></summary><div class="nav-secondary-panel" id="navSecondaryPanel"><button type="button" data-view="rankings">RANKINGS</button><button type="button" data-view="factions">CIVILIZACIONES</button><button type="button" data-view="profile">PERFIL</button></div></details></nav>
 <main>
-<section id="home" class="view active"><div class="hero"><span class="tag">LIGA · 14 DÍAS</span><h1>Construí. Competí. Prestigiá. Dejá legado.</h1><p>Dos loops conectados: una megafábrica persistente que amplía opciones y una Arena de 4 minutos donde el poder competitivo permanece normalizado. PvP acelera la fábrica; la fábrica abre Intel, doctrinas y prestigio sin comprar victorias.</p><button id="openArena" class="btn primary">⚔ ENTRAR A ARENA</button></div><div class="grid"><div class="card span4"><h3>⚔ Arena</h3><div class="metric">4 MIN</div><p class="fine">Rating por habilidad. Las bonificaciones de Legado industrial NO aumentan daño, HP ni economía dentro de Ranked.</p></div><div class="card span4"><h3>🏭 Industrial</h3><div class="metric" id="industrialScore">0</div><p class="fine">Eficiencia, contratos, investigación, producción y prestigios.</p></div><div class="card span4"><h3>👑 Imperio</h3><div class="metric">60/40</div><p class="fine">60% percentil Arena + 40% percentil Industrial. Exige dominar ambos mundos.</p></div><div class="card span8"><h3>Ascensión industrial</h3><div class="bar"><i id="prestigeBar" style="width:0"></i></div><p><b id="prestigePct">0%</b> · Producción ciclo <span id="cycleProduction">0</span> · Contratos <span id="contractCount">0</span>/6 · Investigación <span id="researchCount">0</span>/4</p><div class="bar" style="margin-top:8px"><i id="warProgressBar" style="width:0;background:#ffbf66"></i></div><p><b id="warTier">NIVEL 1</b> · Dominio militar <span id="warProgress">0%</span></p><button id="prestigeBtn" class="btn warn" disabled>PRESTIGIO 0%</button><p class="fine">Al 100% podés continuar con tu civilización o migrar. El reset conserva cuenta, historia y Legados; reinicia la infraestructura del ciclo. </p></div><div class="card span4"><h3>◆ Legado permanente</h3><div class="metric" id="legacyEff">0%</div><p class="fine"><span id="prestigeCount">0</span> prestigios. P1–10: +1% eficiencia industrial; P11–20: +0,5%; luego +0,25%. Nunca entra al Ranked.</p></div></div></section>
+<section id="home" class="view active" aria-labelledby="homeTitle">
+  <div class="home-overview">
+    <section class="home-commander" aria-labelledby="homeTitle">
+      <span class="tag">ESTADO DEL IMPERIO · LIGA DE 14 DÍAS</span>
+      <h1 id="homeTitle">Construí. Competí. Dejá legado.</h1>
+      <p>Tu fábrica sostiene el progreso persistente; Arena pone a prueba tu estrategia. El legado industrial no aumenta daño, vida ni economía en Ranked.</p>
+      <div class="home-score"><span>ÍNDICE INDUSTRIAL</span><strong id="industrialScore">0</strong><small>Eficiencia, contratos, investigación, producción y prestigios.</small></div>
+    </section>
+    <section class="home-next card" aria-labelledby="homeNextTitle">
+      <span class="tag">SIGUIENTE PASO</span>
+      <h2 id="homeNextTitle">Hacé crecer tu Megafábrica</h2>
+      <p>Mejorá edificios, convertí recursos con contratos y elegí investigaciones para preparar opciones de Arena.</p>
+      <button class="btn" type="button" data-guide-view="factory">IR A MEGAFÁBRICA</button>
+    </section>
+  </div>
+  <section class="home-arena" aria-labelledby="homeArenaTitle">
+    <div><span class="tag">COMBATE · PARTIDAS DE 4 MIN</span><h2 id="homeArenaTitle">Entrá a Arena</h2><p>Jugá casual por recursos o competí en Liga. Las partidas puntuables no pagan Créditos.</p></div>
+    <button id="openArena" class="btn primary" type="button">⚔ ENTRAR A ARENA</button>
+  </section>
+  <div class="home-progress-grid" aria-label="Progreso y actividades del Imperio">
+    <section class="card home-prestige" aria-labelledby="homePrestigeTitle">
+      <div class="home-card-heading"><div><span class="tag">PROGRESO DEL CICLO</span><h2 id="homePrestigeTitle">Ascensión industrial</h2></div><strong class="home-progress-value" id="prestigePct">0%</strong></div>
+      <div class="bar" aria-hidden="true"><i id="prestigeBar" style="width:0"></i></div>
+      <p class="home-cycle-stats">Producción <b id="cycleProduction">0</b> · Contratos <b id="contractCount">0</b>/6 · Investigaciones <b id="researchCount">0</b>/4</p>
+      <button id="prestigeBtn" class="btn warn" type="button" disabled>PRESTIGIO 0%</button>
+      <p class="fine">Al completar el ciclo podés continuar con tu civilización o migrar. El prestigio reinicia parte del progreso y conserva cuenta, historia y legados.</p>
+    </section>
+    <section class="card home-activity" aria-labelledby="homeActivitiesTitle">
+      <span class="tag">ACTIVIDADES PERSISTENTES</span><h2 id="homeActivitiesTitle">Contratos e investigaciones</h2>
+      <p>Convertí suministros en recursos y usá Intel para desbloquear mejoras.</p>
+      <div class="home-activity-stats"><div><strong>CONTRATOS</strong><span>Convertí suministros en créditos e Intel.</span></div><div><strong>INVESTIGACIONES</strong><span>Desbloqueá opciones para fábrica y Arena.</span></div></div>
+      <button class="btn" type="button" data-guide-view="factory">ABRIR MEGAFÁBRICA</button>
+    </section>
+    <section class="card home-dominion" aria-labelledby="homeDominionTitle">
+      <span class="tag">PROGRESO MILITAR</span><h2 id="homeDominionTitle">Dominio</h2>
+      <div class="home-card-heading"><strong id="warTier">NIVEL 1</strong><span id="warProgress">0%</span></div>
+      <div class="bar" aria-hidden="true"><i id="warProgressBar" style="width:0;background:#ffbf66"></i></div>
+      <p class="fine">El Dominio militar progresa con PvP y sirve para la maestría de guerra.</p>
+    </section>
+    <section class="card home-legacy" aria-labelledby="homeLegacyTitle">
+      <span class="tag">PROGRESO DISPONIBLE</span><h2 id="homeLegacyTitle">Legado permanente</h2>
+      <div class="metric" id="legacyEff">0%</div>
+      <p><b id="prestigeCount">0</b> prestigios</p>
+      <p class="fine">El legado mejora la eficiencia industrial. No modifica el poder base de Ranked.</p>
+    </section>
+  </div>
+</section>
 <section id="factory" class="view"><div class="hero factory-hero"><div><span class="tag">PROGRESO PERSISTENTE</span><h1>Megafábrica</h1><p class="factory-rule">PRODUCÍ → GASTÁ → CRECÉ → PRESTIGIÁ</p></div><div id="prodText" class="production-summary">Producción…</div><div class="hover-help">Vista rápida primero. Mantené el cursor 2 s para el detalle completo.</div></div><div id="factoryCoach" class="factory-coach"></div><div class="card"><h2>1 · Producí más</h2><div id="factoryBuildings" class="factory-grid"></div></div><div class="grid" style="margin-top:12px"><div class="card span6"><h2>2 · Convertí recursos</h2><div id="contractBox"></div><p class="fine">Los contratos generan créditos, Intel y contribución de Operaciones para tu civilización.</p></div><div class="card span6"><h2>3 · Investigaciones de fábrica y PvP</h2><p class="fine">Comprá con Intel para desbloquear opciones que verás en Arena, dentro de Mejoras de fábrica.</p><div id="researchList" class="research-list"></div></div></div></section>
 <section id="arena" class="view">
 <div class="warning">LIGA DE 14 DÍAS · 15 partidas por puntos en total, hasta 3 por día. No pagan Créditos. Podés jugar partidas casuales por recursos en cualquier momento, antes o después de las puntuables; dan hasta 10 recompensas por día. Guerras territoriales los fines de semana.</div>
