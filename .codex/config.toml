@@ -33,3 +33,19 @@ config_file = "./agents/verifier.toml"
 [agents.security_reviewer]
 description = "Read-only security reviewer for trust boundaries and external effects."
 config_file = "./agents/security_reviewer.toml"
+
+[agents.gameplay_specialist]
+description = "Read-only Factory Wars domain specialist for match rules, empire progression, bots, and gameplay invariants."
+config_file = "./agents/gameplay_specialist.toml"
+
+[agents.web_game_ui_specialist]
+description = "Read-only specialist for the browser game UI, arena HUD, input, canvas, responsive layout, and script integration."
+config_file = "./agents/web_game_ui_specialist.toml"
+
+[agents.supabase_specialist]
+description = "Read-only specialist for Supabase schemas, migrations, RPC, auth, persistence, and synchronization."
+config_file = "./agents/supabase_specialist.toml"
+
+[agents.balance_specialist]
+description = "Read-only specialist for game balance, seeded bot simulations, analytics, and reproducible tuning evidence."
+config_file = "./agents/balance_specialist.toml"

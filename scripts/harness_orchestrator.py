@@ -21,6 +21,8 @@ RISK_PATTERNS = {
     "R2": [r"\b(database|postgres|migration|schema|persistence|transaction|concurren|auth|login|oauth|authentication|authorization|payment|financial|external api|calculation|formula|reward|economy|balance|orchestrator|multi.?agent|model routing|agent routing|hooks?|base de datos|migraci[oó]n|esquema|persistencia|autenticaci[oó]n|autorizaci[oó]n|pagos|financier|c[aá]lculo|f[oó]rmula|recompensa|econom[ií]a|balance|orquestador|orquestaci[oó]n|enrutamiento de agentes|selecci[oó]n de modelos|hooks?)\b"],
     "R1": [r"\b(fix|bug|feature|implement|refactor|ui|ux|gameplay|balance|connect\w*|wire\w*|integrat\w*|orchestrat\w*|route\w*|correg\w*|error|funci[oó]n|implementar|interfaz|jugabilidad|conect\w*|integr\w*|orquest\w*|enrut\w*)\b"],
 }
+RISK_PATTERNS["R1"].append(r"\b(hud|canvas|responsive|viewport|layout|css|html|bot[oó]n(?:es)?|mapa|pantalla|controles|mejor\w*)\b")
+RISK_PATTERNS["R1"].append(r"\b(crea\w*|agreg\w*|implement\w*|modific\w*|cambi\w*|actualiz\w*|correg\w*|corrig\w*|reorganiz\w*|conect\w*)\b")
 RISK_RANK = {"R0": 0, "R1": 1, "R2": 2, "R3": 3}
 
 
@@ -51,6 +53,9 @@ def _route(text: str) -> dict[str, Any]:
     research_only = not change_request and _matches(text, [
         r"\b(research only|investigate only|solo investigar|solo investigaci[oó]n)\b"
     ])
+    change_request = change_request or _matches(text, [r"\b(mejor\w*|crea\w*|agreg\w*|implement\w*|modific\w*|cambi\w*|actualiz\w*|correg\w*|corrig\w*|reorganiz\w*|conect\w*)\b"])
+    question_only = question_only and not change_request
+    research_only = research_only and not change_request
     risk = _risk(text)
     if review_request and risk == "R0":
         risk = "R1"
@@ -58,10 +63,16 @@ def _route(text: str) -> dict[str, Any]:
         r"\b(unknown|unclear|ambiguous|research|investigate|compare|evaluate|new product|architecture|trade.?off|external api|migrate|desconocid|ambigu|investig|compar|evalu|arquitectura|api externa|nuevo producto|decisi[oó]n de dise[nñ]o)\b"
     ])
     visual_only = _matches(text, [r"\b(css|visual|copy|wording|asset|ui polish|ux|solo visual|texto|imagen|estilo|interfaz visual)\b"])
+    visual_only = visual_only or _matches(text, [r"\b(hud|canvas|responsive|layout|bot[oó]n(?:es)?|mapa|pantalla|controles)\b"])
     legacy = _matches(text, [r"\b(legacy|brownfield|characterization|unknown behavior|c[oó]digo legado|comportamiento desconocido|refactor amplio)\b"])
     spike = _matches(text, [r"\b(spike|unknown contract|uncertain api|prototype first|contrato desconocido|prototipo primero|api incierta)\b"])
     behavior_bug = _matches(text, [r"\b(bug|regression|incorrect|broken|calculation|validator|parser|serialization|state machine|regresi[oó]n|c[aá]lculo|incorrecto|roto|validador)\b"])
     doc_only = _matches(text, [r"\b(documentation|docs|readme|documentaci[oó]n|instrucciones de uso)\b"]) and not _matches(text, [r"\b(code|implementation|behavior|logic|backend|frontend|api behavior|c[oó]digo|comportamiento|l[oó]gica|implementar|funci[oó]n)\b"])
+
+    gameplay_signal = _matches(text, [r"\b(arena|match.engine|gameplay|jugabilidad|partida|combate|bot|bots|civilization|civilizaci[oó]n|empire|imperio|progresi[oó]n|econom[ií]a del juego|matchmaking)\b"])
+    ui_signal = _matches(text, [r"\b(ui|ux|hud|canvas|responsive|viewport|layout|css|html|interfaz|bot[oó]n|botones|mapa|pantalla|controles|touch|pointer|iframe)\b"])
+    persistence_signal = _matches(text, [r"\b(supabase|sql|schema|migration|migraci[oó]n|rls|rpc|persist|persistence|persistencia|save|guardado|auth|login|profile|perfil|sync|sincronizaci[oó]n|database|base de datos)\b"])
+    balance_signal = _matches(text, [r"\b(balance|balancing|tuning|balanceo|equilibrio|simulat|simulaci[oó]n|simulador|win rate|tasa de victoria|econom[ií]a|economy|seed|semilla|matchup|enfrentamiento)\b"])
 
     if question_only or research_only or (doc_only and not behavior_bug):
         tdd = "not_applicable"
@@ -79,6 +90,14 @@ def _route(text: str) -> dict[str, Any]:
         tdd = "test_after_allowed"
 
     skills = ["harness-mvp"] if question_only or research_only else ["harness-mvp", "software-engineering"]
+    if gameplay_signal:
+        skills.append("gameplay-domain")
+    if ui_signal:
+        skills.append("browser-game-ui")
+    if persistence_signal:
+        skills.append("supabase-data")
+    if balance_signal:
+        skills.append("game-balance")
     if rdd:
         skills.append("rdd")
     if not question_only and not research_only and risk != "R0":
@@ -94,6 +113,14 @@ def _route(text: str) -> dict[str, Any]:
     skills = list(dict.fromkeys(skills))
 
     roles: list[str] = []
+    if gameplay_signal and risk != "R0":
+        roles.append("gameplay_specialist")
+    if ui_signal and risk != "R0":
+        roles.append("web_game_ui_specialist")
+    if persistence_signal and risk != "R0":
+        roles.append("supabase_specialist")
+    if balance_signal and risk != "R0":
+        roles.append("balance_specialist")
     if not question_only and (risk != "R0" or rdd):
         roles.append("explorer")
     if rdd and (not question_only or risk in {"R2", "R3"}):
@@ -124,6 +151,9 @@ def _route(text: str) -> dict[str, Any]:
         if role in roles
     }
     stages = ["ANSWER"] if question_only else (["EXPLORE"] if "explorer" in roles else [])
+    specialists = [role for role in roles if role.endswith("_specialist")]
+    if specialists:
+        stages.append("DOMAIN_SPECIALIST_INPUT")
     if rdd:
         stages.append("RDD")
     if not question_only and not research_only:

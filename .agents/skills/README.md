@@ -1,5 +1,14 @@
 # Skills
 
+Skills específicas del juego:
+
+- `gameplay-domain/`: reglas Arena/Megafábrica, bots, progresión y compatibilidad.
+- `browser-game-ui/`: HUD, controles, layout, input y contratos del navegador.
+- `supabase-data/`: esquema, migraciones, RPC, auth, RLS y persistencia.
+- `game-balance/`: tuning y simulaciones reproducibles con límites explícitos.
+
+El router las agrega por señales del pedido; también pueden leerse directamente para invocación manual.
+
 - `harness-mvp/`: flujo, roles y proporcionalidad de riesgo.
 - `rdd/`: investigación y discovery solo ante incertidumbre material.
 - `sdd/`: contrato mínimo previo a cambios no triviales.

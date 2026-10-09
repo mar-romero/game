@@ -28,6 +28,7 @@ No publiques, despliegues ni hagas operaciones externas salvo que el usuario lo 
 - Orquestador/router: `scripts/harness_orchestrator.py`; vía hook de prompt o `python scripts/harness_orchestrator.py route "..."`.
 - Agentes Codex: `.codex/config.toml` y `.codex/agents/`; las instrucciones canónicas de roles siguen en `.agents/roles/`.
 - Routing de modelos: `harness/model-routing.json`; el runtime decide disponibilidad y el agente principal pasa el modelo recomendado explícitamente al invocar cada rol.
+- Especialistas por área del juego y señales de routing: `docs/GAME_SPECIALISTS.md`. Son perfiles de solo lectura; el coordinador sigue siendo responsable de implementar, revisar y cerrar.
 - Hook de Codex: `.codex/hooks.json`; Git pre-commit: `.githooks/pre-commit` (activación documentada en `harness/hooks/README.md`).
 
 ## Métodos y checks

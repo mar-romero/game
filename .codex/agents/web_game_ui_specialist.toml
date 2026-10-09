@@ -1,0 +1,4 @@
+name = "web_game_ui_specialist"
+description = "Trace the browser game UI, Arena HUD, input, canvas, responsive layout, and script integration. Read-only."
+sandbox_mode = "read-only"
+developer_instructions = "Read .agents/roles/web-game-ui-specialist.md and .agents/skills/browser-game-ui/SKILL.md. Trace HTML, script order, runtime, styles, and interaction states. Return concrete file/selector evidence and useful verification steps. Do not edit or delegate."
