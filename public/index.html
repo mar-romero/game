@@ -10,49 +10,78 @@
 <nav class="nav" aria-label="Navegación principal"><div class="nav-primary"><button type="button" class="active" data-view="home" aria-current="page">IMPERIO</button><button type="button" data-view="factory">MEGAFÁBRICA</button><button type="button" data-view="arena">ARENA</button></div><details class="nav-secondary" id="navSecondary" open><summary aria-controls="navSecondaryPanel"><span>OTRAS VISTAS</span><span id="navSecondaryCurrent"></span><span class="nav-secondary-chevron" aria-hidden="true">⌄</span></summary><div class="nav-secondary-panel" id="navSecondaryPanel"><button type="button" data-view="rankings">RANKINGS</button><button type="button" data-view="factions">CIVILIZACIONES</button><button type="button" data-view="profile">PERFIL</button></div></details></nav>
 <main>
 <section id="home" class="view active" aria-labelledby="homeTitle">
-  <div class="home-overview">
-    <section class="home-commander" aria-labelledby="homeTitle">
-      <span class="tag">ESTADO DEL IMPERIO · LIGA DE 14 DÍAS</span>
-      <h1 id="homeTitle">Construí. Competí. Dejá legado.</h1>
-      <p>Tu fábrica sostiene el progreso persistente; Arena pone a prueba tu estrategia. El legado industrial no aumenta daño, vida ni economía en Ranked.</p>
-      <div class="home-score"><span>ÍNDICE INDUSTRIAL</span><strong id="industrialScore">0</strong><small>Eficiencia, contratos, investigación, producción y prestigios.</small></div>
-    </section>
-    <section class="home-next card" aria-labelledby="homeNextTitle">
-      <span class="tag">SIGUIENTE PASO</span>
-      <h2 id="homeNextTitle">Hacé crecer tu Megafábrica</h2>
-      <p>Mejorá edificios, convertí recursos con contratos y elegí investigaciones para preparar opciones de Arena.</p>
-      <button class="btn" type="button" data-guide-view="factory">IR A MEGAFÁBRICA</button>
-    </section>
-  </div>
-  <section class="home-arena" aria-labelledby="homeArenaTitle">
-    <div><span class="tag">COMBATE · PARTIDAS DE 4 MIN</span><h2 id="homeArenaTitle">Entrá a Arena</h2><p>Jugá casual por recursos o competí en Liga. Las partidas puntuables no pagan Créditos.</p></div>
-    <button id="openArena" class="btn primary" type="button">⚔ ENTRAR A ARENA</button>
-  </section>
-  <div class="home-progress-grid" aria-label="Progreso y actividades del Imperio">
-    <section class="card home-prestige" aria-labelledby="homePrestigeTitle">
-      <div class="home-card-heading"><div><span class="tag">PROGRESO DEL CICLO</span><h2 id="homePrestigeTitle">Ascensión industrial</h2></div><strong class="home-progress-value" id="prestigePct">0%</strong></div>
-      <div class="bar" aria-hidden="true"><i id="prestigeBar" style="width:0"></i></div>
-      <p class="home-cycle-stats">Producción <b id="cycleProduction">0</b> · Contratos <b id="contractCount">0</b>/6 · Investigaciones <b id="researchCount">0</b>/4</p>
+  <h1 id="homeTitle" class="sr-only">Imperio</h1>
+  <div class="home-stage">
+    <section class="home-commander" aria-label="Estado del comandante">
+      <div class="home-commander-emblem" aria-hidden="true">♛</div>
+      <div class="home-commander-identity"><small>COMANDANTE</small><strong id="homeCommanderName">Factory-Local</strong><span id="homeCommanderCiv">SIN CIVILIZACIÓN</span></div>
+      <div class="home-commander-score"><span>ÍNDICE INDUSTRIAL</span><strong id="industrialScore">0</strong></div>
+      <div class="home-cycle-progress"><div><span>PROGRESO DEL CICLO</span><b id="prestigePct">0%</b></div><div class="bar" aria-hidden="true"><i id="prestigeBar" style="width:0"></i></div><small>Producción del ciclo <b id="cycleProduction">0</b></small></div>
       <button id="prestigeBtn" class="btn warn" type="button" disabled>PRESTIGIO 0%</button>
-      <p class="fine">Al completar el ciclo podés continuar con tu civilización o migrar. El prestigio reinicia parte del progreso y conserva cuenta, historia y legados.</p>
     </section>
-    <section class="card home-activity" aria-labelledby="homeActivitiesTitle">
-      <span class="tag">ACTIVIDADES PERSISTENTES</span><h2 id="homeActivitiesTitle">Contratos e investigaciones</h2>
-      <p>Convertí suministros en recursos y usá Intel para desbloquear mejoras.</p>
-      <div class="home-activity-stats"><div><strong>CONTRATOS</strong><span>Convertí suministros en créditos e Intel.</span></div><div><strong>INVESTIGACIONES</strong><span>Desbloqueá opciones para fábrica y Arena.</span></div></div>
-      <button class="btn" type="button" data-guide-view="factory">ABRIR MEGAFÁBRICA</button>
+    <div class="home-island" aria-hidden="true">
+      <svg class="home-island-art" viewBox="0 0 900 500" role="presentation" focusable="false">
+        <defs>
+          <linearGradient id="islandWater" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#167fbd"/><stop offset=".5" stop-color="#12c7e8"/><stop offset="1" stop-color="#075c9f"/></linearGradient>
+          <linearGradient id="islandLand" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8ae5a6"/><stop offset=".52" stop-color="#3a9e84"/><stop offset="1" stop-color="#1c6676"/></linearGradient>
+          <linearGradient id="islandRock" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d8e8e8"/><stop offset=".3" stop-color="#718fa5"/><stop offset="1" stop-color="#243e5f"/></linearGradient>
+          <linearGradient id="islandGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e6ffff"/><stop offset=".35" stop-color="#59dfff"/><stop offset="1" stop-color="#187ebd"/></linearGradient>
+          <filter id="islandGlow" x="-.5" y="-.5" width="2" height="2"><feGaussianBlur stdDeviation="9"/></filter>
+        </defs>
+        <rect width="900" height="500" rx="24" fill="url(#islandWater)"/>
+        <path d="M0 85 155 24l68 33 74-46 89 24 88-30 82 35 87-15 78 43 91-21 88 42v40l-103 24-93-16-92 46-112-22-92 21-88-29-90 26-100-39L0 177z" fill="#7de4f2" opacity=".28"/>
+        <path d="m102 277 136-102 113 14 78-74 151 13 105 95 91 39-66 116-159 61-167-20-145 43-125-65-82-74z" fill="#063c73" opacity=".55" filter="url(#islandGlow)"/>
+        <path d="m70 256 113-100 133 16 88-71 145 12 95 56 113 28 80 79-55 95-140 54-166-18-131 38-129-57-94-78z" fill="url(#islandRock)" stroke="#d8fbff" stroke-width="5"/>
+        <path d="m92 246 98-77 124 17 91-67 128 16 93 51 99 25 61 63-46 42-132 36-161-16-128 35-111-48-78-62z" fill="url(#islandLand)" stroke="#a4ffd1" stroke-width="3"/>
+        <path d="m180 219 120 15 100-72 127 15 67 44-73 37-161-9-90 54-102-41z" fill="none" stroke="#d1e9c8" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+        <path d="m325 328 52-56 138-4 98-55M351 166l18 105m164-94-18 92" fill="none" stroke="#b8d4d6" stroke-width="11" stroke-linecap="round" opacity=".8"/>
+        <g fill="#185a55" stroke="#a7edbd" stroke-width="2"><path d="m125 222 17-46 18 46z"/><path d="m154 244 14-38 15 38z"/><path d="m211 183 15-41 16 41z"/><path d="m245 195 13-36 14 36z"/><path d="m582 173 17-48 18 48z"/><path d="m615 189 14-40 16 40z"/><path d="m704 228 16-44 16 44z"/><path d="m676 238 13-36 14 36z"/><path d="m536 327 15-41 16 41z"/><path d="m191 297 14-38 15 38z"/></g>
+        <ellipse cx="436" cy="241" rx="105" ry="75" fill="#24dfff" opacity=".48" filter="url(#islandGlow)"/>
+        <g stroke="#e9fcff" stroke-width="4" stroke-linejoin="round">
+          <path d="m361 246 78-48 81 47-81 48z" fill="#4e7891"/><path d="m361 246 78 47v-78l-78 31z" fill="#c9e5ed"/><path d="m439 293 81-48v-78l-81 48z" fill="#819eb3"/>
+          <path d="m397 216 42-26 45 26-45 26z" fill="#f7ffff"/><path d="m397 216 42 26v-33l-42-26z" fill="#2da1d1"/><path d="m439 242 45-26v-33l-45 26z" fill="url(#islandGlass)"/>
+          <path d="m420 190 19-57 20 57z" fill="#eaffff"/><path d="m439 133v57l20-57z" fill="#56dfff"/><path d="M434 131h10v-21h-10z" fill="#fff"/>
+          <path d="m303 249 37-23 38 23-38 23z" fill="#7793a7"/><path d="m303 249 37 23v-45z" fill="#c7dce2"/><path d="m340 272 38-23v-46l-38 24z" fill="#54768c"/>
+          <path d="m501 196 29-18 30 18-30 18z" fill="#819bae"/><path d="m501 196 29 18v-38z" fill="#e5f8fb"/><path d="m530 214 30-18v-36l-30 16z" fill="#48c9ed"/>
+          <path d="m558 277 31-20 32 20-32 19z" fill="#819bae"/><path d="m558 277 31 19v-39z" fill="#d8edf1"/><path d="m589 296 32-19v-39l-32 19z" fill="#51c8ee"/>
+          <path d="m265 278 28-18 29 18-29 17z" fill="#819bae"/><path d="m265 278 28 17v-35z" fill="#d8edf1"/><path d="m293 295 29-17v-35l-29 17z" fill="#51c8ee"/>
+        </g>
+        <g fill="#fff" stroke="#32dfff" stroke-width="4"><path d="m215 222 12-21 12 21v23h-24z"/><path d="m648 223 13-23 13 23v24h-26z"/><path d="m453 336 12-21 12 21v23h-24z"/></g>
+        <g fill="#ffe072"><circle cx="439" cy="151" r="5"/><circle cx="529" cy="191" r="4"/><circle cx="588" cy="271" r="4"/><circle cx="293" cy="273" r="4"/></g>
+      </svg>
+      <div class="home-map-label"><span>MEGAFÁBRICA</span><small>PROGRESO PERSISTENTE</small></div>
+      <div class="home-map-production"><span>⚡ <b id="homeEnergyRate">+0/s</b></span><span>◈ <b id="homeCreditsRate">+0/s</b></span><span>⌁ <b id="homeIntelRate">+0/s</b></span></div>
+    </div>
+    <aside class="home-action-panel">
+      <section class="home-next" aria-labelledby="homeNextTitle">
+        <div class="home-panel-title"><span aria-hidden="true">↗</span><h2 id="homeNextTitle">SIGUIENTE PASO</h2></div>
+        <h3>Hacé crecer tu Megafábrica</h3>
+        <p>Mejorá edificios, completá contratos y elegí investigaciones con Intel.</p>
+        <div class="home-progress-summary"><span>PRESTIGIO</span><b id="homeProgressLabel">0%</b><div class="bar" aria-hidden="true"><i id="homeProgressBar" style="width:0"></i></div></div>
+        <button class="btn home-factory-link" type="button" data-guide-view="factory">ABRIR MEGAFÁBRICA <span aria-hidden="true">›</span></button>
+      </section>
+      <button id="openArena" class="btn home-arena" type="button"><span aria-hidden="true">⚔</span><span>JUGAR ARENA</span><span aria-hidden="true">›</span></button>
+      <p class="home-ranked-note">Liga puntuable sin premios de Créditos · Casual puede dar recursos.</p>
+    </aside>
+  </div>
+  <div class="home-activities" aria-label="Progreso persistente">
+    <section class="home-activity home-contracts" aria-labelledby="homeContractsTitle">
+      <h2 id="homeContractsTitle"><span aria-hidden="true">▣</span> CONTRATOS <span class="home-card-arrow" aria-hidden="true">›</span></h2>
+      <p>Contratos completados este ciclo</p><div class="home-activity-value"><b id="contractCount">0</b><span>/6</span></div>
+      <div class="home-mini-bar" aria-hidden="true"><i id="homeContractBar" style="width:0"></i></div>
+      <button type="button" data-guide-view="factory">VER EN MEGAFÁBRICA <span aria-hidden="true">›</span></button>
     </section>
-    <section class="card home-dominion" aria-labelledby="homeDominionTitle">
-      <span class="tag">PROGRESO MILITAR</span><h2 id="homeDominionTitle">Dominio</h2>
-      <div class="home-card-heading"><strong id="warTier">NIVEL 1</strong><span id="warProgress">0%</span></div>
-      <div class="bar" aria-hidden="true"><i id="warProgressBar" style="width:0;background:#ffbf66"></i></div>
-      <p class="fine">El Dominio militar progresa con PvP y sirve para la maestría de guerra.</p>
+    <section class="home-activity home-research" aria-labelledby="homeResearchTitle">
+      <h2 id="homeResearchTitle"><span aria-hidden="true">⚗</span> INVESTIGACIONES <span class="home-card-arrow" aria-hidden="true">›</span></h2>
+      <p>Mejoras seleccionadas</p><div class="home-activity-value"><b id="researchCount">0</b></div>
+      <button type="button" data-guide-view="factory">VER EN MEGAFÁBRICA <span aria-hidden="true">›</span></button>
     </section>
-    <section class="card home-legacy" aria-labelledby="homeLegacyTitle">
-      <span class="tag">PROGRESO DISPONIBLE</span><h2 id="homeLegacyTitle">Legado permanente</h2>
-      <div class="metric" id="legacyEff">0%</div>
-      <p><b id="prestigeCount">0</b> prestigios</p>
-      <p class="fine">El legado mejora la eficiencia industrial. No modifica el poder base de Ranked.</p>
+    <section class="home-activity home-rewards" aria-labelledby="homeRewardsTitle">
+      <h2 id="homeRewardsTitle"><span aria-hidden="true">✦</span> LEGADO <span class="home-card-arrow" aria-hidden="true">›</span></h2>
+      <p>Eficiencia industrial permanente</p><div class="home-activity-value"><b id="legacyEff">0%</b></div>
+      <small><b id="prestigeCount">0</b> prestigios · No modifica el poder base de Ranked.</small>
+      <div class="home-war-progress"><span><b id="warTier">NIVEL 1</b> · Dominio <b id="warProgress">0%</b></span><div class="home-mini-bar" aria-hidden="true"><i id="warProgressBar" style="width:0"></i></div></div>
+      <button type="button" data-guide-view="factory">VER PROGRESO <span aria-hidden="true">›</span></button>
     </section>
   </div>
 </section>
