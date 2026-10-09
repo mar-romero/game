@@ -330,3 +330,29 @@
   #home .home-activity{min-height:142px;padding:12px}
 }
 @media(prefers-reduced-motion:reduce){#home .home-island:before{animation:none;opacity:.45}#home .home-island-art{animation:none;transform:none}}
+
+/* La isla queda como primera vista y el HUD acompaña el arte en móviles. */
+@media(max-width:640px){
+  #home .home-stage{position:relative;gap:9px}
+  #home .home-island{order:1;width:100%;aspect-ratio:4/5;min-height:0;margin:0;border-radius:15px}
+  #home .home-island-art{position:absolute;inset:0;width:100%;height:100%;min-height:0;object-position:center 48%}
+  #home .home-commander{position:absolute;z-index:3;top:10px;left:10px;right:10px;order:2;align-self:auto;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:5px 9px;margin:0;padding:9px;border-color:#b7efff99;border-radius:13px;background:linear-gradient(145deg,#0a2338ef,#071827ef);box-shadow:0 8px 24px #03101c88;backdrop-filter:blur(9px)}
+  #home .home-commander-emblem{grid-row:span 2;width:40px;height:46px;font-size:24px}
+  #home .home-commander-identity{gap:1px}
+  #home .home-commander-identity small{font-size:8px}
+  #home .home-commander-identity strong{font-size:14px}
+  #home .home-commander-identity>span{font-size:9px}
+  #home .home-commander-score{grid-column:3;grid-row:1 / span 2;display:grid;align-content:center;justify-items:end;gap:1px;padding:4px 6px;border:0;background:transparent;text-align:right}
+  #home .home-commander-score span{font-size:7px}
+  #home .home-commander-score strong{font-size:19px}
+  #home .home-cycle-progress{grid-column:1/-1;display:grid;gap:3px;padding-top:5px;border-top:1px solid #b7efff44}
+  #home .home-cycle-progress>div:first-child{display:flex;justify-content:space-between;gap:6px}
+  #home .home-cycle-progress>div:first-child span{font-size:8px}
+  #home .home-cycle-progress small{font-size:9px}
+  #home #prestigeBtn{grid-column:1/-1;min-height:44px;padding:7px 10px;font-size:11px}
+  /* Keep the title plaque in the gap above the bottom production strip. */
+  #home .home-map-label{top:auto;left:9px;right:auto;bottom:48px;padding:6px 8px}
+  #home .home-map-production{left:7px;right:7px;bottom:7px;gap:4px}
+  #home .home-map-production span{padding:5px 7px;font-size:9px}
+  #home .home-factory-link,#home .home-activity>button{min-height:44px}
+}
