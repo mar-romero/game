@@ -77,18 +77,116 @@ namespace FactoryWars.Unity6
         private FactoryWarsEmpireCommand pendingEmpireCommand;
         private string pendingEmpireEventId;
         private bool HasAmbiguousCommand { get { return pendingEmpireCommand != null && !string.IsNullOrEmpty(pendingEmpireEventId); } }
+        private RectTransform factoryAccountPanel;
+        private RectTransform factoryBuildingsPanel;
+        private RectTransform factoryResearchPanel;
+
+        private void BuildFactoryIllustration(FactoryWarsEmpireState state)
+        {
+            var mapSpace = new GameObject("Factory Map Scroll Space", typeof(RectTransform), typeof(LayoutElement));
+            mapSpace.transform.SetParent(content, false);
+            factoryMapSpace = mapSpace.GetComponent<LayoutElement>();
+            factoryMapSpace.preferredHeight = 740;
+
+            double[] rates = state != null && state.buildings != null ? CurrentProductionRates(state) : null;
+            string[] names = { "ENERGÍA", "ACERO", "INTEL", "CRÉDITOS" };
+            string[] keys = { "generator", "refinery", "lab", "automation" };
+            int[] rateIndices = { 1, 2, 3, 0 };
+            Vector2[] positions = { new Vector2(.22f, .76f), new Vector2(.78f, .76f), new Vector2(.22f, .47f), new Vector2(.78f, .47f) };
+            for (int i = 0; i < keys.Length; i++)
+            {
+                int level = state != null && state.buildings != null ? GetBuildingLevel(state.buildings, keys[i]) : -1;
+                string detail = level < 0 ? "Nv. —\n—/s" : "Nv. " + level + "\n+" + rates[rateIndices[i]].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
+                string key = keys[i];
+                FactoryMapBadge(names[i], detail, positions[i], 120, (HudIcon)rateIndices[i], () => OpenFactoryResource(key));
+            }
+            FactoryMapBadge("MEGAFÁBRICA", "INVESTIGAR · CONTRATOS", new Vector2(.5f, .69f), 205, HudIcon.Factory,
+                () => FocusFactoryDetails(factoryResearchPanel != null ? factoryResearchPanel : factoryAccountPanel));
+            FactoryMapBadge("GESTIONAR FÁBRICA", "CUENTA · MEJORAS ↓", new Vector2(.5f, .16f), 185, HudIcon.Factory,
+                () => FocusFactoryDetails(factoryAccountPanel));
+        }
+
+        private void FactoryMapBadge(string title, string detail, Vector2 position, float width, HudIcon icon, UnityAction callback)
+        {
+            var badge = Panel("Map label · " + title, factoryMapOverlay, new Color32(5, 40, 65, 242));
+            var rect = badge.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+            rect.sizeDelta = new Vector2(width, 70);
+            factoryMapMarkers.Add(new FactoryMapMarker { rect = rect, artAnchor = position });
+            Color accent = icon == HudIcon.Credits ? gold : cyan;
+            var outline = badge.AddComponent<Outline>(); outline.effectColor = new Color(accent.r, accent.g, accent.b, .7f); outline.effectDistance = new Vector2(1, -1);
+            NameIllumination(badge.transform, accent, new Vector2(0, .59f), Vector2.one, new Vector2(4, 0), new Vector2(-4, -3));
+            var iconImage = HudIconImage(badge.transform, icon, new Vector2(0, .5f), new Vector2(34, 40));
+            iconImage.rectTransform.anchoredPosition = new Vector2(23, 0);
+            var name = PlacedLabel(badge.transform, title, width > 190 ? 13 : width > 150 ? 11 : 12, white, FontStyle.Bold, TextAnchor.MiddleCenter,
+                new Vector2(0, .59f), Vector2.one, new Vector2(43, 0), new Vector2(-4, -2));
+            name.horizontalOverflow = HorizontalWrapMode.Overflow;
+            PlacedLabel(badge.transform, detail, width > 150 ? 10 : 12, new Color32(97, 252, 215, 255), FontStyle.Bold, TextAnchor.MiddleCenter,
+                Vector2.zero, new Vector2(1, .59f), new Vector2(43, 2), new Vector2(-4, 0));
+            var button = badge.AddComponent<Button>(); ButtonFeedback(button);
+            button.onClick.AddListener(callback);
+        }
+
+        private void UpdateFactoryMapVisibility()
+        {
+            if (factoryMapOverlay == null || content == null) return;
+            factoryMapOverlay.gameObject.SetActive(currentSection == HubSection.MegaFactory && content.anchoredPosition.y < 2f);
+        }
+
+        private void UpdateFactoryMapLayout()
+        {
+            if (currentSection == HubSection.MegaFactory && factoryMapSpace != null && screenScroll != null)
+            {
+                float mapHeight = screenScroll.viewport.rect.height;
+                if (mapHeight > 0 && Mathf.Abs(factoryMapSpace.preferredHeight - mapHeight) > .1f)
+                    factoryMapSpace.preferredHeight = mapHeight;
+            }
+            UpdateFactoryMapVisibility();
+            if (factoryMapOverlay == null || factoryArtRect == null || !factoryMapOverlay.gameObject.activeSelf) return;
+            Rect bounds = factoryMapOverlay.rect;
+            foreach (var marker in factoryMapMarkers)
+            {
+                if (marker.rect == null) continue;
+                Vector2 source = Vector2.Scale(marker.artAnchor - factoryArtRect.pivot, factoryArtRect.rect.size);
+                Vector3 local = factoryMapOverlay.InverseTransformPoint(factoryArtRect.TransformPoint(source));
+                float halfWidth = marker.rect.rect.width / 2;
+                // Art points follow the same cover transform. Keep the small labels readable at cropped edges.
+                local.x = Mathf.Clamp(local.x, bounds.xMin + halfWidth + 6, bounds.xMax - halfWidth - 6);
+                marker.rect.localPosition = new Vector3(local.x, local.y, 0);
+            }
+        }
+
+        private void OpenFactoryResource(string key)
+        {
+            if (currentSection != HubSection.MegaFactory) ShowSection(HubSection.MegaFactory);
+            var producer = factoryBuildingsPanel != null ? factoryBuildingsPanel.Find("Card Body/Building " + key) as RectTransform : null;
+            FocusFactoryDetails(producer != null ? producer : factoryBuildingsPanel != null ? factoryBuildingsPanel : factoryAccountPanel);
+        }
+
+        private void FocusFactoryDetails(RectTransform target)
+        {
+            if (target == null) return;
+            Canvas.ForceUpdateCanvases();
+            var scroll = content.GetComponentInParent<ScrollRect>();
+            if (scroll != null) scroll.StopMovement();
+            float top = -content.InverseTransformPoint(target.TransformPoint(new Vector3(0, target.rect.yMax, 0))).y;
+            float maxScroll = Mathf.Max(0, content.rect.height - ((RectTransform)content.parent).rect.height);
+            content.anchoredPosition = new Vector2(0, Mathf.Clamp(top, 0, maxScroll));
+        }
 
         private void BuildFactoryScreen()
         {
-            Hero("MEGAFÁBRICA", "CRECÉ · PRODUCÍ · INVESTIGÁ", "Progreso persistente · conectado al servidor", new Color32(33, 156, 189, 255));
-            if (onlineProfile == null || onlineProfile.empire == null || onlineProfile.empire.state == null)
+            factoryAccountPanel = factoryBuildingsPanel = factoryResearchPanel = null;
+            FactoryWarsEmpireState state = onlineProfile != null && onlineProfile.empire != null ? onlineProfile.empire.state : null;
+            BuildFactoryIllustration(state);
+            if (state == null)
             {
                 BuildOnlineSignInCard();
                 return;
             }
 
-            FactoryWarsEmpireState state = onlineProfile.empire.state;
             var account = Card("FÁBRICA ONLINE", (onlineProfile.profile != null ? onlineProfile.profile.nickname : "Cuenta conectada") + " · revisión " + onlineProfile.empire.revision, 166);
+            factoryAccountPanel = account.GetComponent<RectTransform>();
             Transform accountBody = CardBody(account.transform);
             StatRow(accountBody, "CIVILIZACIÓN", CivilizationName(state.currentCiv), state.civLocked ? "Bloqueada hasta prestigiar" : "Elegí tu civilización");
             FlowActionButton(accountBody, "ACTUALIZAR PRODUCCIÓN", cyan, RefreshFactory);
@@ -96,7 +194,7 @@ namespace FactoryWars.Unity6
 
             var resources = Card("RESERVAS", "Saldos confirmados por el servidor", 430);
             Transform resourceBody = CardBody(resources.transform);
-            StatRow(resourceBody, "CRÉDITOS", FormatAmount(state.credits), "Automatización · gasto de fábrica");
+            StatRow(resourceBody, "ORO", FormatAmount(state.credits), "Mina aurífera · contratos y fábrica");
             StatRow(resourceBody, "ENERGÍA", FormatAmount(state.energy), "Generadores · contratos");
             StatRow(resourceBody, "ACERO", FormatAmount(state.steel), "Refinerías · contratos");
             StatRow(resourceBody, "INTEL", FormatAmount(state.intel), "Laboratorios · investigación");
@@ -104,13 +202,15 @@ namespace FactoryWars.Unity6
             StatRow(resourceBody, "DOMINIO", FormatAmount(state.dominion), "Progreso de dominio");
 
             var modules = Card("COMPLEJO INDUSTRIAL", "Las mejoras se validan y aplican en el servidor.", 430);
+            factoryBuildingsPanel = modules.GetComponent<RectTransform>();
             Transform moduleList = CardBody(modules.transform);
             BuildingCard(moduleList, state, "generator", "GENERADORES", "Energía industrial", "⚡", 120, 1.55);
             BuildingCard(moduleList, state, "refinery", "REFINERÍAS", "Acero industrial", "▣", 140, 1.58);
             BuildingCard(moduleList, state, "lab", "LABORATORIOS", "Investigación", "⌁", 180, 1.62);
-            BuildingCard(moduleList, state, "automation", "AUTOMATIZACIÓN", "Créditos", "◈", 220, 1.65);
+            BuildingCard(moduleList, state, "automation", "MINA AURÍFERA", "Oro · contratos y logística", "◈", 220, 1.65);
 
             BuildResearchCard(state);
+            factoryResearchPanel = content.GetChild(content.childCount - 1).GetComponent<RectTransform>();
             BuildContractCard(state);
             var controls = Card("CUENTA", "La sesión es temporal y se borra al cerrar la app.", 110);
             FlowActionButton(CardBody(controls.transform), "CERRAR SESIÓN", gold, SignOut).interactable = !HasAmbiguousCommand;
@@ -119,14 +219,15 @@ namespace FactoryWars.Unity6
         private void BuildOnlineSignInCard()
         {
             var auth = Card("CONECTAR TU FÁBRICA", "Usá una cuenta online existente vinculada a email. No importamos ni reemplazamos saves locales.", 340);
+            factoryAccountPanel = auth.GetComponent<RectTransform>();
             Transform body = CardBody(auth.transform);
             bool configured = apiConfiguration != null && !string.IsNullOrWhiteSpace(apiConfiguration.apiBaseUrl) &&
                               !string.IsNullOrWhiteSpace(apiConfiguration.supabaseUrl) && !string.IsNullOrWhiteSpace(apiConfiguration.supabasePublicKey);
-            connectionStatus = FlowLabel(body, configured ? "Ingresá con tu cuenta Factory Wars." : "El build necesita configurar el asset Resources/FactoryWarsApiConfiguration en Unity.", 10, muted, 46);
+            connectionStatus = FlowLabel(body, configured ? "Ingresá con tu cuenta Factory Wars." : "El build necesita configurar el asset Resources/FactoryWarsApiConfiguration en Unity.", 10, muted, FontStyle.Normal, 46);
             emailInput = TextInput(body, "Email vinculado a la cuenta", false, 42);
             passwordInput = TextInput(body, "Contraseña", true, 42);
             FlowActionButton(body, "CONECTAR Y CARGAR", cyan, SignInAndLoad).interactable = configured;
-            FlowLabel(body, "No uses service_role. La contraseña y sesión no se guardan en este dispositivo.", 9, muted, 34);
+            FlowLabel(body, "No uses service_role. La contraseña y sesión no se guardan en este dispositivo.", 9, muted, FontStyle.Normal, 34);
         }
 
         private void SignInAndLoad()
@@ -371,7 +472,7 @@ namespace FactoryWars.Unity6
         private void BuildContractCard(FactoryWarsEmpireState state)
         {
             string subtitle;
-            if (state.activeContract == null) subtitle = "Completa pedidos para recibir Créditos e Intel.";
+            if (state.activeContract == null) subtitle = "Completa pedidos para recibir Oro e Intel.";
             else
             {
                 string timer = state.activeContract.endsAt > 0
@@ -460,7 +561,7 @@ namespace FactoryWars.Unity6
         {
             var go = new GameObject("Text · " + value, typeof(RectTransform), typeof(Text)); go.transform.SetParent(parent, false);
             LayoutElement(go).preferredHeight = height;
-            var text = go.GetComponent<Text>(); text.text = value; text.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); text.fontSize = size; text.color = color; text.fontStyle = style; text.alignment = TextAnchor.MiddleLeft; text.horizontalOverflow = HorizontalWrapMode.Wrap; text.verticalOverflow = VerticalWrapMode.Overflow; text.raycastTarget = false;
+            var text = go.GetComponent<Text>(); text.text = value; text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); text.fontSize = size; text.color = color; text.fontStyle = style; text.alignment = TextAnchor.MiddleLeft; text.horizontalOverflow = HorizontalWrapMode.Wrap; text.verticalOverflow = VerticalWrapMode.Overflow; text.raycastTarget = false;
             return text;
         }
 

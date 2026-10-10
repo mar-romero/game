@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a10f6d009afc4d02a55f8abf1a7c3341, type: 3}
   m_Name: FactoryWarsApiConfiguration
   m_EditorClassIdentifier:
-  apiBaseUrl:
-  supabaseUrl:
-  supabasePublicKey:
+  apiBaseUrl: http://localhost:8080
+  supabaseUrl: https://xqpatcoksbudkngtxmqu.supabase.co
+  supabasePublicKey: sb_publishable_LEjMfwol66kVtcHMLVilEg_CW2LDh_D

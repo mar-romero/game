@@ -118,6 +118,47 @@ namespace FactoryWars.Unity6
             completed?.Invoke(error == null ? response : null, error);
         }
 
+        public IEnumerator GetLeaderboard(Action<FactoryWarsLeaderboardResponse, FactoryWarsApiError> completed)
+        {
+            int requestEpoch = sessionEpoch;
+            FactoryWarsLeaderboardResponse response = null;
+            FactoryWarsApiError error = null;
+            yield return AuthenticatedRequest("GET", "/leaderboard", null,
+                (FactoryWarsLeaderboardResponse value, FactoryWarsApiError failure) => { response = value; error = failure; });
+            if (requestEpoch != sessionEpoch) yield break;
+            if (error == null && !IsValidLeaderboard(response))
+                error = new FactoryWarsApiError(502, "La API devolvió una clasificación incompleta.");
+            completed?.Invoke(error == null ? response : null, error);
+        }
+
+        public IEnumerator JoinSeason(Action<FactoryWarsSeasonJoinResponse, FactoryWarsApiError> completed)
+        {
+            int requestEpoch = sessionEpoch;
+            FactoryWarsSeasonJoinResponse response = null;
+            FactoryWarsApiError error = null;
+            // Civilization and player identity come exclusively from server-side state.
+            yield return AuthenticatedRequest("POST", "/season/join", "{}",
+                (FactoryWarsSeasonJoinResponse value, FactoryWarsApiError failure) => { response = value; error = failure; });
+            if (requestEpoch != sessionEpoch) yield break;
+            if (error == null && (response == null || !response.joined || string.IsNullOrWhiteSpace(response.seasonId)))
+                error = new FactoryWarsApiError(502, "La API no confirmó la inscripción en temporada. Actualizá para consultar tu estado.");
+            completed?.Invoke(error == null ? response : null, error);
+        }
+
+        private static bool IsValidLeaderboard(FactoryWarsLeaderboardResponse response)
+        {
+            if (response == null || string.IsNullOrWhiteSpace(response.seasonId) || response.players == null) return false;
+            var ids = new System.Collections.Generic.HashSet<string>();
+            foreach (var player in response.players)
+            {
+                if (player == null || string.IsNullOrWhiteSpace(player.participant_id) ||
+                    string.IsNullOrWhiteSpace(player.display_name) || string.IsNullOrWhiteSpace(player.civilization) ||
+                    !ids.Add(player.participant_id) || player.points < 0 ||
+                    player.wins < 0 || player.draws < 0 || player.losses < 0) return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Creates an event identifier for a command. Keep it with the pending command if the UI
         /// needs to offer a manual retry after an ambiguous response.

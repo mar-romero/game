@@ -50,6 +50,34 @@ namespace FactoryWars.Unity6
     }
 
     [Serializable]
+    public sealed class FactoryWarsLeaderboardPlayer
+    {
+        public string participant_id;
+        public string display_name;
+        public string civilization;
+        public bool is_bot;
+        public int rating;
+        public int points;
+        public int wins;
+        public int draws;
+        public int losses;
+    }
+
+    [Serializable]
+    public sealed class FactoryWarsLeaderboardResponse
+    {
+        public string seasonId;
+        public FactoryWarsLeaderboardPlayer[] players;
+    }
+
+    [Serializable]
+    public sealed class FactoryWarsSeasonJoinResponse
+    {
+        public bool joined;
+        public string seasonId;
+    }
+
+    [Serializable]
     public sealed class FactoryWarsEmpireBuildings
     {
         public int generator;
