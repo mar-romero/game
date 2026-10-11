@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071421">
+  <title>Factory Wars · Vista Unity</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #071421; color: #d6efff; font: 14px system-ui, sans-serif; }
+    .preview-header { min-height: 64px; padding: max(8px, env(safe-area-inset-top)) 12px 8px; text-align: center; }
+    a { color: #70eaff; }
+    .preview-header p { margin: 4px 0 0; font-size: 12px; }
+    #unity-container { position: relative; width: min(100%, calc((100dvh - 70px) * 390 / 844)); aspect-ratio: 390 / 844; margin: 0 auto; background: #071421; }
+    #unity-canvas { display: block; width: 100%; height: 100%; }
+    #unity-loading { position: absolute; inset: 45% 8% auto; text-align: center; pointer-events: none; }
+    progress { width: 100%; accent-color: #32e4f5; }
+    #unity-warning { position: absolute; inset: 20% 5% auto; padding: 12px; background: #102d42; border: 1px solid #70eaff; border-radius: 12px; overflow-wrap: anywhere; }
+    #unity-warning[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <header class="preview-header">
+    <a href="../">Volver al juego</a> · <strong>Vista Unity</strong>
+    <p>Vista previa visual. Cuenta, producción y partidas online todavía no están disponibles aquí.</p>
+  </header>
+  <main id="unity-container">
+    <canvas id="unity-canvas" width="390" height="844" tabindex="0" aria-label="Vista previa interactiva de Factory Wars"></canvas>
+    <div id="unity-loading" role="status">Cargando Factory Wars…<progress id="unity-progress" max="1" value="0"></progress></div>
+    <div id="unity-warning" role="alert" hidden></div>
+  </main>
+  <script>
+    const canvas = document.getElementById('unity-canvas');
+    const loading = document.getElementById('unity-loading');
+    const warning = document.getElementById('unity-warning');
+    function showError(message) {
+      warning.textContent = message;
+      warning.hidden = false;
+      loading.hidden = true;
+    }
+    const config = {
+      dataUrl: 'Build/{{{ DATA_FILENAME }}}',
+      frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
+      codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+      streamingAssetsUrl: 'StreamingAssets',
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      showBanner: (message, type) => { if (type === 'error') showError(message); }
+    };
+    const loader = document.createElement('script');
+    loader.src = 'Build/{{{ LOADER_FILENAME }}}';
+    loader.onerror = () => showError('No se pudo descargar el juego. Recargá la página para reintentar.');
+    loader.onload = () => createUnityInstance(canvas, config, progress => {
+      document.getElementById('unity-progress').value = progress;
+    }).then(() => { loading.hidden = true; }).catch(() => {
+      showError('No se pudo iniciar la vista Unity. Probá recargar o usar un navegador compatible con WebGL 2.');
+    });
+    document.body.appendChild(loader);
+  </script>
+</body>
+</html>

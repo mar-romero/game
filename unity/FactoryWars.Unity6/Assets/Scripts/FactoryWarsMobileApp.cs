@@ -49,6 +49,8 @@ namespace FactoryWars.Unity6
         private readonly Text[] resourceHudRates = new Text[4];
         private enum HudIcon { Credits, Energy, Steel, Intel, Factory, Swords, Trophy, Globe }
         private readonly Sprite[] hudIconSprites = new Sprite[8];
+        private Sprite hudPanelFill, hudPanelEdge, hudPanelGlow;
+        private readonly List<Texture2D> hudPanelTextures = new List<Texture2D>();
         private GameObject toastPanel;
         private Text toast;
         private HubSection currentSection = HubSection.MegaFactory;
@@ -133,6 +135,10 @@ namespace FactoryWars.Unity6
         {
             foreach (var sprite in hudIconSprites)
                 if (sprite != null) Destroy(sprite);
+            if (hudPanelFill != null) Destroy(hudPanelFill);
+            if (hudPanelEdge != null) Destroy(hudPanelEdge);
+            if (hudPanelGlow != null) Destroy(hudPanelGlow);
+            foreach (var texture in hudPanelTextures) Destroy(texture);
         }
 
         private Image HudIconImage(Transform parent, HudIcon icon, Vector2 anchor, Vector2 size)
@@ -147,13 +153,59 @@ namespace FactoryWars.Unity6
             return image;
         }
 
-        private static void NameIllumination(Transform parent, Color accent, Vector2 min, Vector2 max, Vector2 insetMin, Vector2 insetMax)
+        private void EnsureHudPanelSprites()
         {
-            var backing = Panel("Name illumination", parent, new Color(accent.r, accent.g, accent.b, .10f));
-            Anchor(backing, min, max, insetMin, insetMax);
-            backing.GetComponent<Image>().raycastTarget = false;
-            var glow = backing.AddComponent<Outline>();
-            glow.effectColor = new Color(accent.r, accent.g, accent.b, .09f); glow.effectDistance = new Vector2(3, -2);
+            if (hudPanelFill != null) return;
+            const int size = 64;
+            const float radius = 12;
+            var pixels = new Color[3][] { new Color[size * size], new Color[size * size], new Color[size * size] };
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                // Nine-slicing stretches the center and edges while retaining the rounded corners.
+                float dx = Mathf.Abs(x + .5f - size / 2f) - (size / 2f - radius);
+                float dy = Mathf.Abs(y + .5f - size / 2f) - (size / 2f - radius);
+                float distance = Mathf.Min(Mathf.Max(dx, dy), 0) + new Vector2(Mathf.Max(dx, 0), Mathf.Max(dy, 0)).magnitude - radius;
+                float fill = Mathf.Clamp01(.5f - distance);
+                int index = y * size + x;
+                pixels[0][index] = new Color(1, 1, 1, fill);
+                pixels[1][index] = new Color(1, 1, 1, fill - Mathf.Clamp01(-1f - distance));
+                pixels[2][index] = new Color(1, 1, 1, Mathf.Clamp01(1f - Mathf.Abs(distance + 2f) / 5f) * .32f);
+            }
+            var sprites = new Sprite[3];
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+                texture.name = "Rounded HUD " + i; texture.wrapMode = TextureWrapMode.Clamp;
+                texture.filterMode = FilterMode.Bilinear; texture.SetPixels(pixels[i]); texture.Apply(false, true);
+                hudPanelTextures.Add(texture);
+                sprites[i] = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(16, 16, 16, 16));
+            }
+            hudPanelFill = sprites[0]; hudPanelEdge = sprites[1]; hudPanelGlow = sprites[2];
+        }
+
+        private GameObject RoundedHudPanel(string name, Transform parent, Color fill, Color accent)
+        {
+            EnsureHudPanelSprites();
+            var panelObject = Panel(name, parent, fill);
+            var image = panelObject.GetComponent<Image>(); image.sprite = hudPanelFill; image.type = Image.Type.Sliced;
+            var glow = Panel("Edge glow", panelObject.transform, accent);
+            Anchor(glow, Vector2.zero, Vector2.one, new Vector2(-3, -3), new Vector2(3, 3));
+            var glowImage = glow.GetComponent<Image>(); glowImage.sprite = hudPanelGlow; glowImage.type = Image.Type.Sliced; glowImage.raycastTarget = false;
+            LayoutElement(glow).ignoreLayout = true;
+            var edge = Panel("Lit edge", panelObject.transform, new Color(accent.r, accent.g, accent.b, .8f));
+            Anchor(edge, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            var edgeImage = edge.GetComponent<Image>(); edgeImage.sprite = hudPanelEdge; edgeImage.type = Image.Type.Sliced; edgeImage.raycastTarget = false;
+            LayoutElement(edge).ignoreLayout = true;
+            return panelObject;
+        }
+
+        private static void HudDivider(Transform parent, Vector2 min, Vector2 max, Vector2 insetMin, Vector2 insetMax)
+        {
+            var divider = Panel("Inset divider", parent, new Color32(106, 183, 204, 145));
+            Anchor(divider, min, max, insetMin, insetMax);
+            divider.GetComponent<Image>().raycastTarget = false;
+            LayoutElement(divider).ignoreLayout = true;
         }
 
         private static void ButtonFeedback(Button button)
@@ -250,17 +302,21 @@ namespace FactoryWars.Unity6
             Anchor(markerLayer, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             header.transform.SetAsLastSibling();
 
-            nav = Panel("Bottom Navigation", safe.transform, new Color32(5, 37, 61, 240)).GetComponent<RectTransform>();
+            nav = RoundedHudPanel("Bottom Navigation", safe.transform, new Color32(5, 40, 65, 255), cyan).GetComponent<RectTransform>();
             Anchor(nav.gameObject, Vector2.zero, new Vector2(1, 0), new Vector2(5, 5), new Vector2(-5, 86));
-            nav.gameObject.AddComponent<Outline>().effectColor = cyan;
             var navLayout = nav.gameObject.AddComponent<HorizontalLayoutGroup>();
-            navLayout.padding = new RectOffset(6, 6, 6, 6); navLayout.spacing = 4;
+            navLayout.padding = new RectOffset(6, 6, 6, 6); navLayout.spacing = 0;
             navLayout.childControlHeight = true; navLayout.childControlWidth = true; navLayout.childForceExpandHeight = true; navLayout.childForceExpandWidth = true;
 
             NavButton(HudIcon.Factory, "FAB", HubSection.MegaFactory);
             NavButton(HudIcon.Swords, "PVP", HubSection.Pvp);
             NavButton(HudIcon.Trophy, "RANKING", HubSection.Rankings);
             NavButton(HudIcon.Globe, "CIVILIZACIONES", HubSection.Civilizations);
+            for (int i = 1; i < 4; i++)
+            {
+                float dividerX = i * .25f;
+                HudDivider(nav, new Vector2(dividerX, .18f), new Vector2(dividerX, .82f), new Vector2(-.5f, 0), new Vector2(.5f, 0));
+            }
 
             var toastPanel = Panel("Integration Toast", safe.transform, new Color32(9, 27, 43, 250));
             Anchor(toastPanel, new Vector2(.06f, 0), new Vector2(.94f, 0), new Vector2(0, 92), new Vector2(0, 142));
@@ -271,7 +327,7 @@ namespace FactoryWars.Unity6
 
         private void NavButton(HudIcon icon, string label, HubSection section)
         {
-            var button = Panel("Nav " + section, nav, panel);
+            var button = Panel("Nav " + section, nav, Color.clear);
             button.AddComponent<LayoutElement>().flexibleWidth = 1;
             HudIconImage(button.transform, icon, new Vector2(.5f, .67f), new Vector2(44, 42));
             var labelText = PlacedLabel(button.transform, label, label == "CIVILIZACIONES" ? 8 : 11, white, FontStyle.Bold, TextAnchor.MiddleCenter, new Vector2(0, .08f), new Vector2(1, .35f), new Vector2(2, 0), new Vector2(-2, 0));
@@ -282,40 +338,36 @@ namespace FactoryWars.Unity6
             marker.GetComponent<Image>().raycastTarget = false;
             var click = button.AddComponent<Button>(); ButtonFeedback(click);
             click.onClick.AddListener(() => ShowSection(section));
-            var outline = button.AddComponent<Outline>(); outline.effectColor = line; outline.effectDistance = new Vector2(1, -1);
         }
 
         private void BuildResourceHud(Transform parent)
         {
             string[] names = { "CRÉDITOS", "ENERGÍA", "ACERO", "INTEL" };
-            Color[] colors = { gold, cyan, muted, new Color32(194, 136, 250, 255) };
             string[] buildingKeys = { "automation", "generator", "refinery", "lab" };
             for (int i = 0; i < names.Length; i++)
             {
                 float left = i * .25f;
-                var card = Panel("Resource " + names[i], parent, new Color32(13, 43, 68, 255));
+                var card = RoundedHudPanel("Resource " + names[i], parent, new Color32(5, 40, 65, 255), cyan);
                 Anchor(card, new Vector2(left, .05f), new Vector2(left + .25f, .87f), new Vector2(3, 0), new Vector2(-3, 0));
-                var outline = card.AddComponent<Outline>(); outline.effectColor = new Color(colors[i].r, colors[i].g, colors[i].b, .65f); outline.effectDistance = new Vector2(1, -1);
-                NameIllumination(card.transform, i == 0 ? gold : cyan, new Vector2(0, .72f), Vector2.one, new Vector2(3, 0), new Vector2(-3, -3));
-                var icon = HudIconImage(card.transform, (HudIcon)i, new Vector2(0, .85f), new Vector2(26, 27));
-                icon.rectTransform.anchoredPosition = new Vector2(16, 0);
-                var name = PlacedLabel(card.transform, names[i], 9, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, .72f), Vector2.one, new Vector2(31, 0), new Vector2(-3, -3));
+                var name = PlacedLabel(card.transform, names[i], 10, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, 1), Vector2.one, new Vector2(5, -40), new Vector2(-43, 0));
                 name.horizontalOverflow = HorizontalWrapMode.Overflow;
-                resourceHudAmounts[i] = PlacedLabel(card.transform, "—", 17, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, .31f), new Vector2(1, .70f), new Vector2(6, 0), new Vector2(-47, 0));
+                var icon = HudIconImage(card.transform, (HudIcon)i, new Vector2(0, .40f), new Vector2(30, 26));
+                icon.rectTransform.anchoredPosition = new Vector2(17, 0);
+                resourceHudAmounts[i] = PlacedLabel(card.transform, "—", 18, white, FontStyle.Bold, TextAnchor.MiddleLeft, new Vector2(0, .26f), new Vector2(1, .54f), new Vector2(34, 0), new Vector2(-5, 0));
                 resourceHudAmounts[i].resizeTextForBestFit = true;
-                resourceHudAmounts[i].resizeTextMinSize = 10; resourceHudAmounts[i].resizeTextMaxSize = 17;
-                resourceHudRates[i] = PlacedLabel(card.transform, "—/s", 11, new Color32(89, 250, 196, 255), FontStyle.Bold, TextAnchor.MiddleCenter, Vector2.zero, new Vector2(1, .33f), new Vector2(1, 0), new Vector2(-1, 0));
+                resourceHudAmounts[i].resizeTextMinSize = 9; resourceHudAmounts[i].resizeTextMaxSize = 18;
+                HudDivider(card.transform, new Vector2(0, .25f), new Vector2(1, .25f), new Vector2(8, 0), new Vector2(-8, 1));
+                resourceHudRates[i] = PlacedLabel(card.transform, "—/s", 12, new Color32(89, 250, 196, 255), FontStyle.Bold, TextAnchor.MiddleCenter, Vector2.zero, new Vector2(1, .24f), new Vector2(4, 0), new Vector2(-4, 0));
                 string key = buildingKeys[i];
                 var manage = Panel("Manage " + names[i], card.transform, Color.clear);
                 var manageRect = manage.GetComponent<RectTransform>();
-                manageRect.anchorMin = manageRect.anchorMax = new Vector2(1, .49f);
-                manageRect.pivot = new Vector2(1, .5f); manageRect.anchoredPosition = new Vector2(-3, 0); manageRect.sizeDelta = new Vector2(40, 40);
-                var plus = Panel("Plus affordance", manage.transform, new Color32(8, 134, 103, 255));
+                manageRect.anchorMin = manageRect.anchorMax = Vector2.one;
+                manageRect.pivot = Vector2.one; manageRect.anchoredPosition = new Vector2(-1, 0); manageRect.sizeDelta = new Vector2(40, 40);
+                var plus = RoundedHudPanel("Plus affordance", manage.transform, new Color32(8, 134, 103, 255), new Color32(67, 255, 187, 255));
                 var plusRect = plus.GetComponent<RectTransform>();
-                plusRect.anchorMin = plusRect.anchorMax = new Vector2(.5f, .5f); plusRect.sizeDelta = new Vector2(30, 30); plusRect.anchoredPosition = Vector2.zero;
+                plusRect.anchorMin = plusRect.anchorMax = new Vector2(.5f, .5f); plusRect.sizeDelta = new Vector2(20, 20); plusRect.anchoredPosition = new Vector2(6, 0);
                 plus.GetComponent<Image>().raycastTarget = false;
-                plus.AddComponent<Outline>().effectColor = new Color32(67, 255, 187, 255);
-                PlacedLabel(plus.transform, "+", 20, white, FontStyle.Bold, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+                PlacedLabel(plus.transform, "+", 17, white, FontStyle.Bold, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
                 var manageButton = manage.AddComponent<Button>(); manageButton.targetGraphic = plus.GetComponent<Image>(); ButtonFeedback(manageButton);
                 manageButton.onClick.AddListener(() => OpenFactoryResource(key));
             }
@@ -364,11 +416,10 @@ namespace FactoryWars.Unity6
             for (int i = 0; i < nav.childCount; i++)
             {
                 var child = nav.GetChild(i).gameObject;
+                if (child.GetComponent<Button>() == null) continue;
                 var image = child.GetComponent<Image>();
                 bool active = child.name == "Nav " + section;
-                image.color = active ? new Color32(18, 67, 91, 255) : new Color32(13, 32, 49, 255);
-                var outline = child.GetComponent<Outline>();
-                if (outline != null) outline.effectColor = active ? cyan : line;
+                image.color = Color.clear;
                 var icon = child.transform.Find("Icon")?.GetComponent<Image>();
                 if (icon != null) icon.color = active ? Color.white : new Color(.8f, .88f, .94f, .85f);
                 var label = child.transform.Find("Label")?.GetComponent<Text>();

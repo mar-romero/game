@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Factory Wars — Arena nueva</title>
+  <link rel="stylesheet" href="game/presentation/styles/arena-v2.css">
+</head>
+<body>
+  <main>
+    <header><h1>Arena nueva</h1><a href="arena.html">Abrir Arena actual</a></header>
+    <p class="intro">Práctica local contra bot. Ordená tus opciones y bloqueá una de cada familia del rival. Las investigaciones están habilitadas para probar el diseño; esta práctica no da premios.</p>
+    <section id="preparation" aria-labelledby="prep-title">
+      <h2 id="prep-title">Prepará tu plan</h2>
+      <p>Elegí y ordená 4 de los 10 cohetes, 4 de las 10 defensas y 3 de los 10 sabotajes. Tras los bloqueos, los primeros dos cohetes y defensas quedan activos y el tercero es reserva. En sabotaje: primero activo y los restantes reserva. Un bloqueo que no coincida no afecta tu lista.</p>
+      <div id="loadout" class="families"></div>
+      <label>Semilla del rival <input id="seed" type="number" min="1" max="4294967295" value="17"></label>
+      <button id="prepare">Resolver bloqueos</button>
+      <div id="preview" hidden></div>
+      <div id="bonus-choice" hidden>
+        <label>Bonus permanente <select id="bonus"></select></label>
+        <p id="bonus-detail"></p>
+        <p class="hint">Elegís uno al empezar y queda fijo toda la partida. Un espacio extra activa una opción adicional; si ocupa toda la reserva de esa familia, no podrás reconfigurarla.</p>
+      </div>
+      <button id="start" hidden>Empezar partida</button>
+    </section>
+    <section id="battle" hidden aria-labelledby="battle-title">
+      <h2 id="battle-title">Partida</h2>
+      <p class="hint">Cada acción cuesta Créditos. Cada familia puede cambiarse una vez por 40 Energía, con reserva disponible. Empezás con 100 Energía; el nodo aporta hasta 20 más por control acumulado. El bonus permanece fijo.</p>
+      <div class="topline"><strong id="clock"></strong><span id="node"></span><button id="pause">Pausar</button><button id="restart">Nueva partida</button></div>
+      <div id="players" class="players"></div>
+      <p id="flights"></p>
+      <section aria-label="Acciones"><div id="actions" class="families"></div></section>
+      <div id="economy-actions" class="controls"></div>
+      <p id="notice" role="status" aria-live="polite"></p>
+      <details><summary>Últimos movimientos</summary><ol id="events"></ol></details>
+    </section>
+  </main>
+  <script type="module" src="game/adapters/web/arena-v2-controller.js"></script>
+</body>
+</html>

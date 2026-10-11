@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Factory Wars · Megafábrica v2</title>
+  <link rel="stylesheet" href="game/presentation/styles/factory-v2.css">
+</head>
+<body>
+  <header>
+    <div><p class="eyebrow">FACTORY WARS · PRÁCTICA LOCAL</p><h1>Tu Megafábrica</h1></div>
+    <nav aria-label="Otras pantallas"><a href="index.html">Juego principal</a><a href="arena-v2.html">Arena v2</a></nav>
+  </header>
+  <main>
+    <p class="intro">Elegí un proyecto, repartí tus recursos y completá las tres misiones. Cada Prestigio desbloquea una opción PvP permanente. La fábrica produce mientras estás fuera, hasta 4 horas por ausencia.</p>
+    <p id="message" role="status" aria-live="polite">Cargando tu fábrica…</p>
+    <section id="storage-error" class="notice" hidden><h2>Necesitamos recuperar el guardado</h2><p id="storage-detail"></p><button id="reload-save">Volver a cargar</button><button id="download-save">Descargar datos conservados</button></section>
+    <div id="factory" hidden>
+      <section aria-labelledby="resources-heading"><div class="section-title"><h2 id="resources-heading">Producción</h2><span id="cycle-label"></span></div><div id="resources" class="resources"></div></section>
+      <div class="columns">
+        <section aria-labelledby="buildings-heading"><h2 id="buildings-heading">Mejorá tu fábrica</h2><p>Invertí Créditos para producir más. Cada productor empieza en nivel 1.</p><div id="buildings" class="cards"></div></section>
+        <section aria-labelledby="project-heading"><h2 id="project-heading">Tu gran objetivo</h2><p>Elegís un proyecto por ciclo. Podés aportar materiales en varias entregas.</p><div id="project" class="cards"></div></section>
+        <section aria-labelledby="contracts-heading"><h2 id="contracts-heading">Contratos</h2><p>Una entrega a la vez. Elegí entre rapidez y recompensa.</p><p id="contract-status"></p><div id="contracts" class="cards"></div></section>
+        <section aria-labelledby="missions-heading"><h2 id="missions-heading">Camino al Prestigio</h2><div id="missions"></div><p id="prestige-reason"></p><button id="open-prestige">Elegir investigación y prestigiar</button><p class="muted">Se reinician recursos, edificios, proyecto y misiones. Conservás cada investigación PvP para siempre.</p></section>
+      </div>
+      <section aria-labelledby="collection-heading"><h2 id="collection-heading">Tu arsenal permanente</h2><p>Las investigaciones agregan alternativas con ventajas y compensaciones. Prestigiar no aumenta las estadísticas de combate. Un bonus desbloqueado es una opción para elegir en Arena.</p><div id="collection"></div><p class="notice">La selección de Arena v2 todavía no lee estos desbloqueos. Este export muestra los IDs disponibles para la futura integración.</p><label for="unlocks">Opciones disponibles (arsenal inicial + investigaciones)</label><textarea id="unlocks" readonly rows="7" spellcheck="false"></textarea><button id="copy-unlocks">Copiar opciones</button></section>
+    </div>
+    <footer><p>Esta práctica tiene su propio guardado en este navegador. Sus tiempos y costos son provisionales.</p><button id="reset-save" class="danger">Reiniciar esta práctica</button></footer>
+  </main>
+  <dialog id="prestige-dialog" aria-labelledby="prestige-title">
+    <form id="prestige-form"><h2 id="prestige-title">Elegí tu investigación permanente</h2><p>Recibís exactamente una opción nueva. Después comienza otra fábrica.</p><label for="research-choice">Investigación</label><select id="research-choice" required></select><p id="research-detail"></p><p>Las investigaciones anteriores permanecen. El bonus que elijas aquí se desbloquea para Arena; no se activa en tu fábrica.</p><div class="dialog-actions"><button type="button" id="cancel-prestige">Seguir en este ciclo</button><button type="submit">Confirmar Prestigio</button></div></form>
+  </dialog>
+  <script type="module" src="game/adapters/web/factory-v2-controller.js"></script>
+</body>
+</html>

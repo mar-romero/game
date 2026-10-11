@@ -1,0 +1,6 @@
+Los riesgos principales que resolvería antes de implementarlo son:
+1. Que los bloqueos no quiten las acciones básicas. Que bloqueen una opción de la lista preparada y el siguiente avance, como describiste. Así el rival afecta tu plan sin dejarte sin una acción esencial.
+2. Que la lista se confirme antes del bloqueo. Si el rival ve tu orden y después elige qué bloquear, puede escoger siempre el veto perfecto. Recomiendo que ambos confirmen sus listas y bloqueos antes de revelar el resultado.
+3. Que la progresión no se convierta en ventaja por antigüedad. Las investigaciones permanentes obtenidas al prestigiar se conservan, pero desbloquean variantes con intercambios, no versiones superiores; más Prestigios amplían el repertorio, no las estadísticas base. También hay que asegurar suficientes opciones para que un jugador nuevo pueda completar las listas necesarias.
+4. Que el nodo dé una ventana para responder. La meta de minuto 3 o 4 suena razonable en una partida de cinco minutos. Hay que medir cuánto cuesta enviar guardianes y cuánto tiempo tarda la extracción; si capturarlo pronto garantiza siempre el tercer cambio, el nodo puede volverse obligatorio.
+5. Que los bots usen el sistema nuevo. Si las personas pueden reconfigurar cohetes, escudos y sabotajes pero los bots no, las partidas contra bots no servirán para evaluar bien el balance.

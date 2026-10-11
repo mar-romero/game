@@ -98,9 +98,10 @@ namespace FactoryWars.Unity6
                 int level = state != null && state.buildings != null ? GetBuildingLevel(state.buildings, keys[i]) : -1;
                 string detail = level < 0 ? "Nv. —\n—/s" : "Nv. " + level + "\n+" + rates[rateIndices[i]].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
                 string key = keys[i];
-                FactoryMapBadge(names[i], detail, positions[i], 120, (HudIcon)rateIndices[i], () => OpenFactoryResource(key));
+                FactoryMapBadge(names[i], detail, positions[i], 128, (HudIcon)rateIndices[i], () => OpenFactoryResource(key));
             }
-            FactoryMapBadge("MEGAFÁBRICA", "INVESTIGAR · CONTRATOS", new Vector2(.5f, .69f), 205, HudIcon.Factory,
+            string contracts = state == null ? "—" : state.contractsCompleted.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"));
+            FactoryMapBadge("MEGAFÁBRICA", "CONTRATOS: " + contracts, new Vector2(.5f, .69f), 205, HudIcon.Factory,
                 () => FocusFactoryDetails(factoryResearchPanel != null ? factoryResearchPanel : factoryAccountPanel));
             FactoryMapBadge("GESTIONAR FÁBRICA", "CUENTA · MEJORAS ↓", new Vector2(.5f, .16f), 185, HudIcon.Factory,
                 () => FocusFactoryDetails(factoryAccountPanel));
@@ -108,21 +109,31 @@ namespace FactoryWars.Unity6
 
         private void FactoryMapBadge(string title, string detail, Vector2 position, float width, HudIcon icon, UnityAction callback)
         {
-            var badge = Panel("Map label · " + title, factoryMapOverlay, new Color32(5, 40, 65, 242));
+            var badge = RoundedHudPanel("Map label · " + title, factoryMapOverlay, new Color32(5, 40, 65, 255), cyan);
             var rect = badge.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-            rect.sizeDelta = new Vector2(width, 70);
+            bool producer = icon != HudIcon.Factory;
+            rect.sizeDelta = new Vector2(width, producer ? 76 : 70);
             factoryMapMarkers.Add(new FactoryMapMarker { rect = rect, artAnchor = position });
-            Color accent = icon == HudIcon.Credits ? gold : cyan;
-            var outline = badge.AddComponent<Outline>(); outline.effectColor = new Color(accent.r, accent.g, accent.b, .7f); outline.effectDistance = new Vector2(1, -1);
-            NameIllumination(badge.transform, accent, new Vector2(0, .59f), Vector2.one, new Vector2(4, 0), new Vector2(-4, -3));
-            var iconImage = HudIconImage(badge.transform, icon, new Vector2(0, .5f), new Vector2(34, 40));
-            iconImage.rectTransform.anchoredPosition = new Vector2(23, 0);
-            var name = PlacedLabel(badge.transform, title, width > 190 ? 13 : width > 150 ? 11 : 12, white, FontStyle.Bold, TextAnchor.MiddleCenter,
-                new Vector2(0, .59f), Vector2.one, new Vector2(43, 0), new Vector2(-4, -2));
+            var iconImage = HudIconImage(badge.transform, icon, new Vector2(0, .54f), new Vector2(36, 42));
+            iconImage.rectTransform.anchoredPosition = new Vector2(25, 0);
+            var name = PlacedLabel(badge.transform, title, width > 190 ? 14 : width > 150 ? 12 : 13, white, FontStyle.Bold, TextAnchor.MiddleLeft,
+                new Vector2(0, producer ? .66f : .53f), Vector2.one, new Vector2(46, 0), new Vector2(-7, -2));
             name.horizontalOverflow = HorizontalWrapMode.Overflow;
-            PlacedLabel(badge.transform, detail, width > 150 ? 10 : 12, new Color32(97, 252, 215, 255), FontStyle.Bold, TextAnchor.MiddleCenter,
-                Vector2.zero, new Vector2(1, .59f), new Vector2(43, 2), new Vector2(-4, 0));
+            if (producer)
+            {
+                var lines = detail.Split('\n');
+                PlacedLabel(badge.transform, lines[0], 13, white, FontStyle.Bold, TextAnchor.MiddleLeft,
+                    new Vector2(0, .35f), new Vector2(1, .66f), new Vector2(46, 0), new Vector2(-7, 0));
+                HudDivider(badge.transform, new Vector2(0, .34f), new Vector2(1, .34f), new Vector2(46, 0), new Vector2(-9, 1));
+                PlacedLabel(badge.transform, lines.Length > 1 ? lines[1] : "—/s", 13, new Color32(97, 252, 215, 255), FontStyle.Bold, TextAnchor.MiddleLeft,
+                    Vector2.zero, new Vector2(1, .32f), new Vector2(46, 2), new Vector2(-7, 0));
+            }
+            else
+            {
+                PlacedLabel(badge.transform, detail, width > 190 ? 13 : 11, new Color32(97, 252, 215, 255), FontStyle.Bold, TextAnchor.MiddleLeft,
+                    Vector2.zero, new Vector2(1, .53f), new Vector2(46, 4), new Vector2(-7, 0));
+            }
             var button = badge.AddComponent<Button>(); ButtonFeedback(button);
             button.onClick.AddListener(callback);
         }
