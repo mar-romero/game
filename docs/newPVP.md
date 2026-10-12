@@ -4,7 +4,7 @@ Este documento registra el diseño conversado de la nueva Arena. Las reglas tien
 
 ## La idea en una frase
 
-Antes de entrar, cada jugador prepara su selección de cohetes, defensas y sabotajes, además de elegir los bloqueos que aplicará al rival. Al comenzar la partida elige **un bonus permanente** —por ejemplo, +15% de economía o un espacio adicional de cohetes, defensas o sabotajes— que dura hasta el final y no se puede cambiar. En combate, las opciones tácticas se pagan con Créditos y se pueden reconfigurar con Energía: empieza con 100, cada cambio cuesta 40 y el nodo puede aportar hasta 20 más para pagar el tercer cambio.
+Antes de entrar, cada jugador elige un bonus fijo, prepara su selección de cohetes, defensas y sabotajes, y preselecciona los bloqueos que aplicará al rival. Los activos siempre son 2 cohetes, 2 defensas y 1 sabotaje; los bonus familiares añaden opciones de reserva, no activos. En combate, las opciones tácticas se pagan con Créditos y se pueden reconfigurar con Energía: empieza con 100, cada cambio cuesta 40 (35 con Reconfiguración eficiente) y el nodo puede aportar hasta 20 más.
 
 ## Las tres cosas que se deciden
 
@@ -16,7 +16,7 @@ Antes de entrar, cada jugador prepara su selección de cohetes, defensas y sabot
 
 Los ejemplos describen estilos, no números finales. Cada opción debe resolver una situación distinta y tener una respuesta posible. Ninguna debería ser la mejor elección en todas las partidas.
 
-Al comenzar el combate cada jugador elige **un bonus permanente**. Puede enfocarse en economía, sumar un espacio de cohetes, defensa o sabotaje, u ofrecer otra ventaja del núcleo. Es una sola elección, permanece activa toda la partida y no se puede cambiar. Es independiente de las acciones pagadas con Créditos y de las reconfiguraciones tácticas pagadas con Energía.
+Antes de preparar la lista cada jugador elige **un bonus fijo**. Puede enfocarse en economía, reservas adicionales, o apoyar guardianes y reconfiguraciones. Es una sola elección, permanece activa toda la partida y no se puede cambiar. Es independiente de las acciones pagadas con Créditos y de las reconfiguraciones tácticas pagadas con Energía.
 
 ## Preparación antes de empezar
 
@@ -28,9 +28,9 @@ Antes de buscar partida, cada jugador prepara una lista ordenada de opciones inv
 - 4 opciones de escudo.
 - 3 opciones de sabotaje.
 
-El catálogo de práctica tiene **10 cohetes, 10 escudos, 10 sabotajes y 10 bonus permanentes de economía o apoyo**. Su desbloqueo por investigaciones de la Megafábrica aún requiere integración. No se llevan las 40 opciones a una partida: antes de jugar se arma una lista ordenada de 4 cohetes, 4 defensas y 3 sabotajes. Tras los bloqueos quedan hasta tres opciones disponibles por familia. La base activa es **2 cohetes, 2 defensas y 1 sabotaje**; los restantes disponibles son reservas. Una investigación habilita alternativas, no una mejora estadística automática.
+El catálogo de práctica tiene **10 cohetes, 10 escudos, 10 sabotajes y 10 bonus fijos**. La práctica Arena v2 lee los desbloqueos de la Megafábrica v2 local en el mismo navegador; conectar esta progresión a la Arena integrada y a cuentas todavía requiere trabajo. Antes de preparar la lista se elige un bonus. Normalmente se ordenan 4 cohetes, 4 defensas y 3 sabotajes. Los bonus de reserva familiar permiten elegir 5 de esa familia, si hay una quinta variante investigada (o una cuarta de sabotaje). Tras bloquear, se usan como máximo 3 cohetes/defensas y 3 sabotajes (4 en la familia del bonus); otros candidatos sirven de reemplazo si el rival bloquea una opción anterior. La base activa siempre es **2 cohetes, 2 defensas y 1 sabotaje**. Una investigación habilita alternativas, no una mejora estadística automática.
 
-Cada jugador prepara también un bloqueo por familia para aplicarlo al rival. El bonus permanente se elige al comenzar la partida y queda fijo: por ejemplo, una mejora económica o un espacio adicional de una familia. Las ideas de abajo son una propuesta de catálogo; porcentajes, costos y duración quedan para balancear.
+Cada jugador elige también un bloqueo por familia para aplicarlo al rival. El bonus se elige antes de preparar la lista y queda fijo desde el inicio hasta terminar la partida. Los porcentajes, costos y duración quedan para balancear.
 
 ### Catálogo propuesto de investigaciones
 
@@ -72,59 +72,59 @@ Cada opción debe tener una ventaja, un costo o una situación donde sea menos �
 |---|---|---|
 | **Interferencia de escudos** | Reduce temporalmente los escudos ya activos. | No afecta escudos futuros ni el ingreso. |
 | **Bloqueo económico** | Reduce temporalmente los ingresos de Créditos. | No destruye Créditos acumulados; duración breve. |
-| **Freno industrial** | Hace más lenta la producción de Créditos. | No interrumpe acciones ni fábricas existentes. |
+| **Freno industrial** | Reduce 60% el ingreso adicional de las mejoras económicas durante 12 s. | Conserva el ingreso base; sin mejoras económicas no reduce ingresos. |
 | **Interferencia de recargas** | Alarga las recargas de una familia por unos segundos. | No cancela acciones ya lanzadas. |
 | **Retraso de lanzamiento** | Aumenta brevemente el tiempo de viaje de los cohetes enemigos. | No reduce su daño cuando llegan. |
 | **Emboscada al nodo** | Retrasa la próxima llegada de guardianes rivales. | No elimina guardianes que ya controlan el nodo. |
-| **Fricción de fábrica** | Aumenta el costo de la próxima fábrica enemiga. | Solo afecta una compra y puede evitarse si no construye. |
+| **Fricción económica** | Aumenta 35% el costo de la próxima mejora económica enemiga. | Solo se consume con una compra exitosa; no afecta acciones ni guardianes. |
 | **Corte de suministros** | Aumenta el costo de la próxima acción enemiga de una familia. | El rival puede esperar o elegir otra familia. |
 | **Interferencia de reconfiguración** | Alarga la reconfiguración enemiga si ya está en curso. | No la cancela ni revela la opción elegida. |
 | **Sabotaje de precisión** | Debilita temporalmente una acción activa elegida del rival. | Afecta un solo espacio y tiene una señal visible. |
 
 #### Economía y apoyo — 10 investigaciones
 
-Se elige **un solo bonus** al comenzar, después de resolver los bloqueos. Queda fijo durante toda la partida. Estos son los diez ejecutables del prototipo; los valores son provisionales y no tienen balance medido.
+Se elige **un solo bonus antes de ordenar el arsenal**. Queda fijo durante toda la partida. Estos son los diez bonus; los valores son provisionales y no tienen balance medido. Los bonus de reserva requieren que Megafábrica haya desbloqueado una variante adicional.
 
 | Investigación | Ventaja | Límite o costo |
 |---|---|---|
 | **Rendimiento sostenido** | +15% de ingresos toda la partida. | Consume la única elección de bonus; no aumenta potencia ni reduce costos. |
-| **Expansión** | +20% de ingresos durante los primeros 90 s. | Después deja de dar ingresos extra. |
-| **Eficiencia** | Fábricas y mejoras económicas cuestan 12% menos. | No reduce acciones ni guardianes. |
+| **Reconfiguración eficiente** | Cada cambio cuesta 35 Energía en vez de 40. | Ahorra 5 Energía por cambio; no aumenta cuántas veces se puede cambiar una familia. |
+| **Eficiencia** | Mejoras económicas cuestan 12% menos. | No reduce acciones ni guardianes. |
 | **Compuesto** | +0,12% de ingresos por segundo sin daño al núcleo, hasta +35%. | El daño al núcleo reinicia el crecimiento. |
 | **Tesorería** | +80 Créditos iniciales. | Ventaja de una sola vez; no aumenta ingresos. |
 | **Logística** | Guardianes cuestan 25% menos. | Solo beneficia la disputa del nodo. |
 | **Reserva de emergencia** | Una vez entrega 100 Créditos al quedar con 35 o menos. | No se activa antes del umbral y no se repite. |
-| **Espacio extra de cohetes** | Activa una tercera opción disponible de cohete. | Si ocupa todas las opciones, no queda reserva de cohete para cambiar. |
-| **Espacio extra de defensa** | Activa una tercera opción disponible de defensa. | Si ocupa todas las opciones, no queda reserva de defensa para cambiar. |
-| **Espacio extra de sabotaje** | Activa una segunda opción disponible de sabotaje. | Tras un bloqueo coincidente pueden quedar ambas activas y ninguna reserva. |
+| **Reserva extra de cohetes** | Agrega una quinta variante seleccionable y una reserva adicional. | Los cohetes activos siguen siendo 2; requiere 5 cohetes desbloqueados. |
+| **Reserva extra de escudos** | Agrega una quinta variante seleccionable y una reserva adicional. | Los escudos activos siguen siendo 2; requiere 5 escudos desbloqueados. |
+| **Reserva extra de sabotaje** | Agrega una cuarta variante seleccionable y una reserva adicional. | El sabotaje activo sigue siendo 1; requiere 4 sabotajes desbloqueados. |
 
-**Bonus permanente elegido al comenzar:** se elige uno y permanece activo toda la partida. Puede ser, por ejemplo, **+15% de ingresos**, un espacio adicional de cohetes, defensas o sabotajes, más Créditos iniciales, menor costo para enviar guardianes o una reserva de emergencia. No se compra con Energía ni reemplaza las opciones tácticas.
+**Bonus fijo:** se elige uno antes de la preparación, no se compra con Energía y permanece toda la partida. Los bonus de reserva agregan una opción de repuesto, nunca un botón ni un uso activo adicional.
 
 ### 2. Bloqueos del rival
 
 Cada jugador prepara un bloqueo del catálogo por familia: un cohete, una defensa y un sabotaje. Puede no coincidir con la lista del rival; en ese caso no elimina ninguna opción. El orden de la lista se fija antes del bloqueo.
 
-- Si una de las primeras tres opciones de una lista de cuatro queda bloqueada, la siguiente opción avanza para completar las tres. Ejemplo: `A → B → C → D`, se bloquea `B`, queda `A → C → D`.
+- Si una de las opciones de juego queda bloqueada, la siguiente opción ordenada avanza para ocupar su lugar. Ejemplo sin bonus: `A → B → C → D`, se bloquea `B`, quedan `A → C → D`.
 - Si no se bloquea ninguna de las primeras tres, se usan esas tres.
-- La selección de sabotaje tiene tres opciones; al bloquear una quedan **dos**. Empezás con una y la otra queda como reserva para el único cambio de sabotaje permitido.
+- La selección de sabotaje tiene tres opciones; al bloquear una quedan **dos**. Empezás con una y la otra queda como reserva para el único cambio de sabotaje permitido. El bonus de reserva permite elegir una alternativa adicional; tras filtrar el bloqueo se conserva como máximo una alternativa más para esa familia.
 
-Las opciones disponibles alimentan la configuración principal y la alternativa de cambio de cada familia. El resultado se conoce antes de que empiece la partida; no se rehace el arsenal tras ver el bloqueo.
+Las opciones disponibles alimentan la configuración principal y sus reservas. El resultado se conoce antes de que empiece la partida; no se rehace el arsenal tras ver el bloqueo.
 
 ## Qué ocurre durante el PvP
 
 ### Recursos
 
-- **Créditos:** sostienen la economía de la partida y pagan acciones, construcciones y envío de guardianes al nodo. Mandar guardianes tiene un costo; esos Créditos dejan de estar disponibles para otras decisiones.
-- **Energía:** empieza en 100 y paga reconfiguraciones a razón de 40 por cambio. Controlar el nodo la aumenta gradualmente hasta 20 adicionales (120 como máximo). No compra ataques, economía ni mejoras económicas.
+- **Créditos:** sostienen la economía de la partida y pagan acciones, mejoras económicas y envío de guardianes al nodo. «Mejorar economía» es la única compra que aumenta el ingreso: niveles de 9/15/24/38 Créditos por segundo, con costos de 165/360/720. Mandar guardianes tiene un costo; esos Créditos dejan de estar disponibles para otras decisiones.
+- **Energía:** empieza en 100 y paga reconfiguraciones a razón de 40 por cambio, o 35 con Reconfiguración eficiente. Controlar el nodo la aumenta gradualmente hasta 20 adicionales (120 como máximo). No compra ataques, economía ni mejoras económicas.
 - **Guardianes:** se envían para disputar el control del nodo; invertir más guardianes implica comprometer más Créditos.
 
 ### Cambios de estrategia
 
-Cada familia puede reconfigurarse **como máximo una vez**: cohetes, defensas y sabotajes tienen cada uno su propio cambio. El resultado del bloqueo deja hasta tres opciones disponibles por familia; durante la partida se usan **2 cohetes, 2 defensas y 1 sabotaje**, más el espacio adicional si se eligió ese bonus. Se pagan los usos con Créditos. Una reconfiguración cambia una opción activa por una reserva disponible y cuesta 40 de Energía. Si el bonus de espacio adicional deja esa familia sin reserva, no puede reconfigurarse. El bonus elegido al comenzar sigue activo y no se cambia durante la partida.
+Cada familia puede reconfigurarse **como máximo una vez**: cohetes, defensas y sabotajes tienen cada uno su propio cambio. El bloqueo selecciona hasta tres opciones utilizables (cuatro con bonus de reserva en esa familia); durante la partida se usan siempre **2 cohetes, 2 defensas y 1 sabotaje** y las demás quedan como reservas. Una reconfiguración cambia una opción activa por una reserva disponible y cuesta 40 de Energía, o 35 con Reconfiguración eficiente. El bonus elegido antes de preparar el arsenal queda activo toda la partida.
 
 Las opciones principales son tipos reutilizables con recarga; no son munición limitada. Los usos cuestan Créditos según la economía PvP.
 
-Los cambios se pagan con Energía, no con Créditos. Con los 100 iniciales podés pagar dos cambios (80) y te quedan 20, insuficientes para otro. Si controlás el nodo el tiempo necesario, acumulás hasta 20 adicionales: llegás a 40 disponibles y podés pagar el tercer cambio. Cada familia se cambia como máximo una vez, así que sin controlar el nodo una conserva su configuración inicial; con el nodo podés cambiar cohetes, escudos y sabotaje.
+Los cambios se pagan con Energía, no con Créditos. Con el costo normal, los 100 iniciales permiten dos cambios (80) y el nodo aporta los 20 necesarios para un tercero. Con Reconfiguración eficiente, tres cambios cuestan 105: alcanza con obtener 5 Energía del nodo. Cada familia se cambia como máximo una vez.
 
 ```mermaid
 flowchart LR
@@ -202,7 +202,7 @@ La decisión económica sigue activa durante todo el combate: invertir Créditos
 - La investigación amplía el repertorio y da objetivos a largo plazo; el bonus permanente permite definir una inclinación estratégica para la partida.
 - El bloqueo permite anticipar y afectar el plan del rival antes del primer movimiento.
 - Las dos adaptaciones base obligan a priorizar dos familias; no se puede responder a todo.
-- El nodo permite competir por una respuesta adicional, pero cuesta Créditos que podrían acelerar otras partes de la fábrica.
+- El nodo permite competir por una respuesta adicional, pero cuesta Créditos que podrían financiar mejoras económicas u otras acciones de combate.
 - Los cambios anunciados crean una ventana de lectura y reacción, y el tiempo de reconfiguración evita cambiar instantáneamente como respuesta perfecta.
 
 ## Regla permanente entre Prestigios
@@ -215,14 +215,14 @@ Las investigaciones permanentes amplían las estrategias disponibles; no dan una
 
 Desbloquear una investigación tampoco la equipa automáticamente ni permite llevar todo el catálogo a una partida. Se respetan la selección previa de **4 cohetes, 4 defensas y 3 sabotajes**, los bloqueos y el único bonus elegido para esa partida. El bonus desbloqueado también debe competir en igualdad de condiciones con las demás opciones.
 
-**Pendiente de definir:** misiones exactas, requisitos y costo de cada investigación, y cómo se concede la primera investigación antes del primer Prestigio. Esta regla de persistencia y balance ya queda fijada; su integración con la Megafábrica todavía no está implementada.
+La práctica Megafábrica v2 ya tiene misiones y otorga una investigación permanente por Prestigio; la Arena v2 usa ese guardado local. Siguen pendientes la integración con el juego principal, la sincronización de cuenta y servidor, y el balance final de investigaciones. La regla de persistencia y de no ganar poder estadístico por acumular Prestigios queda fijada.
 
 ## Reglas que deben conservarse juntas
 
 - Máximo **dos cambios base** por partida.
 - El nodo puede habilitar **un tercer cambio total**, como máximo.
 - Cada familia se puede cambiar una sola vez.
-- Una reconfiguración cambia una opción activa por una reserva disponible de la misma familia. Sin reserva no puede cambiarse. El bonus permanente se elige al comenzar y queda activo durante toda la partida.
+- Una reconfiguración cambia una opción activa por una reserva disponible de la misma familia. Sin reserva no puede cambiarse. El bonus se elige antes de preparar el arsenal y queda activo durante toda la partida.
 - El bloqueo ocurre antes de iniciar el combate; no se rehace la configuración después de ver el bloqueo.
 - Un cambio no reinicia recargas ni cancela ataques en tránsito.
 - Los efectos de investigación, las variantes y los valores de balance deben distinguirse; desbloquear una opción no debe convertirse accidentalmente en una mejora estadística permanente.
@@ -231,7 +231,7 @@ Desbloquear una investigación tampoco la equipa automáticamente ni permite lle
 ## Números y decisiones aún por cerrar
 
 1. **Catálogo:** el prototipo contiene 10/10/10 variantes y 10 bonus; falta conectarlos a investigaciones y fijar valores finales con balance medido.
-2. **Bonus permanente:** medir economía frente a espacios adicionales de familia. En el prototipo un espacio activa una opción adicional, lo que puede dejar la familia sin reserva de cambio.
+2. **Bonus fijo:** medir economía frente a reservas adicionales de familia; ningún bonus altera los slots activos 2/2/1.
 3. **Bloqueo:** definir el protocolo competitivo de confirmación e información oculta entre humanos; la práctica local revela ambas configuraciones tras resolver los bloqueos.
 4. **Nodo:** definir fuerzas iniciales y balancear guardianes; con el modelo de 180 segundos de control, disputar no garantiza completar los +20 justo al minuto 4.
 5. **Reconfiguración:** el prototipo paga/consume al iniciar, demora 5 s y anuncia la familia; falta medir y validar esa ventana en partidas reales.
@@ -244,16 +244,33 @@ MEGAFÁBRICA
   investigo opciones ───────────────► desbloqueo un catálogo de 10 por familia
 
 ANTES DE JUGAR
-  elijo y ordeno 4 cohetes / 4 defensas / 3 sabotajes del catálogo
+  elijo 1 bonus fijo
+  ordeno 4 cohetes / 4 defensas / 3 sabotajes
+  si mi bonus agrega reserva y tengo variantes investigadas, ordeno 5 / 5 / 4 en esa familia
   preselecciono un bloqueo para cada familia del rival
                     │
   se aplican los bloqueos y las opciones siguientes avanzan
-  al comenzar elijo un bonus permanente ─► queda fijo toda la partida
+  activos durante la partida: 2 cohetes / 2 defensas / 1 sabotaje
 
 DURANTE LA PARTIDA
   Créditos ─► economía / acciones / guardianes
-  Energía  ─► 100 iniciales; cada cambio cuesta 40
+  Energía  ─► 100 iniciales; cada cambio cuesta 40 (35 con Reconfiguración eficiente)
   Nodo     ─► control sostenido aporta hasta 20 para el 3.er cambio
                     │
   aviso de familia ─► espera ─► revelar opción nueva
 ```
+
+## Rivales de práctica
+
+Arena v2 permite elegir la personalidad del bot. El estilo afecta tanto sus prioridades de arsenal/bonus como sus decisiones durante la partida; no cambia las reglas ni agrega recursos.
+
+| Estilo | Plan de juego |
+|---|---|
+| **Equilibrado** | Alterna economía, ataques, defensa y nodo. |
+| **Presión** | Busca ataques frecuentes y ventanas para dañar el núcleo. |
+| **Economista** | Invierte más temprano en ingresos y se protege mientras los recupera. |
+| **Defensor** | Prioriza escudos que respondan a los ataques visibles. |
+| **Control del nodo** | Dedica más Créditos a disputar el nodo y obtener Energía. |
+| **Saboteador** | Busca ventanas útiles para frenar la economía, las acciones y las reconfiguraciones. |
+
+La misma semilla y el mismo estilo producen la misma preparación y decisiones bajo la misma secuencia de partida. Los perfiles son heurísticas locales contra bot; su dificultad y balance todavía no están medidos.

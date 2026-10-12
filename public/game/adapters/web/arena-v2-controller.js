@@ -1,13 +1,70 @@
 import { ArenaMatch, resolveLoadout } from '../../domain/arena-v2/match-engine.js';
-import { BONUSES, CATALOG, FAMILIES, LIST_COUNTS, defaultLoadout } from '../../domain/arena-v2/balance.js';
-import { ArenaPracticeBot } from '../../application/arena-v2-bot.js';
+import { BONUSES, CATALOG, FAMILIES, candidateCountsForBonus, defaultLoadout } from '../../domain/arena-v2/balance.js';
+import { ArenaPracticeBot, BOT_ARCHETYPES } from '../../application/arena-v2-bot.js';
+import { BASE_ARSENAL, SAVE_KEY } from '../../domain/factory-v2/catalog.js';
+import { decodeSave } from '../../domain/factory-v2/save-format.js';
+import { exportUnlocks } from '../../domain/factory-v2/factory-engine.js';
 
 const $ = id => document.getElementById(id);
 const names = { rockets: 'Cohetes', shields: 'Escudos', sabotage: 'Sabotaje' };
-const effectNames = { income: 'ingresos reducidos', factoryIncome: 'producción adicional reducida', cooldown: 'recarga lenta', rocketDelay: 'lanzamientos demorados', nextGuardian: 'próximo envío demorado', nextFactory: 'próxima fábrica encarecida', nextAction: 'próxima acción encarecida', precision: 'potencia reducida', shieldDelay: 'activación de defensa demorada', guardianDelay: 'guardianes demorados' };
+const effectNames = { income: 'ingresos reducidos', economicIncome: 'ingreso de mejoras económicas reducido', cooldown: 'recarga lenta', rocketDelay: 'lanzamientos demorados', nextGuardian: 'próximo envío demorado', nextUpgrade: 'próxima mejora económica encarecida', nextAction: 'próxima acción encarecida', precision: 'potencia reducida', shieldDelay: 'activación de defensa demorada', guardianDelay: 'guardianes demorados' };
 let loadout = defaultLoadout(), prepared = null, match = null, bot = null, paused = false;
 let lastFrame = null, renderElapsed = 0, interactionHeld = false, resultRendered = false;
 const sabotageTargets = {};
+let availableUnlocks = BASE_ARSENAL;
+
+function freezeUnlocks(unlocks) {
+  return Object.freeze(Object.fromEntries(Object.entries(unlocks).map(([family, ids]) => [family, Object.freeze([...ids])])));
+}
+function usableBonuses(unlocks) {
+  return unlocks.bonuses.filter(id => {
+    const family = BONUSES[id].extraReserveFamily;
+    return !family || unlocks[family].length >= candidateCountsForBonus(id)[family];
+  });
+}
+function resizeCandidates(target, unlocks) {
+  const counts = candidateCountsForBonus(target.bonus);
+  for (const family of FAMILIES) {
+    const eligible = target.candidates[family].filter(id => unlocks[family].includes(id));
+    target.candidates[family] = [...new Set([...eligible, ...unlocks[family]])].slice(0, counts[family]);
+  }
+}
+function refreshFactoryUnlocks(onlyIfChanged = false) {
+  const previousUnlocks = availableUnlocks;
+  let message;
+  availableUnlocks = BASE_ARSENAL;
+  try {
+    const raw = window.localStorage.getItem(SAVE_KEY);
+    if (raw === null) message = 'Arsenal inicial disponible. Prestigiá en Megafábrica nueva para desbloquear más opciones.';
+    else {
+      const factory = decodeSave(raw);
+      availableUnlocks = freezeUnlocks(exportUnlocks(factory));
+      message = `Megafábrica conectada: ${factory.permanent.research.length} investigaciones permanentes. Se agregan opciones para elegir; las estadísticas de combate siguen siendo las de cada variante.`;
+    }
+  } catch {
+    message = 'No pudimos leer un guardado válido de Megafábrica. Usás el arsenal inicial; tus datos se conservan. Revisá el guardado desde Megafábrica nueva.';
+  }
+  if ($('factory-sync-status').textContent !== message) $('factory-sync-status').textContent = message;
+  const optionsChanged = Object.keys(availableUnlocks).some(family =>
+    previousUnlocks[family].length !== availableUnlocks[family].length
+    || availableUnlocks[family].some(id => !previousUnlocks[family].includes(id)))
+    || previousUnlocks.bonuses.length !== availableUnlocks.bonuses.length
+    || availableUnlocks.bonuses.some(id => !previousUnlocks.bonuses.includes(id));
+  // Factory saves every second; preserve focused controls for resource-only saves.
+  if (onlyIfChanged && !optionsChanged) return;
+  const bonusOptions = usableBonuses(availableUnlocks);
+  if (!bonusOptions.includes(loadout.bonus)) loadout.bonus = bonusOptions[0] ?? 'expansion';
+  resizeCandidates(loadout, availableUnlocks);
+  $('bonus').replaceChildren(...availableUnlocks.bonuses.map(id => {
+    const family = BONUSES[id].extraReserveFamily;
+    const item = option(id, `${BONUSES[id].name}${family && !bonusOptions.includes(id) ? ' · requiere una variante investigada más' : ''}`);
+    item.disabled = !bonusOptions.includes(id);
+    return item;
+  }));
+  $('bonus').value = loadout.bonus;
+  $('bonus-detail').textContent = BONUSES[loadout.bonus].detail;
+  renderPreparation();
+}
 
 function button(text, onClick, disabled = false) {
   const el = document.createElement('button'); el.textContent = text; el.disabled = disabled;
@@ -19,7 +76,10 @@ function paragraph(text, className = '') {
 function option(value, text) {
   const el = document.createElement('option'); el.value = value; el.textContent = text; return el;
 }
-function invalidate() { prepared = null; $('start').hidden = true; $('preview').hidden = true; $('bonus-choice').hidden = true; }
+function invalidate() { prepared = null; $('start').hidden = true; $('preview').hidden = true; }
+function updateBotStyleDetail() {
+  $('bot-style-detail').textContent = BOT_ARCHETYPES[$('bot-style').value]?.description ?? '';
+}
 
 function renderPreparation() {
   $('loadout').replaceChildren();
@@ -32,7 +92,7 @@ function renderPreparation() {
       const choice = document.createElement('select');
       choice.setAttribute('aria-label', `${names[family]}, opción ${index + 1}`);
       Object.entries(CATALOG[family]).forEach(([variant, data]) => {
-        if (variant === id || !loadout.candidates[family].includes(variant)) choice.append(option(variant, `${index + 1}. ${data.name} · ${data.cost} C`));
+        if (availableUnlocks[family].includes(variant) && (variant === id || !loadout.candidates[family].includes(variant))) choice.append(option(variant, `${index + 1}. ${data.name} · ${data.cost} C`));
       });
       choice.value = id; choice.title = CATALOG[family][id].detail;
       choice.addEventListener('change', () => { loadout.candidates[family][index] = choice.value; invalidate(); renderPreparation(); });
@@ -61,40 +121,64 @@ function renderPreparation() {
   }
 }
 const chosenBans = {};
-Object.entries(BONUSES).forEach(([id, data]) => $('bonus').append(option(id, data.name)));
-$('bonus').value = loadout.bonus;
 function bonusChanged() {
-  loadout.bonus = $('bonus').value; $('bonus-detail').textContent = BONUSES[loadout.bonus].detail;
-  if (prepared) { prepared.loadouts[0].bonus = loadout.bonus; renderPreview(); }
+  if (!usableBonuses(availableUnlocks).includes($('bonus').value)) return;
+  loadout.bonus = $('bonus').value;
+  resizeCandidates(loadout, availableUnlocks);
+  $('bonus-detail').textContent = BONUSES[loadout.bonus].detail;
+  invalidate(); renderPreparation();
 }
 $('bonus').addEventListener('change', bonusChanged);
+$('bot-style').replaceChildren(...Object.entries(BOT_ARCHETYPES).map(([id, profile]) => option(id, profile.name)));
+$('bot-style').value = 'balanced';
+updateBotStyleDetail();
+$('bot-style').addEventListener('change', () => { updateBotStyleDetail(); invalidate(); });
 $('seed').addEventListener('input', invalidate);
-bonusChanged(); renderPreparation();
+refreshFactoryUnlocks();
+window.addEventListener('storage', event => {
+  if (event.key !== SAVE_KEY && event.key !== null) return;
+  if (prepared || match) {
+    $('factory-sync-status').textContent = 'El guardado de Megafábrica cambió. Se actualizará al resolver una nueva preparación; esta configuración y la partida conservan sus opciones.';
+  } else refreshFactoryUnlocks(true);
+});
 
 $('prepare').addEventListener('click', () => {
   const seed = Number($('seed').value);
   if (!Number.isInteger(seed) || seed < 1 || seed > 4294967295) { $('preview').hidden = false; $('preview').textContent = 'Elegí una semilla entera válida.'; return; }
+  for (const family of FAMILIES) chosenBans[family] = $(`ban-${family}`).value;
+  invalidate(); refreshFactoryUnlocks();
+  const unlocks = freezeUnlocks(availableUnlocks);
   const picker = new ArenaPracticeBot(seed);
-  const enemy = defaultLoadout(Object.keys(BONUSES)[Math.floor(picker.random() * Object.keys(BONUSES).length)]);
+  const botArchetype = $('bot-style').value;
+  const profile = BOT_ARCHETYPES[botArchetype] ?? BOT_ARCHETYPES.balanced;
+  const enemyBonusOptions = usableBonuses(unlocks);
+  const favoredBonuses = profile.bonusPriority.filter(id => enemyBonusOptions.includes(id));
+  const enemyBonus = favoredBonuses[0] ?? enemyBonusOptions[Math.floor(picker.random() * enemyBonusOptions.length)];
+  const enemy = defaultLoadout(enemyBonus);
+  const enemyCounts = candidateCountsForBonus(enemy.bonus);
   for (const family of FAMILIES) {
-    const ids = Object.keys(CATALOG[family]);
-    for (let i = ids.length - 1; i > 0; i--) {
-      const j = Math.floor(picker.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]];
+    const pool = [...unlocks[family]];
+    const preferred = profile.preferences[family].filter(id => pool.includes(id));
+    const remaining = pool.filter(id => !preferred.includes(id));
+    for (let i = remaining.length - 1; i > 0; i--) {
+      const j = Math.floor(picker.random() * (i + 1)); [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
     }
-    enemy.candidates[family] = ids.slice(0, LIST_COUNTS[family]);
+    enemy.candidates[family] = [...preferred, ...remaining].slice(0, enemyCounts[family]);
   }
   const ownBans = Object.fromEntries(FAMILIES.map(family => [family, $(`ban-${family}`).value]));
   const enemyBans = Object.fromEntries(FAMILIES.map(family => {
     const list = Object.keys(CATALOG[family]); return [family, list[Math.floor(picker.random() * list.length)]];
   }));
-  prepared = { loadouts: [structuredClone(loadout), enemy], bans: [ownBans, enemyBans], seed };
-  renderPreview(); $('bonus-choice').hidden = false;
+  prepared = { loadouts: [structuredClone(loadout), enemy], bans: [ownBans, enemyBans], unlocks: Object.freeze([unlocks, unlocks]), seed, botArchetype };
+  renderPreview();
 });
 
 function renderPreview() {
-  $('preview').replaceChildren(paragraph('Bloqueos resueltos. Elegí tu bonus permanente y empezá: no podrás cambiarlo durante la partida.'));
+  $('preview').replaceChildren(paragraph('Bloqueos resueltos. El bonus que elegiste queda fijo durante toda la partida.'));
+  const profile = BOT_ARCHETYPES[prepared.botArchetype];
+  $('preview').append(paragraph(`Estilo del rival: ${profile.name}. ${profile.description}`, 'hint'));
   for (let i = 0; i < 2; i++) {
-    const resolved = resolveLoadout(prepared.loadouts[i], prepared.bans[1 - i]);
+    const resolved = resolveLoadout(prepared.loadouts[i], prepared.bans[1 - i], prepared.unlocks[i]);
     $('preview').append(paragraph(i === 0 ? 'Tu configuración:' : 'Configuración del rival:'));
     $('preview').append(paragraph(`Bonus permanente: ${BONUSES[resolved.bonus].name}. ${BONUSES[resolved.bonus].detail}`, 'hint'));
     for (const family of FAMILIES) {
@@ -110,7 +194,7 @@ function renderPreview() {
 $('start').addEventListener('click', () => {
   if (!prepared) return;
   for (const key of Object.keys(sabotageTargets)) delete sabotageTargets[key];
-  match = new ArenaMatch(prepared); bot = new ArenaPracticeBot(prepared.seed, 1);
+  match = new ArenaMatch(prepared); bot = new ArenaPracticeBot(prepared.seed, 1, prepared.botArchetype);
   paused = false; lastFrame = null; resultRendered = false; $('pause').textContent = 'Pausar'; $('pause').disabled = false;
   $('notice').textContent = ''; $('preparation').hidden = true; $('battle').hidden = false; renderBattle();
 });
@@ -126,7 +210,7 @@ $('battle').addEventListener('keydown', event => {
 window.addEventListener('keyup', event => {
   if (event.key === 'Enter' || event.key === ' ') interactionHeld = false;
 });
-$('restart').addEventListener('click', () => { match = null; $('battle').hidden = true; $('preparation').hidden = false; invalidate(); });
+$('restart').addEventListener('click', () => { match = null; $('battle').hidden = true; $('preparation').hidden = false; invalidate(); refreshFactoryUnlocks(); });
 function act(command) {
   if (paused) { $('notice').textContent = 'Continuá la partida para actuar.'; return; }
   const result = match.dispatch(0, command);
@@ -154,11 +238,11 @@ function renderBattle() {
   $('players').replaceChildren();
   state.players.forEach((player, index) => {
     const card = document.createElement('div'); card.className = 'card';
-    const title = document.createElement('h3'); title.textContent = index === 0 ? 'Vos' : 'Rival'; card.append(title);
+    const title = document.createElement('h3'); title.textContent = index === 0 ? 'Vos' : `Rival · ${BOT_ARCHETYPES[prepared?.botArchetype]?.name ?? 'Equilibrado'}`; card.append(title);
     const meter = document.createElement('meter'); meter.min = 0; meter.max = match.config.coreHP; meter.value = player.core; meter.setAttribute('aria-label', 'Vida del núcleo'); card.append(meter);
     card.append(paragraph(`Núcleo ${Math.ceil(player.core)} · Escudo ${Math.ceil(player.shields.reduce((total, shield) => total + shield.capacity * (1 - shield.weakening), 0))}`));
     card.append(paragraph(`Créditos ${Math.floor(player.credits)} · Energía ${player.energy.toFixed(1)} · Nodo +${player.extracted.toFixed(1)}/${match.config.nodeEnergyCap}`));
-    card.append(paragraph(`Bonus fijo: ${BONUSES[player.bonus].name} · Nivel ${player.level + 1} · Fábricas ${player.factories} · Ingreso ${match.income(index).toFixed(1)}/s`, 'hint'));
+    card.append(paragraph(`Bonus fijo: ${BONUSES[player.bonus].name} · Economía nivel ${player.level + 1} · Ingreso ${match.income(index).toFixed(1)}/s`, 'hint'));
     for (const family of FAMILIES) card.append(paragraph(`${names[family]}: ${player.active[family].map(id => CATALOG[family][id].name).join(' + ')}`, 'hint'));
     if (player.emergencyArmed) card.append(paragraph('Escudo de emergencia armado: espera el umbral de vida.', 'hint'));
     if (player.effects.length) card.append(paragraph(`Interferencias: ${player.effects.map(effect => `${effectNames[effect.kind]}${effect.family ? ` (${names[effect.family]}${effect.slot !== undefined ? ` ${effect.slot + 1}` : ''})` : ''}${effect.remaining !== null ? ` ${Math.ceil(effect.remaining)} s` : ''}`).join(', ')}`, 'hint'));
@@ -201,7 +285,7 @@ function renderBattle() {
     else if (!p.reserve[family].length) card.append(paragraph('Sin reserva disponible: esta familia no se puede reconfigurar.', 'hint'));
     $('actions').append(card);
   }
-  $('economy-actions').replaceChildren(actionButton('Mejorar economía', { type: 'upgrade' }), actionButton('Construir fábrica', { type: 'factory' }), actionButton('Enviar 1 guardián', { type: 'guardians', count: 1 }), actionButton('Enviar 3 guardianes', { type: 'guardians', count: 3 }));
+  $('economy-actions').replaceChildren(actionButton('Mejorar economía', { type: 'upgrade' }), actionButton('Enviar 1 guardián', { type: 'guardians', count: 1 }), actionButton('Enviar 3 guardianes', { type: 'guardians', count: 3 }));
   $('events').replaceChildren();
   for (const event of state.events.slice(-12).reverse()) {
     const line = document.createElement('li'), who = event.player === null ? '' : event.player === 0 ? 'Vos' : 'Rival';

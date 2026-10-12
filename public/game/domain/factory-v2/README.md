@@ -83,7 +83,11 @@ Las investigaciones dan alternativas con ventajas y compensaciones. Más Prestig
 }
 ```
 
-La pantalla permite copiar este JSON. **Arena v2 todavía no lo lee**: el enlace abre su práctica actual, sin sincronizar selecciones o investigaciones. La integración debe filtrar opciones elegibles conservando bloqueos, selección y límites de acciones de cada partida.
+La pantalla permite copiar este JSON. **Arena v2 lee automáticamente el guardado local validado** mediante `decodeSave` y `exportUnlocks`. Al preparar la partida, ofrece el arsenal inicial más tus investigaciones permanentes; el bot elige entre las mismas opciones. Las listas son 4/4/3, o 5/5/4 si el bonus de reserva elegido y las investigaciones disponibles permiten una opción extra; el bloqueo puede elegir cualquier ID conocido del catálogo, aunque no esté investigado.
+
+Ambas páginas deben abrirse desde el mismo origen web y navegador. Sin guardado, Arena ofrece el arsenal inicial. Si el guardado es inválido, incompatible o inaccesible, muestra un aviso y usa el arsenal inicial; nunca escribe ni borra datos de la fábrica. La disponibilidad se congela al resolver bloqueos y se pasa a la vista previa y al motor mediante `unlocks`. Cambiar el guardado desde otra pestaña se aplica a la próxima preparación, sin modificar la ya resuelta ni un combate iniciado.
+
+La Megafábrica produce recursos industriales y desbloquea alternativas entre partidas. Dentro de Arena, «Mejorar economía» aumenta el nivel de ingresos usando Créditos del combate; ese nivel termina con la partida. No lleva recursos industriales al PvP ni modifica el ciclo persistente.
 
 ## API y guardado
 
@@ -127,8 +131,8 @@ Referencias de la implementación inicial; los rangos pueden cambiar al editar.
 
 ## Estado y trabajo pendiente
 
-Implementado: ciclo local completo de producción → decisiones económicas → proyecto/misiones → Prestigio → investigación permanente → nuevo ciclo; guardado aislado y export de opciones.
+Implementado: ciclo local completo de producción → decisiones económicas → proyecto/misiones → Prestigio → investigación permanente → nuevo ciclo; guardado aislado, export de opciones y lectura local en la preparación de Arena v2.
 
-Pendiente de integración: usar esta fábrica desde el juego principal, leer sus opciones en la preparación de Arena, migrar saves previos con reglas explícitas, sincronizar con cuentas/servidor y verificar autoridad de recompensas. También quedan políticas de automatización de contratos, especializaciones, capacidad industrial, prestigio con legados industriales, colección visual, civilizaciones, temporadas y proyectos colectivos. Son ampliaciones de la propuesta; no existen en esta práctica.
+Pendiente de integración: usar esta fábrica desde el juego principal, migrar saves previos con reglas explícitas, sincronizar con cuentas/servidor y verificar autoridad de recompensas. La conexión actual solo comparte el guardado local de las dos prácticas v2; no sincroniza cuentas ni dispositivos. También quedan políticas de automatización de contratos, especializaciones, capacidad industrial, prestigio con legados industriales, colección visual, civilizaciones, temporadas y proyectos colectivos. Son ampliaciones de la propuesta; no existen en esta práctica.
 
 Pendiente de validación: balance y tiempos, flujo completo en navegador, móvil, accesibilidad y persistencia concurrente. Se realizaron checks de sintaxis ESM de los cuatro módulos JavaScript; no se añadieron ni ejecutaron pruebas automatizadas ni se afirma verificación visual.

@@ -1,4 +1,4 @@
-import { BALANCE, BONUSES, CATALOG, FAMILIES, LIST_COUNTS, SLOT_COUNTS, defaultLoadout } from './balance.js';
+import { BALANCE, BONUSES, CATALOG, FAMILIES, SLOT_COUNTS, availableCountsForBonus, candidateCountsForBonus, defaultLoadout } from './balance.js';
 
 const clone = value => JSON.parse(JSON.stringify(value));
 const validPlayer = index => index === 0 || index === 1;
@@ -8,18 +8,21 @@ export function resolveLoadout(loadout, incomingBans = {}, unlocks = null) {
   if (!loadout || !Object.hasOwn(BONUSES, loadout.bonus)) throw new Error('Bonus inválido.');
   if (unlocks && (!Array.isArray(unlocks.bonuses) || !unlocks.bonuses.includes(loadout.bonus))) throw new Error('Bonus no investigado.');
   const resolved = { bonus: loadout.bonus, candidates: {}, active: {}, reserve: {} };
+  const requiredCounts = candidateCountsForBonus(loadout.bonus);
+  const maxAvailableCounts = availableCountsForBonus(loadout.bonus);
   for (const family of FAMILIES) {
     const list = loadout.candidates?.[family];
-    if (!Array.isArray(list) || list.length !== LIST_COUNTS[family] || new Set(list).size !== list.length) {
+    if (!Array.isArray(list) || list.length !== requiredCounts[family] || new Set(list).size !== list.length) {
       throw new Error(`Lista inválida: ${family}.`);
     }
     if (list.some(id => !Object.hasOwn(CATALOG[family], id) || (unlocks && !unlocks[family]?.includes(id)))) {
       throw new Error(`Opción no investigada o desconocida: ${family}.`);
     }
+    if (unlocks && (unlocks[family]?.length ?? 0) < requiredCounts[family]) throw new Error(`Falta investigar una opción adicional: ${family}.`);
     const ban = incomingBans[family];
     if (ban != null && !Object.hasOwn(CATALOG[family], ban)) throw new Error(`Bloqueo inválido: ${family}.`);
-    const available = list.filter(id => id !== ban).slice(0, 3);
-    const slots = SLOT_COUNTS[family] + (BONUSES[loadout.bonus].extraFamily === family ? 1 : 0);
+    const available = list.filter(id => id !== ban).slice(0, maxAvailableCounts[family]);
+    const slots = SLOT_COUNTS[family];
     resolved.candidates[family] = available;
     resolved.active[family] = available.slice(0, slots);
     resolved.reserve[family] = available.slice(slots);
@@ -28,13 +31,13 @@ export function resolveLoadout(loadout, incomingBans = {}, unlocks = null) {
 }
 
 function validateConfig(config) {
-  for (const key of ['duration', 'tick', 'coreHP', 'swapCost', 'swapDuration', 'nodeControlSeconds', 'guardianTravel', 'guardianCooldown', 'guardianCost', 'factoryCost']) {
+  for (const key of ['duration', 'tick', 'coreHP', 'swapCost', 'swapDuration', 'nodeControlSeconds', 'guardianTravel', 'guardianCooldown', 'guardianCost']) {
     if (!Number.isFinite(config[key]) || config[key] <= 0) throw new Error(`Configuración inválida: ${key}.`);
   }
-  for (const key of ['startingEnergy', 'nodeEnergyCap', 'startingCredits', 'factoryIncome', 'maxShield']) {
+  for (const key of ['startingEnergy', 'nodeEnergyCap', 'startingCredits', 'maxShield']) {
     if (!Number.isFinite(config[key]) || config[key] < 0) throw new Error(`Configuración inválida: ${key}.`);
   }
-  for (const key of ['maxFactories', 'maxGuardiansPerSend']) {
+  for (const key of ['maxGuardiansPerSend']) {
     if (!Number.isInteger(config[key]) || config[key] < 1) throw new Error(`Configuración inválida: ${key}.`);
   }
   if (!Array.isArray(config.incomeLevels) || !config.incomeLevels.length || config.incomeLevels.some(n => !Number.isFinite(n) || n < 0) ||
@@ -58,7 +61,7 @@ export class ArenaMatch {
         return {
           ...resolved,
           core: this.config.coreHP, credits: this.config.startingCredits + (resolved.bonus === 'treasury' ? 80 : 0), energy: this.config.startingEnergy,
-          extracted: 0, controlSeconds: 0, level: 0, factories: 1, peacefulSeconds: 0,
+          extracted: 0, controlSeconds: 0, level: 0, peacefulSeconds: 0,
           changed: Object.fromEntries(FAMILIES.map(f => [f, false])),
           cooldowns: Object.fromEntries(FAMILIES.map(f => [f, Array(resolved.active[f].length).fill(0)])),
           pending: null, shields: [], effects: [], guardianCooldown: 0,
@@ -88,12 +91,13 @@ export class ArenaMatch {
 
   income(index) {
     const p = this.state.players[index];
-    let multiplier = p.bonus === 'expansion' && this.state.time < 90 ? 1.2 : 1;
-    if (p.bonus === 'sustained') multiplier = 1.15;
+    let multiplier = p.bonus === 'sustained' ? 1.15 : 1;
     if (p.bonus === 'compound') multiplier += Math.min(0.35, p.peacefulSeconds * 0.0012);
     for (const effect of p.effects) if (effect.kind === 'income') multiplier *= 1 - effect.penalty;
-    const industrial = p.effects.find(effect => effect.kind === 'factoryIncome');
-    return (this.config.incomeLevels[p.level] + (p.factories - 1) * this.config.factoryIncome * (industrial ? 1 - industrial.penalty : 1)) * multiplier;
+    const industrial = p.effects.find(effect => effect.kind === 'economicIncome');
+    const baseIncome = this.config.incomeLevels[0];
+    const upgradeIncome = this.config.incomeLevels[p.level] - baseIncome;
+    return (baseIncome + upgradeIncome * (industrial ? 1 - industrial.penalty : 1)) * multiplier;
   }
 
   quote(index, command) {
@@ -122,19 +126,16 @@ export class ArenaMatch {
         const { family, slot, variant } = command;
         if (!FAMILIES.includes(family) || !Number.isInteger(slot) || !p.active[family][slot] || !p.reserve[family].includes(variant)) return { ok: false, error: 'Reemplazo inválido.' };
         if (p.changed[family] || p.pending) return { ok: false, error: 'Familia ya cambiada o cambio en curso.' };
-        energy = c.swapCost;
+        energy = BONUSES[p.bonus].swapCost ?? c.swapCost;
         break;
       }
-      case 'upgrade':
+      case 'upgrade': {
         if (p.level >= c.incomeLevels.length - 1) return { ok: false, error: 'Economía al máximo.' };
         credits = c.upgradeCosts[p.level] * (p.bonus === 'efficiency' ? 0.88 : 1);
-        break;
-      case 'factory':
-        if (p.factories >= c.maxFactories) return { ok: false, error: 'Máximo de fábricas.' };
-        credits = c.factoryCost * (p.bonus === 'efficiency' ? 0.88 : 1);
-        const friction = p.effects.find(effect => effect.kind === 'nextFactory');
+        const friction = p.effects.find(effect => effect.kind === 'nextUpgrade');
         if (friction) credits *= 1 + friction.penalty;
         break;
+      }
       case 'guardians':
         if (!Number.isInteger(command.count) || command.count < 1 || command.count > c.maxGuardiansPerSend) return { ok: false, error: 'Cantidad de guardianes inválida.' };
         if (p.guardianCooldown > 0) return { ok: false, error: 'Guardianes recargando.' };
@@ -153,10 +154,9 @@ export class ArenaMatch {
     const p = this.state.players[index];
     p.credits = Math.max(0, p.credits - result.credits);
     p.energy = Math.max(0, p.energy - result.energy);
-    if (command.type === 'upgrade') p.level++;
-    else if (command.type === 'factory') {
-      p.factories++;
-      p.effects = p.effects.filter(effect => effect.kind !== 'nextFactory');
+    if (command.type === 'upgrade') {
+      p.level++;
+      p.effects = p.effects.filter(effect => effect.kind !== 'nextUpgrade');
     }
     else if (command.type === 'swap') {
       p.changed[command.family] = true;

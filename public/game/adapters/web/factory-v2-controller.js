@@ -70,7 +70,7 @@ function render() {
   setHTML('missions', missions(state).map(item => `<div class="mission">${item.name}: ${item.progress}/${item.target}<progress value="${item.progress}" max="${item.target}" aria-label="${item.name}"></progress></div>`).join(''));
   $('open-prestige').disabled = !canPrestige(state);
   $('prestige-reason').textContent = availableResearch(state).length === 0 ? 'Completaste el catálogo de investigaciones. No hay nuevos Prestigios disponibles en esta práctica.' : canPrestige(state) ? 'Cumpliste todas las misiones. Podés elegir una investigación nueva y comenzar otro ciclo.' : 'Completá las tres misiones para desbloquear el Prestigio.';
-  setHTML('collection', `<p>Arsenal inicial gratuito: 4 cohetes, 4 defensas, 3 sabotajes y Expansión. No cuenta como recompensa de Prestigio.</p>${Object.entries(FAMILY_NAMES).map(([family, label]) => {
+  setHTML('collection', `<p>Arsenal inicial gratuito: 4 cohetes, 4 defensas, 3 sabotajes y Reconfiguración eficiente. No cuenta como recompensa de Prestigio.</p>${Object.entries(FAMILY_NAMES).map(([family, label]) => {
     const gained = state.permanent.research.filter(key => RESEARCH[key].family === family);
     return `<div class="collection-group"><h3>${label}</h3><p class="muted">Iniciales: ${BASE_ARSENAL[family].map(id => escape(ARSENAL_OPTIONS[family][id].name)).join(', ')}</p>${gained.length ? `<ul>${gained.map(key => `<li><strong>${escape(RESEARCH[key].name)}</strong> — ${escape(RESEARCH[key].detail)}</li>`).join('')}</ul>` : '<p>Todavía no ganaste investigaciones de esta familia.</p>'}</div>`;
   }).join('')}`);
@@ -105,7 +105,7 @@ $('research-choice').addEventListener('change', researchDetail);
 $('cancel-prestige').addEventListener('click', () => $('prestige-dialog').close());
 $('prestige-form').addEventListener('submit', event => { event.preventDefault(); dispatch({ type: 'prestige', research: $('research-choice').value }); });
 $('copy-unlocks').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('unlocks').value); announce('Opciones copiadas. Arena todavía requiere integrar este formato.'); }
+  try { await navigator.clipboard.writeText($('unlocks').value); announce('Opciones copiadas. Arena v2 las incorpora automáticamente en la próxima preparación desde el mismo sitio y navegador.'); }
   catch { $('unlocks').focus(); $('unlocks').select(); announce('Seleccionamos el texto. Podés copiarlo manualmente.'); }
 });
 $('reload-save').addEventListener('click', load);

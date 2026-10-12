@@ -9,24 +9,25 @@
 <body>
   <main>
     <header><h1>Arena nueva</h1><a href="arena.html">Abrir Arena actual</a></header>
-    <p class="intro">Práctica local contra bot. Ordená tus opciones y bloqueá una de cada familia del rival. Las investigaciones están habilitadas para probar el diseño; esta práctica no da premios.</p>
+    <p class="intro">Práctica local contra bot. La <a href="factory-v2.html">Megafábrica nueva</a> desbloquea opciones al prestigiar. Ordená tu arsenal disponible y bloqueá una opción por familia del rival. Esta práctica no da premios.</p>
     <section id="preparation" aria-labelledby="prep-title">
       <h2 id="prep-title">Prepará tu plan</h2>
-      <p>Elegí y ordená 4 de los 10 cohetes, 4 de las 10 defensas y 3 de los 10 sabotajes. Tras los bloqueos, los primeros dos cohetes y defensas quedan activos y el tercero es reserva. En sabotaje: primero activo y los restantes reserva. Un bloqueo que no coincida no afecta tu lista.</p>
+      <p id="factory-sync-status" role="status" aria-live="polite"></p>
+      <p>Primero elegí un bonus, que quedará fijo durante toda la partida. Después ordená 4 cohetes, 4 defensas y 3 sabotajes (o una opción más en la familia elegida por un bonus de reserva). En cohetes y defensas, la cuarta opción reemplaza una bloqueada entre las primeras tres. En sabotajes se conservan hasta los tres elegidos. Un bonus de reserva requiere una variante investigada más. Los activos siempre son 2 cohetes, 2 defensas y 1 sabotaje.</p>
+      <label>Bonus fijo de la partida <select id="bonus"></select></label>
+      <p id="bonus-detail" class="hint"></p>
       <div id="loadout" class="families"></div>
+      <label>Estilo del rival <select id="bot-style" aria-describedby="bot-style-detail"></select></label>
+      <p id="bot-style-detail" class="hint"></p>
       <label>Semilla del rival <input id="seed" type="number" min="1" max="4294967295" value="17"></label>
       <button id="prepare">Resolver bloqueos</button>
       <div id="preview" hidden></div>
-      <div id="bonus-choice" hidden>
-        <label>Bonus permanente <select id="bonus"></select></label>
-        <p id="bonus-detail"></p>
-        <p class="hint">Elegís uno al empezar y queda fijo toda la partida. Un espacio extra activa una opción adicional; si ocupa toda la reserva de esa familia, no podrás reconfigurarla.</p>
-      </div>
       <button id="start" hidden>Empezar partida</button>
     </section>
     <section id="battle" hidden aria-labelledby="battle-title">
       <h2 id="battle-title">Partida</h2>
-      <p class="hint">Cada acción cuesta Créditos. Cada familia puede cambiarse una vez por 40 Energía, con reserva disponible. Empezás con 100 Energía; el nodo aporta hasta 20 más por control acumulado. El bonus permanece fijo.</p>
+      <p class="hint">Cada acción cuesta Créditos. Podés cambiar cada familia una vez por 40 Energía (35 con Reconfiguración eficiente), siempre que tengas una reserva. Empezás con 100 Energía; el nodo puede aportar hasta 20 más. El bonus queda fijo.</p>
+      <p class="hint">Mejorar economía aumenta tus ingresos de Créditos por segundo durante esta partida. Tus recursos industriales quedan en la Megafábrica; solo sus opciones investigadas pasan a la preparación de Arena.</p>
       <div class="topline"><strong id="clock"></strong><span id="node"></span><button id="pause">Pausar</button><button id="restart">Nueva partida</button></div>
       <div id="players" class="players"></div>
       <p id="flights"></p>
