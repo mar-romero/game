@@ -1,40 +1,39 @@
 # Arquitectura y guía para desarrolladores
 
-Factory Wars es un juego de estrategia de partidas cortas. El jugador desarrolla una Megafábrica persistente, elige una civilización e investigaciones y usa esos desbloqueos durante combates de Arena. Hay partidas contra bots, simulaciones, Liga local de diez participantes y sincronización opcional con Supabase.
+Factory Wars mantiene tres superficies activas: el cliente Unity 6, la Megafábrica web 3.1 y Arena web V2. Arena V2 es práctica local contra bot; el servidor conserva matchmaking y ranking del runtime anterior. La web V1 está archivada en `archive/v1/public/` porque el runtime del servidor aún carga esas reglas por compatibilidad. Ver [ARCHIVE_V1.md](ARCHIVE_V1.md).
 
 ## Primer recorrido por el código
 
 El mapa visual del flujo del jugador y sus dependencias está en [GAME_FLOW.md](GAME_FLOW.md).
 
-1. Abrí `public/index.html`: es la entrada pública de la Megafábrica.
-2. Seguí `game/adapters/web/empire-controller.js`: coordina la pantalla, el estado local, investigación, contratos, prestigio y Liga.
-3. La Arena aparece en un iframe desde `public/arena.html`, que carga estilos, configuración, aleatoriedad y el runtime.
-4. `game/domain/arena/match-engine.js` contiene el estado y las reglas base de `Match`; `game/adapters/web/arena-core-runtime.js` conecta la partida con la interfaz.
-5. Los archivos `game/adapters/web/arena-production-system.js`, `arena-balance-overrides.js`, `arena-experience-lab.js` y `arena-league-bridge.js` cargan en ese orden sus capas de compatibilidad. `arena-tech.js` agrega mejoras de fábrica y reglas de guardianes después de definir `Match`.
-6. `game/adapters/persistence/arena-online.js` sincroniza perfiles, partidas y recompensas de Arena. `game/adapters/web/empire-controller.js` mantiene su propio flujo de sincronización del Imperio.
-7. `game/domain/arena/industrial-modules.js` contiene los datos de módulos de Arena; sus efectos aún se conectan desde adapters.
-8. `game/domain/empire/catalog.js` contiene civilizaciones, edificios, investigaciones y rutas; `game/domain/empire/economy.js` calcula producción persistente. El controlador activo usa ambos.
-9. `supabase/schema.sql` define tablas, vistas, funciones RPC y políticas. `supabase/migrations/` actualiza bases ya existentes.
-10. `analytics/arena_bot_interactions.js` usa el motor de Arena en navegador. `analytics/balance_simulation.py` es otro simulador aproximado; no confundir sus resultados.
+1. Unity abre el cliente móvil desde `unity/FactoryWars.Unity6/`.
+2. `public/index.html` permite elegir Megafábrica 3.1 o Arena V2 en navegador.
+3. `public/game/adapters/web/factory-v2-controller.js` coordina producción, proyectos, contratos, misiones y prestigio.
+4. `public/game/domain/factory-v2/` contiene catálogo, economía incremental, progresión y guardado local de Megafábrica 3.1.
+5. `public/game/adapters/web/arena-v2-controller.js` conecta la preparación, los bloqueos, los bonus y el combate local.
+6. `public/game/domain/arena-v2/` contiene el motor y balance de Arena V2; `public/game/application/arena-v2-bot.js` implementa el rival de práctica.
+7. El README de Unity describe sus pantallas, recursos y límites de integración.
+8. El runtime online clásico sigue aislado en `server/src/game/arena-runtime.js` y lee sus reglas V1 desde `archive/v1/public/`.
 
-El orden de los scripts de `arena.html` es parte del runtime: configuración y aleatoriedad, motor, campaña, control de Arena, sistemas históricos, Liga, tecnología, Supabase/configuración y sincronizador. Los scripts de compatibilidad son clásicos y síncronos para conservar el orden y los nombres globales actuales.
+Las aplicaciones web activas usan módulos ES. El orden clásico de los scripts de Arena V1 se conserva dentro de `archive/v1/public/arena.html`; el servidor V1 sigue cargando esas mismas capas desde allí.
 
 ## Estructura activa
 
 ```text
 public/
-  index.html                         Entrada de Megafábrica
-  arena.html                         Entrada de Arena; conserva URL para automatización
+  index.html                         Selector de Megafábrica 3.1 y Arena V2
+  factory-v2.html                    Megafábrica web 3.1
+  arena-v2.html                      Arena V2, práctica local contra bot
   game/
-    domain/                          Datos y reglas independientes de UI
-      arena/match-engine.js          Estado, acciones, bots y resolución de partida
-      arena/industrial-modules.js    Catálogo de módulos Arena
-      empire/                         Catálogos, producción y progresión de Megafábrica
-    application/                     Próxima extracción: casos de uso y sesiones
+    domain/
+      arena-v2/                      Reglas y balance del combate V2
+      factory-v2/                    Catálogo, progreso y guardado de fábrica V2
+    application/
+      arena-v2-bot.js                Rival de práctica reproducible
     ports/                           Próxima extracción: contratos de servicios
     adapters/
       web/                           Controladores, runtime y puente de navegador
-      persistence/                   Persistencia/sync existente
+      persistence/                   Integraciones históricas; no usadas por V2
       platform/                      Punto futuro para SDKs nativos
     presentation/
       styles/                        CSS por pantalla
@@ -43,14 +42,15 @@ public/
     platforms/
       web/ mobile/ desktop/ server/  Puntos de composición por plataforma
     shared/                          Código compartido que no es regla de juego
-legacy/v1.6/                         Snapshot sin modificar de los 38 archivos versionados
+archive/v1/public/                   Aplicación web V1; fuera de lo publicado por Pages
+archive/legacy-v1.6/                 Snapshot histórico anterior
 docs/                                Diseño, operaciones y guía de arquitectura
-analytics/                           Simulación y reportes de balance
+archive/analytics-v1/                Simulación y reportes históricos V1
 supabase/                            Esquema, vistas, RPC y migraciones
 tests/                               Lugar para pruebas automatizadas futuras
 ```
 
-Las páginas HTML siguen en la raíz de `public/` para que no cambien las URLs usadas por Pages, el iframe y las simulaciones. Los estilos y scripts ya viven bajo `public/game/`, agrupados por responsabilidad. La entrada web incluye una PWA instalable (`public/manifest.webmanifest` y `public/service-worker.js`); el manifest, el service worker y sus assets usan rutas relativas para que funcionen bajo el prefijo de GitHub Pages. Esto comparte la interfaz web en navegador y pantalla de inicio, pero no crea un binario nativo ni una publicación en tiendas. Las carpetas que todavía no tienen implementación están marcadas con una guía `README.md`; son espacios de destino, no funcionalidades ya migradas.
+Las páginas web activas están en la raíz de `public/`. La PWA usa rutas relativas para funcionar bajo el prefijo de GitHub Pages. El archivo V1 queda fuera de `public/`, aunque sus reglas siguen incluidas en el servidor para compatibilidad. Unity es un cliente separado; su código fuente y recursos están bajo `unity/FactoryWars.Unity6/`.
 
 ## Dependencias objetivo
 
@@ -70,17 +70,13 @@ adapters (browser, local save, Supabase, native SDKs)
 
 Las dependencias deben apuntar hacia el dominio. El dominio no debe importar el DOM, `localStorage`, Supabase, Three.js ni SDKs de tiendas. La aplicación coordina casos de uso a través de interfaces; cada plataforma conecta esas interfaces con sus servicios concretos.
 
-## Qué sigue siendo transitorio
+## Límites actuales de la web
 
-- `match-engine.js` es la implementación base del dominio Arena y no usa DOM ni storage. Expone temporalmente `window.Match` para los adaptadores antiguos.
-- `empire/economy.js` implementa producción y multiplicadores persistentes; `empire/progression.js` implementa puntuación, prestigio, costos, contratos y maestría como funciones puras. La aplicación todavía llama estas reglas desde un controlador web, y queda extraer las transiciones y flujos restantes.
-- `arena-config.js` y `random.js` exponen `window.FactoryWars` como puente porque los adaptadores actuales usan scripts clásicos. Las nuevas reglas no deben agregar más globals.
-- Las capas `arena-production-system.js`, `arena-balance-overrides.js` y `arena-tech.js` contienen reglas mezcladas con la interfaz y siguen extendiendo `Match.prototype`; deben convertirse en sistemas explícitos.
-- `arena-core-runtime.js` aún combina estado de pantalla, renderizado, input, sonidos, reloj y coordinación de partida.
-- `arena-experience-lab.js` y `arena-league-bridge.js` conservan telemetría y mensajes de integración dentro del adaptador web.
-- `empire-controller.js` combina estado, reglas y renderizado de la Megafábrica.
-- La sincronización online está repartida entre el controlador del Imperio, el sincronizador de Arena y el cliente Supabase. Debe converger en adaptadores de persistencia.
-- No hay hoy un build TypeScript, app móvil nativa, app Steam ni servidor autoritativo. La PWA cubre la instalación de la web; Capacitor y las compilaciones nativas siguen reservados para trabajo futuro.
+- `factory-v2-controller.js` sigue coordinando DOM, `localStorage` y el reloj de navegador; las reglas del ciclo están en `factory-v2/factory-engine.js`.
+- Arena V2 se ejecuta localmente contra un bot; no conecta cuentas, Liga, partidas online ni recompensas.
+- El estado web se guarda únicamente en el navegador. El cliente Unity mantiene una implementación C# separada y no comparte estado ni reglas con estos motores.
+- El servidor online conserva las reglas V1 como compatibilidad; la interfaz V1 archivada no forma parte de los archivos públicos de Pages.
+- No hay un build TypeScript ni una publicación móvil nativa.
 
 ## Contratos que deben guiar el diseño
 
@@ -92,7 +88,7 @@ Las dependencias deben apuntar hacia el dominio. El dominio no debe importar el 
 - **Balance separado:** extraer reglas conserva los valores existentes. Ajustes de balance deben ser cambios distintos y citar la simulación usada.
 - **Compatibilidad de saves:** cada cambio de formato conserva una migración desde las claves actuales de `localStorage` y los registros Supabase.
 
-Para el procedimiento de creación de archivos, dependencias y revisión de cambios, seguir `docs/FILE_CONVENTIONS.md`. Para el orden de migración y criterios de paridad, ver `docs/MIGRATION_PLAN.md`.
+Para el procedimiento de creación de archivos, dependencias y revisión de cambios, seguir `docs/FILE_CONVENTIONS.md`. El plan histórico de migración web V1 se conserva en `archive/docs-v1.6/MIGRATION_PLAN.md`.
 
 
-El plan de migración a Android e iOS está en [sprints de migración móvil](sprint/SPRINTS_MIGRACION_MOBILE.md); la tarea y sus criterios de aceptación están en [TAREA_MIGRACION_MOBILE.md](tarea/TAREA_MIGRACION_MOBILE.md).
+Las instrucciones vigentes para abrir y compilar el cliente móvil están en [README de Unity](../unity/FactoryWars.Unity6/README.md). Los planes móviles anteriores se conservaron en `archive/docs-v1.6/`.

@@ -1,3 +1,5 @@
-# Adaptadores web
+# Adaptadores web activos
 
-Código que conecta el juego con el navegador: controladores, scripts clásicos, DOM y configuración web. `campaign-lab.js` conserva la campaña visual histórica; `arena-core-runtime.js` coordina la pantalla y la sesión; los archivos `arena-*` contienen extensiones históricas en el orden indicado por `arena.html`; `empire-controller.js` coordina la pantalla de Imperio. El motor base está en `domain/arena/match-engine.js`. No agregues reglas nuevas aquí: las extensiones existentes se reemplazarán por sistemas del dominio.
+Esta carpeta contiene los controladores de Arena v2 y Megafábrica v2, además del registro de la PWA. Las dos pantallas cargan como módulos ES independientes y usan reglas de `domain/arena-v2/` y `domain/factory-v2/`.
+
+Los adaptadores clásicos de Arena, Liga, sincronización online y Megafábrica V1 se conservan en `archive/v1/public/game/adapters/web/`; no forman parte del sitio activo. El servidor de Arena V1 los carga desde el archivo para mantener su compatibilidad.

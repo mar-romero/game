@@ -1,19 +1,24 @@
-const CACHE_NAME = 'factory-wars-shell-v1';
+const CACHE_NAME = 'factory-wars-v2-shell-v1';
 const APP_ROOT = new URL('./', self.registration.scope);
 const APP_SHELL = [
   'index.html',
+  'arena-v2.html',
+  'factory-v2.html',
   'manifest.webmanifest',
   'icons/icon-192.jpg',
   'icons/icon-512.jpg',
   'icons/apple-touch-icon.png',
-  'game/presentation/styles/empire.css',
-  'game/presentation/assets/empire-island-mobile.jpg',
-  'game/adapters/web/config.js',
   'game/adapters/web/pwa-register.js',
-  'game/domain/empire/catalog.js',
-  'game/domain/empire/economy.js',
-  'game/domain/empire/progression.js',
-  'game/adapters/web/empire-controller.js'
+  'game/adapters/web/arena-v2-controller.js',
+  'game/adapters/web/factory-v2-controller.js',
+  'game/application/arena-v2-bot.js',
+  'game/domain/arena-v2/balance.js',
+  'game/domain/arena-v2/match-engine.js',
+  'game/domain/factory-v2/catalog.js',
+  'game/domain/factory-v2/factory-engine.js',
+  'game/domain/factory-v2/save-format.js',
+  'game/presentation/styles/arena-v2.css',
+  'game/presentation/styles/factory-v2.css'
 ].map((path) => new URL(path, APP_ROOT).href);
 
 self.addEventListener('install', (event) => {
@@ -28,7 +33,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(keys
-        .filter((key) => key.startsWith('factory-wars-shell-') && key !== CACHE_NAME)
+        .filter((key) => key !== CACHE_NAME && (
+          key.startsWith('factory-wars-shell-') || key.startsWith('factory-wars-v2-shell-')
+        ))
         .map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
@@ -40,9 +47,13 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => {
-      if (url.pathname.endsWith('/arena.html')) return Response.error();
-      return caches.match(new URL('index.html', APP_ROOT).href);
+    event.respondWith(fetch(request).catch(async () => {
+      const cachedPage = await caches.match(request, { ignoreSearch: true });
+      if (cachedPage) return cachedPage;
+      if (url.pathname.endsWith('/') || url.pathname.endsWith('/index.html')) {
+        return caches.match(new URL('index.html', APP_ROOT).href) || Response.error();
+      }
+      return Response.error();
     }));
     return;
   }

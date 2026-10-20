@@ -1,6 +1,6 @@
-import { SAVE_KEY, RESOURCES, BUILDINGS, MAX_BUILDING_LEVEL, PROJECTS, CONTRACTS, FAMILY_NAMES, BASE_ARSENAL, ARSENAL_OPTIONS, RESEARCH } from '../../domain/factory-v2/catalog.js';
-import { createFactory, advanceFactory, executeCommand, productionRates, buildingCost, missingResources, missions, availableResearch, canPrestige, exportUnlocks } from '../../domain/factory-v2/factory-engine.js';
-import { decodeSave, encodeSave } from '../../domain/factory-v2/save-format.js';
+import { SAVE_KEY, RESOURCES, BUILDINGS, MAX_BUILDING_LEVEL, MAX_PRESTIGE_COUNT, PROJECTS, CONTRACTS, LEGACY_CONTRACT_IDS, PRESTIGE_ROUTES, PRODUCTION_MODES, MODE_COOLDOWN_MS, FAMILY_NAMES, BASE_ARSENAL, ARSENAL_OPTIONS, RESEARCH } from '../../domain/factory-v2/catalog.js';
+import { createFactory, advanceFactory, executeCommand, productionRates, buildingCost, projectCost, projectProgress, projectMultiplier, contractCost, contractReward, contractDuration, efficiencyMultiplier, costMultiplier, missingResources, missions, availableResearch, canPrestige, exportUnlocks } from '../../domain/factory-v2/factory-engine.js';
+import { decodeSave, encodeSave, legacyBackupPlan } from '../../domain/factory-v2/save-format.js';
 
 const $ = id => document.getElementById(id);
 const number = value => value.toLocaleString('es-AR', { maximumFractionDigits: 1 });
@@ -28,10 +28,19 @@ function load() {
     lastRaw = raw;
     const now = Date.now();
     const loaded = raw === null ? createFactory(now) : decodeSave(raw);
+    // Preserve the exact current V2 JSON even when an older backup exists.
+    if (raw !== null) {
+      const backup = legacyBackupPlan(raw, key => localStorage.getItem(key));
+      if (backup?.writeRequired) {
+        if (localStorage.getItem(SAVE_KEY) !== raw) throw new Error('El guardado cambió antes de respaldarlo. Volvé a cargar.');
+        localStorage.setItem(backup.key, backup.raw);
+        if (localStorage.getItem(backup.key) !== raw) throw new Error('No pudimos confirmar el respaldo V2.');
+      }
+    }
     const elapsed = now - loaded.savedAt;
     const next = advanceFactory(loaded, now);
     commit(next); blocked = false; $('storage-error').hidden = true; $('factory').hidden = false;
-    render(); announce(elapsed >= 5000 ? 'Bienvenido. Se acreditó tu producción acumulada (máximo 4 horas) y los contratos terminados.' : 'Elegí tu proyecto y decidí dónde invertir.');
+    render(); announce(elapsed >= 5000 ? 'Bienvenido. Se acreditó tu producción acumulada (máximo 4 horas) y los contratos terminados.' : 'Elegí una ruta industrial y organizá tu producción.');
   } catch (error) { storageError(`No podemos cargar o guardar la práctica. ${error.message}`); }
 }
 function setHTML(id, html) {
@@ -50,26 +59,36 @@ function affordable(cost) { return Object.keys(missingResources(state, cost)).le
 function render() {
   if (!state || blocked) return;
   const rates = productionRates(state);
-  $('cycle-label').textContent = `Ciclo ${state.permanent.prestigeCount + 1} · ${state.permanent.prestigeCount} Prestigios`;
+  const relativeAdvantage = (efficiencyMultiplier(state) / costMultiplier(state) - 1) * 100;
+  const reachedLimit = state.permanent.prestigeCount >= MAX_PRESTIGE_COUNT;
+  $('cycle-label').textContent = `${reachedLimit ? 'Límite de prestigios alcanzado' : `Ciclo ${state.permanent.prestigeCount + 1}`} · ${state.permanent.prestigeCount} prestigios · requisitos ×${number(costMultiplier(state))} · producción ×${number(efficiencyMultiplier(state))} · ventaja relativa +${number(relativeAdvantage)}%`;
+  const selectedRoute = state.cycle.route;
+  setHTML('routes', selectedRoute ? `<p class="notice">Ruta: <strong>${PRESTIGE_ROUTES[selectedRoute].name}</strong>. ${PRESTIGE_ROUTES[selectedRoute].detail}</p>` : Object.entries(PRESTIGE_ROUTES).filter(([id]) => id !== 'legacy').map(([id, item]) => `<article class="card"><h3>${item.name}</h3><p>${item.detail}</p><button id="route-${id}" data-action="chooseRoute" data-id="${id}">Elegir esta ruta</button></article>`).join(''));
+  const cooldown = state.cycle.modeChangedAt === null ? 0 : Math.max(0, Math.ceil((state.cycle.modeChangedAt + MODE_COOLDOWN_MS - state.savedAt) / 1000));
+  setHTML('modes', selectedRoute === 'legacy' ? '<p>Los modos de producción estarán disponibles después del Prestigio de este ciclo V2.</p>' : Object.entries(PRODUCTION_MODES).map(([id, item]) => `<article class="card"><h3>${item.name}${state.cycle.mode === id ? ' · ACTIVO' : ''}</h3><p>${item.detail}</p><button id="mode-${id}" data-action="setMode" data-id="${id}" ${id === state.cycle.mode || cooldown ? 'disabled' : ''}>${id === state.cycle.mode ? 'Modo activo' : cooldown ? `Disponible en ${cooldown}s` : `Activar ${item.name}`}</button></article>`).join(''));
   setHTML('resources', Object.entries(RESOURCES).map(([key, name]) => `<div class="resource"><span>${name}</span><strong>${number(state.cycle.resources[key])}</strong><small>+${number(rates[key])} / segundo</small></div>`).join(''));
   setHTML('buildings', Object.entries(BUILDINGS).map(([id, building]) => {
     const cost = buildingCost(state, id); const max = state.cycle.buildings[id] >= MAX_BUILDING_LEVEL;
-    return `<article class="card"><div class="card-top"><h3>${building.name}</h3><span>Nivel ${state.cycle.buildings[id]}</span></div><p>Produce ${RESOURCES[building.resource]} · ${number(rates[building.resource])}/s</p><p>${max ? 'Nivel máximo.' : `Costo: ${materials(cost)}<br>${shortage(cost)}`}</p><button id="upgrade-${id}" data-action="upgrade" data-id="${id}" ${max || !affordable(cost) ? 'disabled' : ''}>Mejorar ${building.name}</button></article>`;
+    return `<article class="card"><div class="card-top"><h3>${building.name}</h3><span>Nivel ${state.cycle.buildings[id]}</span></div><p>Produce ${RESOURCES[building.resource]} · ${number(rates[building.resource])}/s</p><p>${max ? 'Nivel máximo.' : `Costo: ${materials(cost)}<br>${shortage(cost)}`}</p><button id="upgrade-${id}" data-action="upgrade" data-id="${id}" ${!selectedRoute || max || !affordable(cost) ? 'disabled' : ''}>Mejorar ${building.name}</button></article>`;
   }).join(''));
   const project = state.cycle.project;
   if (project) {
     const definition = PROJECTS[project.id];
-    const canDeliver = Object.entries(definition.cost).some(([key, amount]) => amount > project.delivered[key] && state.cycle.resources[key] > 0);
-    setHTML('project', `<article class="card"><h3>${definition.name}</h3><p>${definition.detail}</p>${Object.entries(definition.cost).map(([key, amount]) => `<div class="mission">${RESOURCES[key]}: ${number(project.delivered[key])} / ${number(amount)}<progress value="${project.delivered[key]}" max="${amount}" aria-label="Entrega de ${RESOURCES[key]}"></progress></div>`).join('')}<p>${project.completed ? 'Terminado. Recompensa activa hasta el próximo Prestigio.' : 'Cada entrega aporta todo el material disponible que todavía necesita el proyecto. Guardá recursos si preferís invertirlos en otra cosa.'}</p>${project.completed ? '' : `<button id="deliver-project" data-action="deliverProject" ${canDeliver ? '' : 'disabled'}>Entregar materiales disponibles</button>`}</article>`);
+    const totalCost = projectCost(state, project.id);
+    const legacyProject = selectedRoute === 'legacy';
+    const canDeliver = Object.entries(totalCost).some(([key, amount]) => amount > project.delivered[key] && state.cycle.resources[key] > 0);
+    setHTML('project', `<article class="card"><h3>${definition.name}</h3><p>${legacyProject ? 'Recompensa industrial al completar todas las entregas de V2.' : definition.detail}</p><p><strong>Avance: ${number(projectProgress(state) * 100)}% · bonus actual: +${number((projectMultiplier(state) - 1) * 100)}%</strong> ${legacyProject ? '(recompensa al 100%)' : '(hitos: 25%, 60%, 100%)'}</p>${Object.entries(totalCost).map(([key, amount]) => `<div class="mission">${RESOURCES[key]}: ${number(project.delivered[key])} / ${number(amount)}<progress value="${project.delivered[key]}" max="${amount}" aria-label="Entrega de ${RESOURCES[key]}"></progress></div>`).join('')}<p>${project.completed ? 'Terminado. Bonificación máxima activa hasta el próximo Prestigio.' : legacyProject ? 'Cada entrega conserva los objetivos originales de V2. La bonificación se activa al completar el proyecto.' : 'Las entregas activan bonificaciones parciales al alcanzar 25% y 60%. Cada entrega aporta materiales disponibles.'}</p>${project.completed ? '' : `<button id="deliver-project" data-action="deliverProject" ${canDeliver ? '' : 'disabled'}>Entregar materiales disponibles</button>`}</article>`);
   } else {
-    setHTML('project', Object.entries(PROJECTS).map(([id, item]) => `<article class="card"><h3>${item.name}</h3><p>${item.detail}</p><p>Objetivo: ${materials(item.cost)}</p><button id="project-${id}" data-action="selectProject" data-id="${id}">Elegir ${item.name}</button></article>`).join(''));
+    setHTML('project', Object.entries(PROJECTS).map(([id, item]) => `<article class="card"><h3>${item.name}</h3><p>${selectedRoute === 'legacy' ? 'Recompensa industrial al completar todas las entregas de V2.' : item.detail}</p><p>Objetivo: ${materials(projectCost(state, id))}</p><button id="project-${id}" data-action="selectProject" data-id="${id}" ${!selectedRoute || (PRESTIGE_ROUTES[selectedRoute]?.project && PRESTIGE_ROUTES[selectedRoute].project !== id) ? 'disabled' : ''}>Elegir ${item.name}</button></article>`).join(''));
   }
   const contract = state.cycle.contract;
-  $('contract-status').textContent = contract ? `${CONTRACTS[contract.id].name} en curso · ${Math.max(0, Math.ceil((contract.endsAt - state.savedAt) / 1000))} s restantes. Recompensa: ${materials(CONTRACTS[contract.id].reward)}.` : 'Cola libre. La recompensa se acredita automáticamente.';
-  setHTML('contracts', Object.entries(CONTRACTS).map(([id, item]) => `<article class="card"><h3>${item.name} · ${item.duration} s</h3><p>${item.detail}<br>Entrega: ${materials(item.cost)}<br>Recibís: ${materials(item.reward)}</p><p>${shortage(item.cost)}</p><button id="contract-${id}" data-action="startContract" data-id="${id}" ${contract || !affordable(item.cost) ? 'disabled' : ''}>Iniciar ${item.name}</button></article>`).join(''));
+  $('contract-status').textContent = contract ? `${CONTRACTS[contract.id].name} en curso · ${Math.max(0, Math.ceil((contract.endsAt - state.savedAt) / 1000))} s restantes. Recompensa: ${materials(contractReward(state, contract.id))}.` : 'Cola libre. La recompensa se acredita automáticamente.';
+  setHTML('contracts', Object.entries(CONTRACTS).filter(([id]) => selectedRoute !== 'legacy' || LEGACY_CONTRACT_IDS.includes(id)).map(([id, item]) => { const cost = contractCost(state, id); return `<article class="card"><h3>${item.name} · ${contractDuration(state, id)} s</h3><p>${item.detail}<br>Entrega: ${materials(cost)}<br>Recibís: ${materials(contractReward(state, id))}</p><p>${shortage(cost)}</p><button id="contract-${id}" data-action="startContract" data-id="${id}" ${!selectedRoute || contract || !affordable(cost) ? 'disabled' : ''}>Iniciar ${item.name}</button></article>`; }).join(''));
+  $('series-status').textContent = selectedRoute === 'legacy' ? 'Las series de contratos estarán disponibles después del Prestigio de este ciclo V2.' : `Serie logística: ${state.cycle.contractTypes.length}/3 tipos de contrato diferentes. ${state.cycle.seriesCompleted ? '¡Bonus de 100 Créditos y 10 Intel (ampliados por experiencia industrial) cobrado!' : 'Al completar el tercero, cobrás un bonus extra una sola vez por ciclo.'}`;
   setHTML('missions', missions(state).map(item => `<div class="mission">${item.name}: ${item.progress}/${item.target}<progress value="${item.progress}" max="${item.target}" aria-label="${item.name}"></progress></div>`).join(''));
   $('open-prestige').disabled = !canPrestige(state);
-  $('prestige-reason').textContent = availableResearch(state).length === 0 ? 'Completaste el catálogo de investigaciones. No hay nuevos Prestigios disponibles en esta práctica.' : canPrestige(state) ? 'Cumpliste todas las misiones. Podés elegir una investigación nueva y comenzar otro ciclo.' : 'Completá las tres misiones para desbloquear el Prestigio.';
+  $('open-prestige').textContent = reachedLimit ? 'Límite de 100 prestigios alcanzado' : availableResearch(state).length ? 'Elegir investigación y prestigiar' : 'Prestigiar la fábrica';
+  $('prestige-reason').textContent = reachedLimit ? 'Alcanzaste los 100 prestigios. Podés seguir produciendo, mejorar edificios y completar contratos y proyectos. Todas tus investigaciones permanecen disponibles en Arena.' : canPrestige(state) ? (availableResearch(state).length ? 'Misiones cumplidas. Elegí una investigación para Arena y empezá el siguiente ciclo.' : 'Ya tenés todas las investigaciones PvP. Podés prestigiar para seguir mejorando solo la fábrica.') : selectedRoute === 'legacy' ? 'Completá las tres misiones originales de V2. Este ciclo conserva sus costos, producción y recompensas; las reglas V3.1 comienzan después de su Prestigio.' : 'Completá las misiones de tu ruta para desbloquear el Prestigio. Los requisitos suben 20% por ciclo; tu eficiencia industrial permanente también crece, con una ventaja acumulada limitada para preservar el desafío.';
   setHTML('collection', `<p>Arsenal inicial gratuito: 4 cohetes, 4 defensas, 3 sabotajes y Reconfiguración eficiente. No cuenta como recompensa de Prestigio.</p>${Object.entries(FAMILY_NAMES).map(([family, label]) => {
     const gained = state.permanent.research.filter(key => RESEARCH[key].family === family);
     return `<div class="collection-group"><h3>${label}</h3><p class="muted">Iniciales: ${BASE_ARSENAL[family].map(id => escape(ARSENAL_OPTIONS[family][id].name)).join(', ')}</p>${gained.length ? `<ul>${gained.map(key => `<li><strong>${escape(RESEARCH[key].name)}</strong> — ${escape(RESEARCH[key].detail)}</li>`).join('')}</ul>` : '<p>Todavía no ganaste investigaciones de esta familia.</p>'}</div>`;
@@ -94,11 +113,15 @@ $('factory').addEventListener('click', event => {
 });
 function researchDetail() {
   const item = RESEARCH[$('research-choice').value];
-  $('research-detail').textContent = item ? `${FAMILY_NAMES[item.family]} · ${item.name}: ${item.detail}` : '';
+  $('research-detail').textContent = item ? `${FAMILY_NAMES[item.family]} · ${item.name}: ${item.detail}` : 'Prestigio únicamente industrial: el progreso de Arena no cambia.';
 }
 $('open-prestige').addEventListener('click', () => {
   if (!state || blocked || !canPrestige(state)) return;
-  $('research-choice').innerHTML = Object.entries(FAMILY_NAMES).map(([family, name]) => `<optgroup label="${name}">${availableResearch(state).filter(([, item]) => item.family === family).map(([key, item]) => `<option value="${key}">${escape(item.name)}</option>`).join('')}</optgroup>`).join('');
+  const hasResearch = availableResearch(state).length > 0;
+  $('research-choice').hidden = !hasResearch;
+  $('research-label').hidden = !hasResearch;
+  $('research-choice').required = hasResearch;
+  $('research-choice').innerHTML = hasResearch ? Object.entries(FAMILY_NAMES).map(([family, name]) => `<optgroup label="${name}">${availableResearch(state).filter(([, item]) => item.family === family).map(([key, item]) => `<option value="${key}">${escape(item.name)}</option>`).join('')}</optgroup>`).join('') : '';
   researchDetail(); $('prestige-dialog').showModal();
 });
 $('research-choice').addEventListener('change', researchDetail);
@@ -117,7 +140,7 @@ $('download-save').addEventListener('click', () => {
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'factory-v2-guardado.json'; anchor.click(); URL.revokeObjectURL(url);
 });
 $('reset-save').addEventListener('click', () => {
-  if (!window.confirm('¿Reiniciar solamente esta práctica? Se perderán su fábrica y sus investigaciones permanentes. El juego principal conserva sus datos.')) return;
+  if (!window.confirm('¿Reiniciar Megafábrica V3? Se perderán la fábrica y las investigaciones permanentes de esta práctica. El respaldo de V2, si existe, se conserva.')) return;
   try {
     const fresh = createFactory(Date.now()); const raw = encodeSave(fresh);
     localStorage.setItem(SAVE_KEY, raw); lastRaw = raw; state = fresh; blocked = false;

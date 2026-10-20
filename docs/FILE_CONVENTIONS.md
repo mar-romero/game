@@ -17,7 +17,7 @@ Estas reglas mantienen el árbol comprensible mientras la implementación actual
 | Código técnico común que no es regla ni plataforma | `public/game/shared/` |
 | Pruebas y fixtures | `tests/<unit|integration|fixtures>/` |
 
-Hasta introducir un bundler, `public/game/` es código servido directamente. No muevas scripts a una carpeta fuera de `public/` si `serve.py` o Pages no pueden servirlos. Los HTML públicos `index.html` y `arena.html` conservan las URLs para navegación, Pages e interacción con el simulador.
+`public/game/` contiene el código que sirve la web activa. Las pantallas son `public/index.html`, `public/factory-v2.html` (Megafábrica 3.1) y `public/arena-v2.html`; la experiencia V1 se conserva fuera de `public/` en `archive/v1/public/`. El cliente Unity 6 vive en `unity/FactoryWars.Unity6/`.
 
 ## Nombres y límites
 

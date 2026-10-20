@@ -7,3 +7,13 @@ __pycache__/
 *.dump
 *.backup
 factory-wars-*-telemetry-*.json
+
+# Unity-generated and machine-local files. Keep source, assets, package manifests and project settings.
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Ll]ogs/
+**/[Uu]serSettings/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/ProjectSettings/Packages/

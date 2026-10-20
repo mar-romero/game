@@ -1,6 +1,6 @@
 # Nuevo flujo propuesto de PvP
 
-Este documento registra el diseño conversado de la nueva Arena. Las reglas tienen una implementación de práctica local contra bot en `public/arena-v2.html`; el estado exacto y lo pendiente se registran en `public/game/domain/arena-v2/README.md`. La Arena integrada actual sigue usando `public/game/domain/arena/`. La conexión con investigaciones persistentes, PvP online y premios sigue pendiente; el PvP de Unity continúa siendo una presentación sin combate conectado.
+Este documento registra el diseño de Arena V2. Sus reglas tienen una implementación de práctica local contra bot en `public/arena-v2.html`; el estado y lo pendiente se registran en `public/game/domain/arena-v2/README.md`. El runtime online del servidor todavía usa Arena V1 desde `archive/v1/public/`; Unity tiene una implementación local independiente en C#. La conexión de Arena V2 a matchmaking, resultados y premios sigue pendiente.
 
 ## La idea en una frase
 

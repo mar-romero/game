@@ -1,115 +1,32 @@
-# Cómo se desarrolla Factory Wars
+# Flujo actual de Factory Wars
 
-Este mapa muestra el recorrido del jugador y cómo se conectan las partes activas del código. La vista de red es una metáfora para explicar las dependencias y los ciclos de progreso; el juego no usa una red neuronal para decidir las reglas.
-
-## Recorrido de una sesión
+## Superficies activas
 
 ```mermaid
 flowchart TD
-    A[Jugador abre el juego] --> B[public/index.html<br/>Megafábrica]
-    B --> C[ empire-controller.js<br/>carga estado y muestra recursos ]
-    C --> D{¿Qué quiere hacer?}
-    D -->|Construir| E[Validar recursos y costo]
-    E -->|Puede pagar| F[Subir nivel de edificio]
-    E -->|No puede pagar| C
-    F --> G[EmpireEconomy calcula producción]
-    G --> C
-    D -->|Investigar| H[EmpireCatalog valida investigación]
-    H --> I[EmpireProgression calcula costo y progreso]
-    I -->|Puede pagar y está habilitada| J[Guardar investigación]
-    I -->|Falta recurso o requisito| C
-    J --> K[Desbloqueo persistente disponible]
-    K --> C
-    D -->|Contrato| L[EmpireProgression calcula faltantes y recompensa]
-    L -->|Tiene suministros| M[Entregar recursos y recibir recompensa]
-    L -->|Faltan suministros| C
-    M --> C
-    D -->|Jugar Arena| N[arena.html dentro del iframe]
-    N --> O[Configuración + RNG + Match]
-    O --> P[Runtime web procesa input y dibuja]
-    P --> Q{¿La partida terminó?}
-    Q -->|No| P
-    Q -->|Sí| R[Calcular resultado y recompensa]
-    R --> S[Persistencia local / sincronización online]
-    S --> T[Actualizar recursos, estadísticas y Liga]
-    T --> C
-    D -->|Prestigio| U[EmpireProgression calcula avance]
-    U -->|Requisitos completos| V[Reiniciar ciclo y conservar legados]
-    U -->|Aún no| C
-    V --> C
+  U[Cliente Unity 6] --> FAB[Megafábrica Unity]
+  U --> PVPU[PvP Unity: lobby y práctica local]
+  U --> API[API: cuenta, Megafábrica, temporada y ranking]
+  W[public/index.html] --> F[Megafábrica web 3.1]
+  W --> A[Arena web V2]
+  F --> S[Guardado local del navegador]
+  A --> S
+  A --> B[Motor Arena V2 + bot local]
+  OLD[Runtime online Arena V1] --> ARCHIVE[archive/v1/public]
 ```
 
-## Red de dependencias
+## Megafábrica 3.1
 
-Las flechas muestran qué componente aporta datos o decisiones al siguiente. La realimentación Arena → Megafábrica representa las recompensas que permiten nuevas mejoras y partidas.
+La pantalla web activa es `public/factory-v2.html`; la implementación de reglas y persistencia está en `public/game/domain/factory-v2/`. El controlador web coordina producción, proyectos, contratos, misiones, prestigio e investigaciones. Unity mantiene una implementación C# separada en `unity/FactoryWars.Unity6/Assets/Scripts/`.
 
-```mermaid
-flowchart LR
-    subgraph Presentación
-      WEB[Web / HTML]
-      UI[Controladores y runtime]
-      CSS[Estilos]
-      WEB --> UI
-      CSS --> WEB
-    end
+## Arena V2
 
-    subgraph Aplicación y dominio
-      FLOW[Flujos del jugador<br/>a extraer a application]
-      EC[Empire Catalog<br/>datos y requisitos]
-      EE[Empire Economy<br/>producción]
-      EP[Empire Progression<br/>costos y progreso]
-      AC[Arena Config + RNG]
-      AM[Match Engine<br/>estado y reglas base]
-      IM[Industrial Modules]
-      EC --> EP
-      EC --> EE
-      AC --> AM
-      IM --> AM
-      FLOW --> EC
-      FLOW --> EE
-      FLOW --> EP
-      FLOW --> AM
-    end
+`public/arena-v2.html` carga el controlador `public/game/adapters/web/arena-v2-controller.js`, el motor `public/game/domain/arena-v2/match-engine.js` y el bot de práctica `public/game/application/arena-v2-bot.js`. La práctica lee los desbloqueos de Megafábrica web en el mismo navegador. El motor V2 no está conectado al matchmaking ni al ranking del servidor.
 
-    subgraph Adaptadores
-      LOCAL[Estado local]
-      ONLINE[Supabase / Arena Online]
-      PLATFORM[Adaptadores móviles y desktop<br/>futuros]
-    end
+El lobby y la práctica de Unity son implementaciones nativas independientes. El README de Unity documenta sus límites frente al motor V2 web y el servidor.
 
-    UI --> FLOW
-    UI --> AM
-    UI --> LOCAL
-    UI --> ONLINE
-    LOCAL --> UI
-    ONLINE --> UI
-    AM --> UI
-    AM --> LOCAL
-    AM --> ONLINE
-    PLATFORM -. misma aplicación futura .-> FLOW
-    PLATFORM -. mismos modelos .-> AM
-    AM -. resultado y recompensa .-> EE
-```
+## Cuenta y servicios
 
-## Decisiones principales del jugador
+El servidor Node.js proporciona autenticación Supabase, estado/comandos de Megafábrica, temporada y clasificación. El runtime online de Arena mantiene compatibilidad con las reglas archivadas V1. Mantenerlo bajo `archive/v1/public/` es necesario mientras `server/src/game/arena-runtime.js` dependa de él.
 
-| Decisión | Condición | Efecto |
-| --- | --- | --- |
-| Construir edificio | Recursos suficientes | Aumenta capacidad y producción persistente. |
-| Investigar | Intel, requisitos y cupo disponibles | Desbloquea tecnologías para Imperio o Arena. |
-| Completar contrato | Reunir los recursos solicitados | Convierte suministros en créditos, intel y progreso. |
-| Entrar en Arena | Elegir una partida y civilización | Inicia combate contra bots u otros jugadores según el modo. |
-| Elegir acción de combate | Recursos y reglas de partida lo permiten | Cambia economía, defensa, ataque o control del nodo. |
-| Subir de prestigio | Completar las metas del ciclo | Reinicia parte del progreso y conserva beneficios de legado. |
-
-## Cómo leerlo para desarrollar
-
-1. Para cambiar una regla persistente, empezar por `public/game/domain/empire/`.
-2. Para cambiar una regla de combate base, empezar por `public/game/domain/arena/match-engine.js`.
-3. Para cambiar interacción o presentación web, revisar `public/game/adapters/web/` y `public/game/presentation/`.
-4. Para cambiar guardado o sincronización, revisar `public/game/adapters/persistence/` y `supabase/`.
-5. Antes de añadir una plataforma, conectar su adaptador a las reglas compartidas; no duplicar el motor.
-
-Algunas reglas de Arena y flujos de Imperio todavía viven en controladores/extensiones históricos. La arquitectura objetivo y ese trabajo pendiente están descritos en [ARCHITECTURE.md](ARCHITECTURE.md) y [MIGRATION_PLAN.md](MIGRATION_PLAN.md).
-
-Para ver el ida y vuelta detallado entre Megafábrica, PvP y civilizaciones, abrir [FACTORY_PVP_CIVILIZATIONS.md](FACTORY_PVP_CIVILIZATIONS.md).
+Para iniciar la web local, usar `python serve.py`. Para la API, configurar `.env.online` usando `.env.online.example` y seguir `docs/ONLINE_LOCAL_SETUP.md`.

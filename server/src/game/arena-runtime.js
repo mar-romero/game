@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const publicRoot = resolve(process.env.PUBLIC_DIR || resolve(here, '../../../public'));
+const publicRoot = resolve(process.env.V1_PUBLIC_DIR || resolve(here, '../../../archive/v1/public'));
 let Match;
 
 async function loadClassic(path) {

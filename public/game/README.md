@@ -1,17 +1,11 @@
-# Código del juego
+# Código activo del juego
 
-Este es el árbol activo de Factory Wars. El juego web carga estos archivos directamente desde `public/`; `index.html` y `arena.html` son las entradas estables. El snapshot anterior está fuera de este árbol, en `legacy/v1.6/`.
+El sitio web activo carga las pantallas V2 desde `public/`: `../index.html` permite abrir Megafábrica v2 y Arena v2.
 
-- `domain/arena-config.js`: valores de balance de Arena.
-- `domain/random.js`: generador pseudoaleatorio determinista.
-- `domain/arena/match-engine.js`: estado y reglas base de `Match`.
-- `domain/arena/industrial-modules.js`: datos de módulos construibles durante Arena.
-- `domain/empire/catalog.js`: civilizaciones, edificios, investigaciones y rutas.
-- `domain/empire/economy.js`: producción persistente de la Megafábrica.
-- `domain/empire/progression.js`: puntuación, prestigio, costos, contratos y dominio de civilizaciones.
-- `adapters/web/`: controladores de interfaz y compatibilidad con scripts clásicos.
-- `adapters/persistence/`: sincronización de Arena con Supabase.
-- `presentation/styles/`: hojas de estilo por pantalla.
-- `application/`, `ports/` y carpetas de plataforma: límites preparados para próximas extracciones; ver el README de cada carpeta.
+- `domain/arena-v2/`: reglas y balance del combate local.
+- `domain/factory-v2/`: recursos, producción, prestigio y guardado local.
+- `application/arena-v2-bot.js`: rival de práctica.
+- `adapters/web/`: controladores de las pantallas activas y registro de la PWA.
+- `presentation/styles/`: estilos de Arena y Megafábrica v2.
 
-La guía de dependencias está en [Arquitectura](../../docs/ARCHITECTURE.md). Las convenciones para nuevos archivos están en [FILE_CONVENTIONS.md](../../docs/FILE_CONVENTIONS.md), y las etapas pendientes en [MIGRATION_PLAN.md](../../docs/MIGRATION_PLAN.md).
+El juego web V1 está archivado en `../../archive/v1/public/`. Su runtime de servidor se conserva para compatibilidad; el sitio V2 no lo utiliza. Ver [archivo V1](../../docs/ARCHIVE_V1.md).

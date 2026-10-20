@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace FactoryWars.Unity6
 {
-    public enum HubSection { MegaFactory, Pvp, Rankings, Civilizations }
+    public enum HubSection { MegaFactory, MegaFactoryV2, Pvp, Rankings, Civilizations }
 
     [Serializable]
     public sealed class IntegrationEvent : UnityEvent<string> { }
@@ -29,10 +29,14 @@ namespace FactoryWars.Unity6
         private readonly List<GameObject> sceneObjects = new List<GameObject>();
         private readonly Dictionary<Color, Material> worldMaterials = new Dictionary<Color, Material>();
         private readonly Dictionary<string, TextMesh> worldBadges = new Dictionary<string, TextMesh>();
+        private readonly List<GameObject>[] factoryUpgradeDetails = { new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>() };
+        private readonly List<GameObject>[] factoryPrestigeDetails = { new List<GameObject>(), new List<GameObject>(), new List<GameObject>() };
+        private readonly List<FactoryCargoLoop> factoryCargoLoops = new List<FactoryCargoLoop>();
 
         private Canvas canvas;
         private GameObject factoryArtLayer;
         private RectTransform factoryArtRect;
+        private Image canvasBackdropImage;
         private RectTransform factoryMapOverlay;
         private LayoutElement factoryMapSpace;
         private ScrollRect screenScroll;
@@ -41,7 +45,11 @@ namespace FactoryWars.Unity6
         {
             public RectTransform rect;
             public Vector2 artAnchor;
+            public int row;
+            public float preferredWidth;
         }
+        private readonly float[] factoryMapRowHeights = new float[4];
+        private readonly float[] factoryMapRowPositions = new float[4];
         private RectTransform content;
         private RectTransform nav;
         private Text headerTitle;
@@ -49,7 +57,7 @@ namespace FactoryWars.Unity6
         private readonly Text[] resourceHudRates = new Text[4];
         private enum HudIcon { Credits, Energy, Steel, Intel, Factory, Swords, Trophy, Globe }
         private readonly Sprite[] hudIconSprites = new Sprite[8];
-        private Sprite hudPanelFill, hudPanelEdge, hudPanelGlow;
+        private Sprite hudPanelFill, hudPanelEdge, hudPanelGlow, hudPanelSheen;
         private readonly List<Texture2D> hudPanelTextures = new List<Texture2D>();
         private GameObject toastPanel;
         private Text toast;
@@ -62,6 +70,7 @@ namespace FactoryWars.Unity6
         private FactoryWarsApiClient apiClient;
         private FactoryWarsApiConfiguration apiConfiguration;
         private FactoryWarsMeResponse onlineProfile;
+        private FactoryV2Save factoryMapLocalPreview;
         private InputField emailInput, passwordInput;
         private Text connectionStatus;
         private bool apiBusy;
@@ -101,6 +110,7 @@ namespace FactoryWars.Unity6
             Screen.orientation = ScreenOrientation.Portrait;
             LoadHudIcons();
             BuildInterface();
+            BuildWorld();
             ShowSection(HubSection.MegaFactory);
         }
 
@@ -108,11 +118,17 @@ namespace FactoryWars.Unity6
         {
             if (toastPanel != null && toastPanel.activeSelf && Time.unscaledTime > toastUntil) toastPanel.SetActive(false);
             if (waterMaterial != null) waterMaterial.SetTextureOffset("_MainTex", new Vector2(0, Time.time * .008f));
+            ArenaTick(Time.unscaledDeltaTime);
+            TickFactoryV2(Time.unscaledDeltaTime);
         }
+
+        private void OnApplicationPause(bool paused) { if (paused) SaveFactoryV2(true); }
+        private void OnApplicationQuit() { SaveFactoryV2(true); }
 
         private void LateUpdate()
         {
             UpdateFactoryMapLayout();
+            UpdateFactoryV2NavigationLayout();
         }
 
         private void LoadHudIcons()
@@ -138,6 +154,7 @@ namespace FactoryWars.Unity6
             if (hudPanelFill != null) Destroy(hudPanelFill);
             if (hudPanelEdge != null) Destroy(hudPanelEdge);
             if (hudPanelGlow != null) Destroy(hudPanelGlow);
+            if (hudPanelSheen != null) Destroy(hudPanelSheen);
             foreach (var texture in hudPanelTextures) Destroy(texture);
         }
 
@@ -157,8 +174,8 @@ namespace FactoryWars.Unity6
         {
             if (hudPanelFill != null) return;
             const int size = 64;
-            const float radius = 12;
-            var pixels = new Color[3][] { new Color[size * size], new Color[size * size], new Color[size * size] };
+            const float radius = 18;
+            var pixels = new Color[4][] { new Color[size * size], new Color[size * size], new Color[size * size], new Color[size * size] };
             for (int y = 0; y < size; y++)
             for (int x = 0; x < size; x++)
             {
@@ -171,17 +188,19 @@ namespace FactoryWars.Unity6
                 pixels[0][index] = new Color(1, 1, 1, fill);
                 pixels[1][index] = new Color(1, 1, 1, fill - Mathf.Clamp01(-1f - distance));
                 pixels[2][index] = new Color(1, 1, 1, Mathf.Clamp01(1f - Mathf.Abs(distance + 2f) / 5f) * .32f);
+                float reflection = Mathf.Pow((y + .5f) / size, 4) * .18f;
+                pixels[3][index] = new Color(.8f, .96f, 1, fill * reflection);
             }
-            var sprites = new Sprite[3];
+            var sprites = new Sprite[4];
             for (int i = 0; i < sprites.Length; i++)
             {
                 var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
                 texture.name = "Rounded HUD " + i; texture.wrapMode = TextureWrapMode.Clamp;
                 texture.filterMode = FilterMode.Bilinear; texture.SetPixels(pixels[i]); texture.Apply(false, true);
                 hudPanelTextures.Add(texture);
-                sprites[i] = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(16, 16, 16, 16));
+                sprites[i] = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(20, 20, 20, 20));
             }
-            hudPanelFill = sprites[0]; hudPanelEdge = sprites[1]; hudPanelGlow = sprites[2];
+            hudPanelFill = sprites[0]; hudPanelEdge = sprites[1]; hudPanelGlow = sprites[2]; hudPanelSheen = sprites[3];
         }
 
         private GameObject RoundedHudPanel(string name, Transform parent, Color fill, Color accent)
@@ -189,11 +208,16 @@ namespace FactoryWars.Unity6
             EnsureHudPanelSprites();
             var panelObject = Panel(name, parent, fill);
             var image = panelObject.GetComponent<Image>(); image.sprite = hudPanelFill; image.type = Image.Type.Sliced;
-            var glow = Panel("Edge glow", panelObject.transform, accent);
+            var glow = Panel("Edge glow", panelObject.transform, new Color(accent.r, accent.g, accent.b, .6f));
             Anchor(glow, Vector2.zero, Vector2.one, new Vector2(-3, -3), new Vector2(3, 3));
             var glowImage = glow.GetComponent<Image>(); glowImage.sprite = hudPanelGlow; glowImage.type = Image.Type.Sliced; glowImage.raycastTarget = false;
             LayoutElement(glow).ignoreLayout = true;
-            var edge = Panel("Lit edge", panelObject.transform, new Color(accent.r, accent.g, accent.b, .8f));
+            // Layered translucency and reflections; standard UI images do not blur the artwork.
+            var sheen = Panel("Glass reflection", panelObject.transform, Color.white);
+            Anchor(sheen, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            var sheenImage = sheen.GetComponent<Image>(); sheenImage.sprite = hudPanelSheen; sheenImage.type = Image.Type.Sliced; sheenImage.raycastTarget = false;
+            LayoutElement(sheen).ignoreLayout = true;
+            var edge = Panel("Lit edge", panelObject.transform, new Color(accent.r, accent.g, accent.b, .5f));
             Anchor(edge, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             var edgeImage = edge.GetComponent<Image>(); edgeImage.sprite = hudPanelEdge; edgeImage.type = Image.Type.Sliced; edgeImage.raycastTarget = false;
             LayoutElement(edge).ignoreLayout = true;
@@ -236,6 +260,7 @@ namespace FactoryWars.Unity6
             var backdropImage = backdrop.GetComponent<Image>();
             backdropImage.color = ink;
             backdropImage.raycastTarget = false;
+            canvasBackdropImage = backdropImage;
 
             factoryArtLayer = new GameObject("Factory Fullscreen Art", typeof(RectTransform));
             factoryArtLayer.transform.SetParent(canvas.transform, false);
@@ -243,7 +268,7 @@ namespace FactoryWars.Unity6
             var artwork = Panel("Megafactory Island Cover", factoryArtLayer.transform, Color.white);
             factoryArtRect = artwork.GetComponent<RectTransform>();
             var artworkImage = artwork.GetComponent<Image>();
-            artworkImage.sprite = Resources.Load<Sprite>("MegafactoryIsland");
+            artworkImage.sprite = Resources.Load<Sprite>("MegafactoryIslandActive") ?? Resources.Load<Sprite>("MegafactoryIsland");
             artworkImage.raycastTarget = false;
             if (artworkImage.sprite != null)
             {
@@ -264,6 +289,7 @@ namespace FactoryWars.Unity6
             var safeRect = safe.GetComponent<RectTransform>();
             safeRect.anchorMin = Vector2.zero; safeRect.anchorMax = Vector2.one;
             safeRect.offsetMin = Vector2.zero; safeRect.offsetMax = Vector2.zero;
+            safe.GetComponent<Image>().raycastTarget = false;
             safe.AddComponent<SafeAreaFitter>();
 
             var header = Panel("Top Bar", safe.transform, new Color(0, 0, 0, 0));
@@ -277,6 +303,7 @@ namespace FactoryWars.Unity6
             scrollRect.anchorMin = Vector2.zero; scrollRect.anchorMax = Vector2.one;
             scrollRect.offsetMin = new Vector2(0, 86); scrollRect.offsetMax = new Vector2(0, -110);
             scrollRoot.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            scrollRoot.GetComponent<Image>().raycastTarget = false;
             var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
             viewport.transform.SetParent(scrollRoot.transform, false);
             var viewportRect = viewport.GetComponent<RectTransform>();
@@ -302,7 +329,7 @@ namespace FactoryWars.Unity6
             Anchor(markerLayer, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             header.transform.SetAsLastSibling();
 
-            nav = RoundedHudPanel("Bottom Navigation", safe.transform, new Color32(5, 40, 65, 255), cyan).GetComponent<RectTransform>();
+            nav = RoundedHudPanel("Bottom Navigation", safe.transform, new Color32(7, 39, 67, 214), cyan).GetComponent<RectTransform>();
             Anchor(nav.gameObject, Vector2.zero, new Vector2(1, 0), new Vector2(5, 5), new Vector2(-5, 86));
             var navLayout = nav.gameObject.AddComponent<HorizontalLayoutGroup>();
             navLayout.padding = new RectOffset(6, 6, 6, 6); navLayout.spacing = 0;
@@ -328,6 +355,7 @@ namespace FactoryWars.Unity6
         private void NavButton(HudIcon icon, string label, HubSection section)
         {
             var button = Panel("Nav " + section, nav, Color.clear);
+            var surface = button.GetComponent<Image>(); surface.sprite = hudPanelFill; surface.type = Image.Type.Sliced;
             button.AddComponent<LayoutElement>().flexibleWidth = 1;
             HudIconImage(button.transform, icon, new Vector2(.5f, .67f), new Vector2(44, 42));
             var labelText = PlacedLabel(button.transform, label, label == "CIVILIZACIONES" ? 8 : 11, white, FontStyle.Bold, TextAnchor.MiddleCenter, new Vector2(0, .08f), new Vector2(1, .35f), new Vector2(2, 0), new Vector2(-2, 0));
@@ -375,8 +403,27 @@ namespace FactoryWars.Unity6
 
         private void ShowSection(HubSection section)
         {
+            CloseFactoryV2ProducerPopup();
+            if (factoryBuildingTargets != null) { factoryBuildingTargets.SetActive(false); Destroy(factoryBuildingTargets); factoryBuildingTargets = null; }
             rankingViewEpoch++;
             currentSection = section;
+            if (canvasBackdropImage != null) canvasBackdropImage.color = ink;
+            bool arenaFullscreen = section == HubSection.Pvp && arenaLocalMatch != null;
+            var contentLayout = content.GetComponent<VerticalLayoutGroup>();
+            if (contentLayout != null)
+            {
+                contentLayout.padding = arenaFullscreen ? new RectOffset(0, 0, 0, 0) : new RectOffset(14, 14, 14, 24);
+                contentLayout.spacing = arenaFullscreen ? 0 : 12;
+            }
+            if (screenScroll != null)
+            {
+                var scrollRect = screenScroll.GetComponent<RectTransform>();
+                scrollRect.offsetMin = arenaFullscreen ? Vector2.zero : new Vector2(0, 86);
+                scrollRect.offsetMax = arenaFullscreen ? Vector2.zero : new Vector2(0, -110);
+                screenScroll.vertical = !arenaFullscreen;
+            }
+            if (nav != null) nav.gameObject.SetActive(!arenaFullscreen);
+            if (headerTitle != null && headerTitle.transform.parent != null) headerTitle.transform.parent.gameObject.SetActive(!arenaFullscreen);
             // Every visit reloads server state; account data is never reused across visits.
             leaderboard = null;
             rankingError = null;
@@ -387,7 +434,8 @@ namespace FactoryWars.Unity6
                 headerTitle.text = section == HubSection.Pvp ? "ARENA PVP" : section == HubSection.Rankings ? "RANKING" : section == HubSection.Civilizations ? "CIVILIZACIONES" : "MEGAFÁBRICA";
                 headerTitle.gameObject.SetActive(section != HubSection.MegaFactory);
             }
-            factoryArtLayer.SetActive(section == HubSection.MegaFactory);
+            factoryArtLayer.SetActive(section == HubSection.MegaFactory || section == HubSection.MegaFactoryV2);
+            SetWorld(section == HubSection.Pvp);
             for (int i = factoryMapOverlay.childCount - 1; i >= 0; i--)
             {
                 var marker = factoryMapOverlay.GetChild(i).gameObject;
@@ -405,7 +453,8 @@ namespace FactoryWars.Unity6
             switch (section)
             {
                 case HubSection.MegaFactory: BuildFactoryScreen(); break;
-                case HubSection.Pvp: BuildPvpScreen(); break;
+                case HubSection.MegaFactoryV2: BuildFactoryV2Screen(); break;
+                case HubSection.Pvp: BuildArenaScreen(); break;
                 case HubSection.Rankings: BuildRankingsScreen(); break;
                 case HubSection.Civilizations: BuildCivilizationsScreen(); break;
             }
@@ -418,8 +467,8 @@ namespace FactoryWars.Unity6
                 var child = nav.GetChild(i).gameObject;
                 if (child.GetComponent<Button>() == null) continue;
                 var image = child.GetComponent<Image>();
-                bool active = child.name == "Nav " + section;
-                image.color = Color.clear;
+                bool active = child.name == "Nav " + (section == HubSection.MegaFactoryV2 ? HubSection.MegaFactory : section);
+                image.color = active ? new Color(73f / 255, 205f / 255, 235f / 255, .14f) : Color.clear;
                 var icon = child.transform.Find("Icon")?.GetComponent<Image>();
                 if (icon != null) icon.color = active ? Color.white : new Color(.8f, .88f, .94f, .85f);
                 var label = child.transform.Find("Label")?.GetComponent<Text>();
@@ -512,10 +561,12 @@ namespace FactoryWars.Unity6
             Hero("LIGA", "SUBÍ EN LA CLASIFICACIÓN", "Temporada competitiva · resultados verificados", new Color32(155, 103, 203, 255));
             if (apiClient == null || !apiClient.IsAuthenticated)
             {
-                var login = Card("CONECTÁ TU CUENTA", "Iniciá sesión para consultar la temporada online.", 164);
-                FlowActionButton(CardBody(login.transform), "IR A MEGAFÁBRICA · INICIAR SESIÓN", cyan, () => ShowSection(HubSection.MegaFactory));
+                BuildOnlineSignInCard();
                 return;
             }
+            var account = Card("CUENTA ONLINE", "La sesión se cierra al salir de la aplicación.", 110);
+            FlowActionButton(CardBody(account.transform), "CERRAR SESIÓN", gold, SignOut).interactable = !HasAmbiguousCommand;
+            if (HasAmbiguousCommand) BuildPendingCommandCard();
             if (rankingBusy)
             {
                 var loading = Card("CONECTANDO", "Consultando el servidor de Factory Wars", 140);
@@ -529,7 +580,7 @@ namespace FactoryWars.Unity6
                 FlowLabel(body, "HTTP " + rankingError.statusCode + " · " + rankingError.message, 11, gold, FontStyle.Normal, 70);
                 FlowActionButton(body, "REINTENTAR · CONSULTAR ESTADO", cyan, RefreshRanking);
                 if (rankingError.statusCode == 401)
-                    FlowActionButton(body, "IR A CUENTA", gold, () => ShowSection(HubSection.MegaFactory));
+                    FlowActionButton(body, "CONECTAR CUENTA", gold, BuildOnlineSignInCard);
                 return;
             }
             if (leaderboard == null) return;
@@ -869,6 +920,9 @@ namespace FactoryWars.Unity6
             BuildIntelFactory(new Vector3(-2.45f, .08f, 3.45f), steel, steelLight, trim, glow);
             BuildGoldMine(new Vector3(2.45f, .08f, 3.45f), steel, steelLight, trim, glow);
 
+            BuildFactoryProgressDetails(steel, steelLight, trim, glow);
+            BuildFactoryCargoLoops();
+
             // Small terrain accents break up the flat prototype island without external art assets.
             for (int i = 0; i < 9; i++)
             {
@@ -885,6 +939,30 @@ namespace FactoryWars.Unity6
 
         private void UpdateResourceHud()
         {
+            if ((currentSection == HubSection.MegaFactory || currentSection == HubSection.MegaFactoryV2) && factoryV2Save != null && !factoryV2NeedsReset)
+            {
+                double[] v2Rates = FactoryV2Rates(factoryV2Save.cycle);
+                double[] v2Amounts = { factoryV2Save.cycle.credits, factoryV2Save.cycle.energy, factoryV2Save.cycle.steel, factoryV2Save.cycle.intel };
+                int[] v2Levels = { factoryV2Save.cycle.automation, factoryV2Save.cycle.generator, factoryV2Save.cycle.refinery, factoryV2Save.cycle.lab };
+                for (int i = 0; i < resourceHudAmounts.Length; i++)
+                {
+                    if (resourceHudAmounts[i] != null) resourceHudAmounts[i].text = v2Amounts[i].ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"));
+                    if (resourceHudRates[i] != null) resourceHudRates[i].text = "+" + v2Rates[i].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
+                }
+                RefreshWorldBadges(v2Levels, v2Rates, factoryV2Save.permanent.prestigeCount);
+                return;
+            }
+            if (currentSection == HubSection.MegaFactory && factoryMapLocalPreview != null)
+            {
+                double[] localRates = FactoryV2Rates(factoryMapLocalPreview.cycle);
+                double[] localAmounts = { factoryMapLocalPreview.cycle.credits, factoryMapLocalPreview.cycle.energy, factoryMapLocalPreview.cycle.steel, factoryMapLocalPreview.cycle.intel };
+                for (int i = 0; i < resourceHudAmounts.Length; i++)
+                {
+                    if (resourceHudAmounts[i] != null) resourceHudAmounts[i].text = localAmounts[i].ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"));
+                    if (resourceHudRates[i] != null) resourceHudRates[i].text = "+" + localRates[i].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
+                }
+                return;
+            }
             var state = onlineProfile != null && onlineProfile.empire != null ? onlineProfile.empire.state : null;
             if (state == null || state.buildings == null)
             {
@@ -893,7 +971,7 @@ namespace FactoryWars.Unity6
                     if (resourceHudAmounts[i] != null) resourceHudAmounts[i].text = "—";
                     if (resourceHudRates[i] != null) resourceHudRates[i].text = "—/s";
                 }
-                RefreshWorldBadges(null, null);
+                RefreshWorldBadges(null, null, 0);
                 return;
             }
 
@@ -904,12 +982,12 @@ namespace FactoryWars.Unity6
                 if (resourceHudAmounts[i] != null) resourceHudAmounts[i].text = amounts[i].ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"));
                 if (resourceHudRates[i] != null) resourceHudRates[i].text = "+" + rates[i].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
             }
-            RefreshWorldBadges(state, rates);
+            RefreshWorldBadges(state != null && state.buildings != null ? new[] { state.buildings.automation, state.buildings.generator, state.buildings.refinery, state.buildings.lab } : null, rates, state != null ? state.prestigeCount : 0);
         }
 
         private static double[] CurrentProductionRates(FactoryWarsEmpireState state)
         {
-            // Mirrors public/game/domain/empire/economy.js so the Unity HUD follows the game's balance rules.
+            // Mirrors public/game/domain/factory-v2/factory-engine.js so the Unity HUD follows the active factory balance.
             double legacy = 1 + Math.Min(state.prestigeCount, 10) * .01
                 + Math.Min(Math.Max(state.prestigeCount - 10, 0), 10) * .005
                 + Math.Max(state.prestigeCount - 20, 0) * .0025;
@@ -924,20 +1002,109 @@ namespace FactoryWars.Unity6
             };
         }
 
-        private void RefreshWorldBadges(FactoryWarsEmpireState state, double[] rates)
+        private void RefreshWorldBadges(int[] levels, double[] rates, int prestigeCount)
         {
             string[] names = { "ORO", "ENERGÍA", "ACERO", "INTEL" };
             string[] badgeIds = { "Gold mine badge", "Energy factory badge", "Steel factory badge", "Intel factory badge" };
-            int[] levels = state != null && state.buildings != null
-                ? new[] { state.buildings.automation, state.buildings.generator, state.buildings.refinery, state.buildings.lab }
-                : null;
+            if (worldBadges.TryGetValue("Gold mine badge", out var mineBadge)) mineBadge.gameObject.SetActive(currentSection != HubSection.MegaFactoryV2);
             for (int i = 0; i < badgeIds.Length; i++)
             {
+                if (currentSection == HubSection.MegaFactoryV2 && i == 0) continue;
                 if (!worldBadges.TryGetValue(badgeIds[i], out var badge)) continue;
                 badge.text = levels == null || rates == null
                     ? names[i] + "\nNIV — · —/s"
                     : names[i] + "\nNIV " + levels[i] + " · +" + rates[i].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "/s";
             }
+            if (worldBadges.TryGetValue("Megafactory badge", out var hub))
+                hub.text = currentSection == HubSection.MegaFactoryV2 && levels != null && rates != null
+                    ? "CRÉDITOS NIV " + levels[0] + "\nPRESTIGIO " + prestigeCount.ToString("00")
+                    : "MEGAFÁBRICA\nINVESTIGAR · CONTRATAR";
+            int[] visualLevels = levels == null ? new[] { 1, 1, 1, 1 } : levels;
+            for (int i = 0; i < factoryUpgradeDetails.Length; i++)
+                for (int tier = 0; tier < factoryUpgradeDetails[i].Count / 2; tier++)
+                {
+                    int milestone = tier == 0 ? 2 : tier == 1 ? 5 : 10;
+                    bool visible = visualLevels[i] >= milestone;
+                    factoryUpgradeDetails[i][tier * 2].SetActive(visible);
+                    factoryUpgradeDetails[i][tier * 2 + 1].SetActive(visible);
+                }
+            for (int tier = 0; tier < factoryPrestigeDetails.Length; tier++)
+                for (int detail = 0; detail < factoryPrestigeDetails[tier].Count; detail++)
+                    factoryPrestigeDetails[tier][detail].SetActive(prestigeCount >= (tier + 1) * 2);
+            int[] activeRates = currentSection != HubSection.MegaFactoryV2 || levels == null || rates == null
+                ? new[] { 0, 0, 0, 0 }
+                : new[] { rates[0] > 0 ? 1 : 0, rates[1] > 0 ? 1 : 0, rates[2] > 0 ? 1 : 0, rates[3] > 0 ? 1 : 0 };
+            for (int i = 0; i < factoryCargoLoops.Count; i++) factoryCargoLoops[i].isRunning = activeRates[factoryCargoLoops[i].producerIndex] != 0;
+        }
+
+        private void BuildFactoryProgressDetails(Color steel, Color steelLight, Color trim, Color glow)
+        {
+            // Milestone add-ons make upgrades and permanent prestige visible on the illustrated diorama.
+            Vector3[] sites = { new Vector3(0, .08f, 0), new Vector3(-2.45f, .08f, -3.45f), new Vector3(2.45f, .08f, -3.45f), new Vector3(-2.45f, .08f, 3.45f) };
+            for (int producer = 0; producer < sites.Length; producer++)
+            for (int tier = 0; tier < 3; tier++)
+            {
+                float side = tier % 2 == 0 ? -1 : 1;
+                Vector3 p = sites[producer] + new Vector3(side * (1.05f + tier * .18f), .08f, -.12f + tier * .18f);
+                var module = FactoryPart("Factory upgrade " + producer + " tier " + tier, PrimitiveType.Cylinder, p, new Vector3(.32f, .38f + tier * .09f, .32f), tier == 2 ? trim : steelLight);
+                var light = FactoryPart("Factory upgrade light " + producer + " tier " + tier, PrimitiveType.Cube, p + new Vector3(0, .04f, -.17f), new Vector3(.18f, .08f, .025f), glow);
+                module.SetActive(false);
+                light.SetActive(false);
+                factoryUpgradeDetails[producer].Add(module);
+                factoryUpgradeDetails[producer].Add(light);
+            }
+            // Prestige stages surround the hub beacon like hand-painted rings in an isometric strategy diorama.
+            for (int ring = 0; ring < factoryPrestigeDetails.Length; ring++)
+            {
+                float radius = 1.28f + ring * .22f;
+                Color accent = ring == 2 ? trim : glow;
+                Vector3[] markers = { new Vector3(-radius, 1.48f + ring * .1f, 0), new Vector3(radius, 1.48f + ring * .1f, 0), new Vector3(0, 1.48f + ring * .1f, -radius), new Vector3(0, 1.48f + ring * .1f, radius) };
+                for (int i = 0; i < markers.Length; i++)
+                {
+                    var detail = FactoryPart("Factory prestige marker " + ring + " " + i, PrimitiveType.Sphere, markers[i], new Vector3(.13f, .13f, .13f), accent);
+                    detail.SetActive(false);
+                    factoryPrestigeDetails[ring].Add(detail);
+                }
+            }
+        }
+
+        private void BuildFactoryCargoLoops()
+        {
+            // Credits travel above the front roof so the opaque central hall cannot hide the flow.
+            Vector3[] starts = { new Vector3(-.85f, 1.5f, -.88f), new Vector3(-2.45f, .38f, -3.45f), new Vector3(2.45f, .32f, -3.45f), new Vector3(-2.45f, .32f, 3.45f) };
+            Color[] colors = { new Color32(255, 195, 74, 255), new Color32(73, 205, 235, 255), new Color32(242, 128, 61, 255), new Color32(178, 130, 231, 255) };
+            for (int producer = 0; producer < starts.Length; producer++)
+            for (int cargo = 0; cargo < 3; cargo++)
+            {
+                var pod = FactoryPart("Factory cargo " + producer + " " + cargo, PrimitiveType.Sphere, starts[producer], new Vector3(.12f, .12f, .12f), colors[producer]);
+                var loop = pod.AddComponent<FactoryCargoLoop>();
+                loop.start = starts[producer];
+                loop.end = producer == 0 ? new Vector3(.85f, 1.5f, -.88f) : new Vector3(0, .24f, 0);
+                loop.phase = cargo / 3f; loop.producerIndex = producer;
+                factoryCargoLoops.Add(loop);
+            }
+        }
+
+        private void TickFactoryCameraInput()
+        {
+            if (worldCamera == null || currentSection != HubSection.MegaFactoryV2) return;
+            var events = UnityEngine.EventSystems.EventSystem.current;
+            if (Input.touchCount == 1)
+            {
+                var touch = Input.GetTouch(0);
+                if (events != null && events.IsPointerOverGameObject(touch.fingerId)) return;
+                if (touch.phase == TouchPhase.Moved) worldCamera.transform.RotateAround(Vector3.zero, Vector3.up, touch.deltaPosition.x * .22f);
+            }
+            else if (Input.touchCount >= 2)
+            {
+                var a = Input.GetTouch(0); var b = Input.GetTouch(1);
+                if (events != null && (events.IsPointerOverGameObject(a.fingerId) || events.IsPointerOverGameObject(b.fingerId))) return;
+                float previous = (a.position - a.deltaPosition - b.position + b.deltaPosition).magnitude;
+                float current = (a.position - b.position).magnitude;
+                worldCamera.orthographicSize = Mathf.Clamp(worldCamera.orthographicSize - (current - previous) * .008f, 6.8f, 11.5f);
+            }
+            else if (Input.GetMouseButton(1) && (events == null || !events.IsPointerOverGameObject())) worldCamera.transform.RotateAround(Vector3.zero, Vector3.up, Input.GetAxis("Mouse X") * 2.5f);
+            else if (Input.mouseScrollDelta.y != 0 && (events == null || !events.IsPointerOverGameObject())) worldCamera.orthographicSize = Mathf.Clamp(worldCamera.orthographicSize - Input.mouseScrollDelta.y * .35f, 6.8f, 11.5f);
         }
 
         private void BuildCentralFactory(Color steel, Color steelLight, Color trim, Color glow)
@@ -1081,7 +1248,7 @@ namespace FactoryWars.Unity6
         private void SetWorld(bool arena)
         {
             arenaScene = arena;
-            foreach (var obj in sceneObjects) obj.SetActive(arena ? obj.name.StartsWith("Arena") : !obj.name.StartsWith("Arena"));
+            foreach (var obj in sceneObjects) obj.SetActive(arena && obj.name.StartsWith("Arena"));
         }
 
         private static GameObject Panel(string name, Transform parent, Color color)
@@ -1163,6 +1330,585 @@ namespace FactoryWars.Unity6
         {
             transform.localPosition = origin + Vector3.up * (Mathf.Sin(Time.time * 1.5f + phase) * .08f);
             if (transform.name.StartsWith("Crystal")) transform.Rotate(Vector3.up, 20 * Time.deltaTime, Space.World);
+        }
+    }
+
+    public sealed class FactoryCargoLoop : MonoBehaviour
+    {
+        [NonSerialized] public Vector3 start;
+        [NonSerialized] public Vector3 end;
+        [NonSerialized] public float phase;
+        [NonSerialized] public int producerIndex;
+        [NonSerialized] public bool isRunning;
+        private Renderer cargoRenderer;
+        private void Awake() { cargoRenderer = GetComponent<Renderer>(); }
+        private void Update()
+        {
+            if (cargoRenderer != null) cargoRenderer.enabled = isRunning;
+            if (!isRunning) return;
+            float t = Mathf.Repeat(Time.time * .22f + phase, 1f);
+            transform.localPosition = Vector3.Lerp(start, end, t) + Vector3.up * (Mathf.Sin(t * Mathf.PI) * .14f);
+            transform.Rotate(Vector3.up, 100f * Time.deltaTime, Space.World);
+        }
+    }
+
+    public sealed class FactoryMapCargoLoop : MonoBehaviour
+    {
+        public sealed class Route
+        {
+            public readonly int producer, mergeGroup, mergeNode, hiddenFromNode, hiddenToNode;
+            public readonly Vector2[] anchors;
+            public Route(int source, Vector2[] path, int junction = 0, int inlet = -1, int hideFrom = -1, int hideTo = -1)
+            {
+                producer = source; anchors = path; mergeGroup = junction; mergeNode = inlet;
+                hiddenFromNode = hideFrom; hiddenToNode = hideTo;
+            }
+        }
+
+        private sealed class CargoPiece
+        {
+            public RectTransform rect;
+            public CanvasGroup fade;
+            public float distance;
+            public long arrival;
+            public bool active;
+            public Belt belt;
+        }
+
+        private sealed class Belt
+        {
+            public Route route;
+            public Vector2[] points;
+            public float[] cumulative;
+            public bool[] ownsSection;
+            public readonly List<CargoPiece> cargo = new List<CargoPiece>();
+            public readonly List<Image> treads = new List<Image>();
+            public float spawnAt;
+            public float Length { get { return cumulative[cumulative.Length - 1]; } }
+            public float Merge { get { return route.mergeGroup == 0 ? float.PositiveInfinity : cumulative[route.mergeNode]; } }
+        }
+
+        private sealed class ConveyorSection
+        {
+            public Belt belt;
+            public int node;
+            public Image surface;
+        }
+
+        private RectTransform artwork, overlay;
+        private RectTransform conveyorLayer;
+        private readonly List<Belt> belts = new List<Belt>();
+        private readonly List<ConveyorSection> conveyorSections = new List<ConveyorSection>();
+        private readonly Dictionary<int, CargoPiece> reservations = new Dictionary<int, CargoPiece>();
+        private long arrivalSequence;
+        private float clock;
+        private float artWidth;
+        private static readonly Sprite[] materialFaceSprites = new Sprite[4];
+        private static Sprite contactShadowSprite;
+        private static Sprite conveyorPlateSprite;
+        public const float Speed = .072f;
+        private const float Separation = .052f, SpawnInterval = 1.8f;
+        // All distances use the same artwork units and clock as the packages.
+        // Closely linked metal shoes read as one working belt at phone scale.
+        private const float TreadSpacing = .0195f, TreadHalfLength = .0084f, TreadWidth = .0165f;
+        private const float CargoWidth = .022f, CargoHeight = .026f;
+        private const float ContactHeight = 27f / 80f;
+
+        public void Initialize(RectTransform illustration, RectTransform mapOverlay, double[] rates, Route[] routes)
+        {
+            artwork = illustration;
+            overlay = mapOverlay;
+            for (int i = 0; i < routes.Length; i++)
+            {
+                Route route = routes[i];
+                if (rates == null || route.producer >= rates.Length || !(rates[route.producer] > 0)) continue;
+                var belt = new Belt { route = route, points = new Vector2[route.anchors.Length],
+                    cumulative = new float[route.anchors.Length], ownsSection = new bool[route.anchors.Length - 1],
+                    spawnAt = i * .31f };
+                for (int j = 0; j < 6; j++)
+                {
+                    CargoPiece piece = CreateCargo(j, route.producer);
+                    piece.belt = belt;
+                    belt.cargo.Add(piece);
+                }
+                belts.Add(belt);
+            }
+            BuildConveyorSurfaces();
+        }
+
+        private void BuildConveyorSurfaces()
+        {
+            // Standard UI Images share the cargo's render path. Keep the entire
+            // surface layer underneath every package, including plates created later.
+            var layer = new GameObject("Conveyors · moving metal treads", typeof(RectTransform));
+            var rect = layer.GetComponent<RectTransform>();
+            conveyorLayer = rect;
+            rect.SetParent(transform, false);
+            rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            rect.SetAsFirstSibling();
+            var seen = new HashSet<Vector4>();
+            foreach (Belt belt in belts)
+            for (int node = 0; node < belt.route.anchors.Length - 1; node++)
+            {
+                if (belt.route.hiddenFromNode >= 0 && node >= belt.route.hiddenFromNode
+                    && node < belt.route.hiddenToNode) continue;
+                Vector2 from = belt.route.anchors[node], to = belt.route.anchors[node + 1];
+                var segment = new Vector4(from.x, from.y, to.x, to.y);
+                var reversed = new Vector4(to.x, to.y, from.x, from.y);
+                if (seen.Contains(segment) || seen.Contains(reversed)) continue;
+                seen.Add(segment);
+                belt.ownsSection[node] = true;
+                var surface = ConveyorImage(rect, "Recessed graphite conveyor bed", null, new Color32(22, 38, 51, 255));
+                surface.gameObject.SetActive(false);
+                conveyorSections.Add(new ConveyorSection { belt = belt, node = node, surface = surface });
+            }
+        }
+
+        private static Image ConveyorImage(Transform parent, string name, Sprite sprite, Color tint)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            var rect = go.GetComponent<RectTransform>();
+            rect.SetParent(parent, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+            rect.pivot = new Vector2(.5f, .5f);
+            var image = go.GetComponent<Image>();
+            image.sprite = sprite;
+            image.color = tint;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        private static Sprite ConveyorPlateTexture()
+        {
+            if (conveyorPlateSprite != null) return conveyorPlateSprite;
+            const int width = 64, height = 48;
+            var pixels = new Color32[width * height];
+            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+            {
+                // A complete articulated shoe: dark seam, rounded corner guards,
+                // satin steel crown, raised leading lip and inset traction grooves.
+                float edge = Mathf.Min(y, height - 1 - y);
+                if ((x < 3 || x > width - 4) && edge < 3) continue;
+                Color pixel = Color.Lerp(new Color32(67, 94, 111, 255),
+                    new Color32(167, 198, 211, 255), Mathf.Sin((y + .5f) / height * Mathf.PI));
+                if (x < 4) pixel = new Color32(24, 47, 64, 255);
+                else if (x < 7) pixel = new Color32(100, 135, 153, 255);
+                if (x >= width - 6) pixel = x >= width - 3
+                    ? new Color32(228, 246, 250, 255) : new Color32(181, 216, 229, 255);
+                if (edge < 3) pixel = new Color32(30, 59, 78, 255);
+                else if (edge < 6) pixel = new Color32(191, 223, 233, 255);
+                if (x > 12 && x < 47 && (y == 15 || y == 31)) pixel = new Color32(69, 111, 133, 255);
+                // Tiny inset fasteners and a muted cyan edge match the factory steelwork.
+                if ((x - 13) * (x - 13) + (y - 8) * (y - 8) < 7
+                    || (x - 13) * (x - 13) + (y - 39) * (y - 39) < 7)
+                    pixel = new Color32(24, 57, 76, 255);
+                if (x > 25 && x < 40 && y == height - 7) pixel = new Color32(105, 213, 225, 255);
+                pixels[y * width + x] = pixel;
+            }
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.name = "Factory conveyor · moving steel plate";
+            texture.hideFlags = HideFlags.DontSave;
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            conveyorPlateSprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f), width);
+            conveyorPlateSprite.hideFlags = HideFlags.DontSave;
+            return conveyorPlateSprite;
+        }
+
+        private void DrawConveyorSurfaces()
+        {
+            foreach (ConveyorSection section in conveyorSections)
+            {
+                Belt belt = section.belt;
+                int node = section.node;
+                Vector2 start = belt.points[node], delta = belt.points[node + 1] - start;
+                float length = delta.magnitude;
+                float inlet = node == 0 ? artWidth * .008f : 0;
+                float outlet = node == belt.points.Length - 2 ? artWidth * .008f : 0;
+                float usableLength = length - inlet - outlet;
+                bool visible = usableLength > .01f;
+                section.surface.gameObject.SetActive(visible);
+                if (!visible)
+                    continue;
+                Vector2 direction = delta / length;
+                Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+                RectTransform surface = section.surface.rectTransform;
+                surface.anchoredPosition = start + direction * (inlet + usableLength * .5f);
+                surface.localRotation = rotation;
+                surface.sizeDelta = new Vector2(usableLength, artWidth * TreadWidth);
+            }
+            foreach (Belt belt in belts)
+            {
+                int count = Mathf.CeilToInt(belt.Length / TreadSpacing) + 1;
+                while (belt.treads.Count < count)
+                    belt.treads.Add(ConveyorImage(conveyorLayer, "Articulated steel conveyor shoe", ConveyorPlateTexture(), Color.white));
+                // Feeders share a single phase measured from their merge. Deduplicated
+                // trunk sections therefore continue without changing cadence at a junction.
+                float phaseOrigin = belt.route.mergeGroup == 0 ? 0 : belt.Merge;
+                float phase = Mathf.Repeat(clock * Speed + phaseOrigin, TreadSpacing);
+                for (int i = 0; i < belt.treads.Count; i++)
+                {
+                    Image plate = belt.treads[i];
+                    float distance = phase + i * TreadSpacing;
+                    int node = PathSegment(belt, distance);
+                    bool hidden = belt.route.hiddenFromNode >= 0 && node >= belt.route.hiddenFromNode
+                        && node < belt.route.hiddenToNode;
+                    bool onBelt = i < count && distance >= .014f && distance <= belt.Length - .014f
+                        && belt.ownsSection[node] && !hidden;
+                    plate.gameObject.SetActive(onBelt);
+                    if (!onBelt) continue;
+                    float halfLength = TreadHalfLength;
+                    // Never let a shoe project into the hidden bridge opening. At a
+                    // corner shorten only its footprint, while its centre keeps moving
+                    // continuously over the complete polyline instead of restarting.
+                    if (belt.route.hiddenFromNode >= 0)
+                    {
+                        float from = belt.cumulative[belt.route.hiddenFromNode];
+                        float to = belt.cumulative[belt.route.hiddenToNode];
+                        if (distance <= from) halfLength = Mathf.Min(halfLength, from - distance);
+                        if (distance >= to) halfLength = Mathf.Min(halfLength, distance - to);
+                    }
+                    float cornerDistance = Mathf.Min(distance - belt.cumulative[node], belt.cumulative[node + 1] - distance);
+                    float cornerBlend = Mathf.Clamp01(cornerDistance / TreadHalfLength);
+                    halfLength *= Mathf.Lerp(.55f, 1f, cornerBlend);
+                    Vector2 position, before, after;
+                    SamplePath(belt, distance, out position);
+                    SamplePath(belt, Mathf.Max(0, distance - .002f), out before);
+                    SamplePath(belt, Mathf.Min(belt.Length, distance + .002f), out after);
+                    Vector2 direction = (after - before).normalized;
+                    RectTransform tread = plate.rectTransform;
+                    tread.anchoredPosition = position;
+                    tread.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+                    tread.sizeDelta = new Vector2(artWidth * halfLength * 2, artWidth * TreadWidth * .94f);
+                    float gateFade = Mathf.Clamp01((Mathf.Min(distance, belt.Length - distance) - .014f) / .008f);
+                    plate.color = new Color(1, 1, 1, gateFade);
+                }
+            }
+        }
+
+        private CargoPiece CreateCargo(int index, int producer)
+        {
+            var root = new GameObject("Moving resource " + producer + " · " + index, typeof(RectTransform), typeof(CanvasGroup));
+            root.transform.SetParent(transform, false);
+            var rect = root.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+            rect.pivot = new Vector2(.5f, .5f);
+            // The shadow stays below the package while both inherit the root's scale and fade.
+            CreateCargoVisual(root.transform, "Contact shadow", ContactShadowTexture());
+            CreateCargoVisual(root.transform, "Metal package", MaterialFaceTexture(producer));
+            var group = root.GetComponent<CanvasGroup>();
+            group.interactable = false;
+            group.blocksRaycasts = false;
+            group.alpha = 0;
+
+            return new CargoPiece { rect = rect, fade = group };
+        }
+
+        private static void CreateCargoVisual(Transform parent, string name, Sprite sprite)
+        {
+            var child = new GameObject(name, typeof(RectTransform), typeof(Image));
+            child.transform.SetParent(parent, false);
+            var rect = child.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            var image = child.GetComponent<Image>();
+            image.sprite = sprite;
+            image.raycastTarget = false;
+        }
+
+        private static Sprite ContactShadowTexture()
+        {
+            if (contactShadowSprite != null) return contactShadowSprite;
+            const int width = 96, height = 80;
+            var pixels = new Color32[width * height];
+            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+            {
+                float shadow = Mathf.Abs(x + .5f - 48) / 39 + Mathf.Abs(y + .5f - 27) / 20;
+                if (shadow < 1) pixels[y * width + x] = new Color(.015f, .035f, .055f, .55f * (1 - shadow));
+            }
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.name = "Factory cargo · contact shadow";
+            texture.hideFlags = HideFlags.DontSave;
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            contactShadowSprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f), width);
+            contactShadowSprite.hideFlags = HideFlags.DontSave;
+            return contactShadowSprite;
+        }
+
+        private static Sprite MaterialFaceTexture(int producer)
+        {
+            if (materialFaceSprites[producer] != null) return materialFaceSprites[producer];
+            const int width = 96, height = 80;
+            Color accent = producer == 0 ? new Color32(255, 194, 49, 255) : producer == 1
+                ? new Color32(92, 234, 255, 255) : producer == 2 ? new Color32(171, 202, 223, 255)
+                : new Color32(90, 134, 255, 255);
+            var pixels = new Color32[width * height];
+            // Both side faces share the island's isometric axes. The lower diamond is
+            // centered on ContactHeight, so its shadow follows the belt centerline.
+            var silhouette = new[] { new Vector2(8, 28), new Vector2(48, 7), new Vector2(88, 28),
+                new Vector2(88, 56), new Vector2(48, 77), new Vector2(8, 56) };
+            var front = new[] { new Vector2(11, 29), new Vector2(47, 11), new Vector2(47, 36), new Vector2(11, 54) };
+            var top = new[] { new Vector2(12, 57), new Vector2(48, 74), new Vector2(84, 57), new Vector2(48, 39) };
+            var side = new[] { new Vector2(50, 11), new Vector2(85, 29), new Vector2(85, 54), new Vector2(50, 36) };
+            var topStrap = new[] { new Vector2(22, 62), new Vector2(28, 65), new Vector2(65, 47), new Vector2(59, 44) };
+            var lidPanel = new[] { new Vector2(32, 57), new Vector2(48, 65), new Vector2(68, 56), new Vector2(52, 48) };
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Vector2 point = new Vector2(x + .5f, y + .5f);
+                    Color pixel = Color.clear;
+                    if (InsideCargoFace(point, silhouette)) pixel = new Color32(14, 35, 51, 255);
+                    if (InsideCargoFace(point, front))
+                    {
+                        float faceY = point.y + (point.x - 11) * .5f - 29;
+                        pixel = Color.Lerp(new Color32(64, 98, 122, 255), new Color32(221, 239, 246, 255), faceY / 25);
+                        // A recessed resource badge and broad corner guards survive phone scale.
+                        if (point.x > 18 && point.x < 42 && faceY > 4 && faceY < 23)
+                        {
+                            pixel = new Color32(19, 45, 62, 255);
+                            pixel = CargoEmblemPixel(producer, (point.x - 18) * 30 / 24, (faceY - 4) * 25 / 19, accent, pixel);
+                        }
+                        if (point.x < 16 || point.x > 44) pixel = Color.Lerp(accent, Color.white, .15f);
+                        if (faceY > 23 || faceY < 2) pixel = new Color32(224, 245, 249, 255);
+                    }
+                    if (InsideCargoFace(point, top))
+                    {
+                        pixel = Color.Lerp(new Color32(156, 203, 224, 255), Color.white, (point.y - 39) / 35);
+                        if (InsideCargoFace(point, lidPanel)) pixel = Color.Lerp(accent, new Color32(25, 66, 96, 255), .55f);
+                        if (InsideCargoFace(point, topStrap)) pixel = Color.Lerp(accent, Color.white, .35f);
+                    }
+                    if (InsideCargoFace(point, side))
+                    {
+                        float faceY = point.y - (point.x - 50) * (18f / 35f) - 11;
+                        pixel = Color.Lerp(new Color32(30, 59, 83, 255), new Color32(108, 162, 190, 255), faceY / 25);
+                        if (point.x < 54 || point.x > 81) pixel = Color.Lerp(accent, Color.black, .25f);
+                        if (point.x > 59 && point.x < 77 && (faceY > 7 && faceY < 10 || faceY > 14 && faceY < 17))
+                            pixel = new Color32(19, 45, 62, 255);
+                        if (faceY > 23) pixel = new Color32(193, 224, 237, 255);
+                    }
+                    pixels[y * width + x] = pixel;
+                }
+            }
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.name = "Factory cargo · metal resource case " + producer;
+            texture.hideFlags = HideFlags.DontSave;
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            var sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f), width);
+            sprite.name = texture.name;
+            sprite.hideFlags = HideFlags.DontSave;
+            materialFaceSprites[producer] = sprite;
+            return sprite;
+        }
+
+        private static bool InsideCargoFace(Vector2 point, Vector2[] corners)
+        {
+            bool positive = false, negative = false;
+            for (int i = 0; i < corners.Length; i++)
+            {
+                Vector2 edge = corners[(i + 1) % corners.Length] - corners[i];
+                Vector2 offset = point - corners[i];
+                float cross = edge.x * offset.y - edge.y * offset.x;
+                positive |= cross > 0; negative |= cross < 0;
+                if (positive && negative) return false;
+            }
+            return true;
+        }
+
+        private static Color CargoEmblemPixel(int producer, float x, float y, Color accent, Color background)
+        {
+            if (producer == 0 || producer == 2)
+            {
+                // A broad beveled ingot; steel carries a second stacked billet.
+                float ingotY = producer == 2 && y < 12 ? y + 10 : y;
+                if (x > 4 && x < 26 && ingotY > 8 && ingotY < 19 && x > 6 - (ingotY - 8) * .2f)
+                    return ingotY > 15 ? Color.Lerp(accent, Color.white, .55f) : accent;
+            }
+            else if (producer == 1)
+            {
+                // Two wide strokes form a cyan lightning bolt.
+                if ((y >= 12 && y <= 22 && x >= 18 - (22 - y) * .8f && x <= 25 - (22 - y) * .8f)
+                    || (y >= 3 && y < 13 && x >= 7 + (y - 3) * .7f && x <= 14 + (y - 3) * .7f))
+                    return Color.Lerp(accent, Color.white, .2f);
+            }
+            else
+            {
+                bool pin = ((x > 3 && x < 27 && (y > 3 && y < 6 || y > 19 && y < 22))
+                    || (y > 5 && y < 20 && (x > 3 && x < 6 || x > 24 && x < 27)));
+                if (pin) return accent;
+                if (x > 7 && x < 23 && y > 7 && y < 18)
+                    return x > 10 && x < 20 && y > 10 && y < 15 ? Color.Lerp(accent, Color.white, .75f) : accent;
+            }
+            return background;
+        }
+
+        private void Update()
+        {
+            if (artwork == null || overlay == null) return;
+            artWidth = Vector2.Distance(MapPoint(Vector2.zero), MapPoint(Vector2.right));
+            if (artWidth <= .01f) return;
+            // Small steps preserve physical spacing even after a slow Editor frame.
+            float dt = Mathf.Min(Time.unscaledDeltaTime, .05f);
+            clock += dt;
+            foreach (Belt belt in belts)
+            {
+                for (int i = 0; i < belt.points.Length; i++)
+                {
+                    belt.points[i] = MapPoint(belt.route.anchors[i]);
+                    if (i > 0) belt.cumulative[i] = belt.cumulative[i - 1]
+                        + Vector2.Distance(belt.points[i - 1], belt.points[i]) / artWidth;
+                }
+                if (clock >= belt.spawnAt) Spawn(belt);
+            }
+            DrawConveyorSurfaces();
+            UpdateJunctions();
+            foreach (Belt belt in belts)
+            {
+                belt.cargo.Sort(FrontFirst);
+                float leader = float.PositiveInfinity;
+                foreach (CargoPiece piece in belt.cargo)
+                {
+                    if (!piece.active) continue;
+                    float next = Mathf.Min(piece.distance + Speed * dt, leader - Separation);
+                    if (belt.route.mergeGroup != 0)
+                    {
+                        float stop = belt.Merge - Separation;
+                        if (next >= stop && piece.arrival == 0) piece.arrival = ++arrivalSequence;
+                        CargoPiece reservation;
+                        reservations.TryGetValue(belt.route.mergeGroup, out reservation);
+                        if (piece.distance < belt.Merge && reservation != piece) next = Mathf.Min(next, stop);
+                        // Shared-trunk distance is measured from the same junction for every feeder.
+                        foreach (Belt other in belts)
+                        {
+                            if (other.route.mergeGroup != belt.route.mergeGroup) continue;
+                            foreach (CargoPiece ahead in other.cargo)
+                            {
+                                if (ahead == piece || !ahead.active) continue;
+                                float progress = ahead.distance - other.Merge;
+                                if (progress >= 0 && progress > piece.distance - belt.Merge)
+                                    next = Mathf.Min(next, belt.Merge + progress - Separation);
+                            }
+                        }
+                    }
+                    piece.distance = Mathf.Max(piece.distance, next);
+                    if (piece.distance >= belt.Length)
+                    {
+                        piece.active = false;
+                        piece.fade.alpha = 0;
+                        CargoPiece owner;
+                        if (reservations.TryGetValue(belt.route.mergeGroup, out owner) && owner == piece)
+                            reservations.Remove(belt.route.mergeGroup);
+                        continue;
+                    }
+                    leader = piece.distance;
+                    DrawCargo(piece);
+                }
+            }
+        }
+
+        private static int FrontFirst(CargoPiece a, CargoPiece b)
+        {
+            return (b.active ? b.distance : -1).CompareTo(a.active ? a.distance : -1);
+        }
+
+        private void Spawn(Belt belt)
+        {
+            foreach (CargoPiece piece in belt.cargo)
+                if (piece.active && piece.distance < Separation) return;
+            foreach (CargoPiece piece in belt.cargo)
+            {
+                if (piece.active) continue;
+                piece.active = true; piece.distance = 0; piece.arrival = 0;
+                belt.spawnAt = clock + SpawnInterval;
+                return;
+            }
+        }
+
+        private void UpdateJunctions()
+        {
+            foreach (Belt belt in belts)
+            {
+                int group = belt.route.mergeGroup;
+                if (group == 0) continue;
+                CargoPiece owner;
+                if (reservations.TryGetValue(group, out owner) && owner != null && owner.active
+                    && owner.distance < owner.belt.Merge + Separation) continue;
+                CargoPiece first = null;
+                foreach (Belt feeder in belts)
+                {
+                    if (feeder.route.mergeGroup != group) continue;
+                    foreach (CargoPiece piece in feeder.cargo)
+                        if (piece.active && piece.arrival > 0 && piece.distance < feeder.Merge
+                            && (first == null || piece.arrival < first.arrival)) first = piece;
+                }
+                reservations[group] = first;
+            }
+        }
+
+        private void DrawCargo(CargoPiece piece)
+        {
+            Belt belt = piece.belt;
+            // Fading alone leaves part of the sprite past the gate. Keep the entire
+            // contact diamond on the tread without changing transport/merge distance.
+            float endpointInset = Mathf.Min(.01f, belt.Length * .2f);
+            float visualDistance = Mathf.Clamp(piece.distance, endpointInset, belt.Length - endpointInset);
+            Vector2 position;
+            SamplePath(belt, visualDistance, out position);
+            // Route anchors sit on the belt surface. The sprite pivot is at its visual center,
+            // so raise the cargo until its lower face and contact shadow sit on that anchor.
+            float contactOffset = artWidth * CargoHeight * (.5f - ContactHeight);
+            piece.rect.anchoredPosition = position + Vector2.up * contactOffset;
+            piece.rect.sizeDelta = new Vector2(artWidth * CargoWidth, artWidth * CargoHeight);
+            // The diamond footprint follows both isometric axes; keep the case's walls
+            // upright instead of tilting its whole sprite with a screen-space rotation.
+            float gateFade = Mathf.Max(.0001f, Mathf.Min(.015f, (belt.Length - endpointInset * 2) * .5f));
+            float entrance = Mathf.SmoothStep(0, 1, Mathf.Clamp01((piece.distance - endpointInset) / gateFade));
+            float exit = Mathf.SmoothStep(0, 1, Mathf.Clamp01((belt.Length - endpointInset - piece.distance) / gateFade));
+            float visible = 1;
+            if (belt.route.hiddenFromNode >= 0)
+            {
+                float from = belt.cumulative[belt.route.hiddenFromNode], to = belt.cumulative[belt.route.hiddenToNode];
+                if (piece.distance > from && piece.distance < to)
+                {
+                    float enterShadow = Mathf.SmoothStep(0, 1, Mathf.Clamp01((piece.distance - from) / .012f));
+                    float leaveShadow = Mathf.SmoothStep(0, 1, Mathf.Clamp01((to - piece.distance) / .012f));
+                    visible = 1 - Mathf.Min(enterShadow, leaveShadow);
+                }
+            }
+            piece.fade.alpha = entrance * exit * visible;
+            piece.rect.localScale = Vector3.one * Mathf.Lerp(.85f, 1, Mathf.Min(entrance, exit));
+        }
+
+        private void SamplePath(Belt belt, float distance, out Vector2 position)
+        {
+            int segment = PathSegment(belt, distance);
+            float length = belt.cumulative[segment + 1] - belt.cumulative[segment];
+            float t = length > .0001f ? (distance - belt.cumulative[segment]) / length : 0;
+            position = Vector2.Lerp(belt.points[segment], belt.points[segment + 1], t);
+        }
+
+        private static int PathSegment(Belt belt, float distance)
+        {
+            int segment = 0;
+            while (segment < belt.points.Length - 2 && distance > belt.cumulative[segment + 1]) segment++;
+            return segment;
+        }
+
+        private Vector2 MapPoint(Vector2 anchor)
+        {
+            Vector2 source = Vector2.Scale(anchor - artwork.pivot, artwork.rect.size);
+            return overlay.InverseTransformPoint(artwork.TransformPoint(source));
         }
     }
 }

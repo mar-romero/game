@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Factory Wars · Imperios",
-  "short_name": "Factory Wars",
-  "description": "Desarrollá tu Megafábrica y competí en Arena.",
+  "name": "Factory Wars · Megafábrica y Arena v2",
+  "short_name": "Factory Wars v2",
+  "description": "Práctica local en la Megafábrica y la Arena de Factory Wars.",
   "lang": "es",
   "start_url": "./index.html",
   "scope": "./",
@@ -11,17 +11,7 @@
   "background_color": "#071018",
   "theme_color": "#071018",
   "icons": [
-    {
-      "src": "./icons/icon-192.jpg",
-      "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-512.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    }
+    { "src": "./icons/icon-192.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any" },
+    { "src": "./icons/icon-512.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
   ]
 }
