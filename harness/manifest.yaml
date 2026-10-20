@@ -47,8 +47,17 @@ delegation:
     security_signal: [security_reviewer]
     game_domain_signal: [gameplay_specialist]
     browser_ui_signal: [web_game_ui_specialist]
+    unity_visual_signal: [unity_graphics_specialist]
+    unity_visual_change: [verifier]
     persistence_signal: [supabase_specialist]
     balance_signal: [balance_specialist]
+unity_visual_workflow:
+  trigger: Unity context plus graphics, UI, or animation signal
+  skill: unity-visual-qa
+  tdd_mode: test_after_allowed unless spike, characterization, or tdd_required applies
+  change_stages: [REVIEW, VERIFY]
+  evidence: compile after changes, observe Game/Play at target resolution, check console; sequence for animation
+  read_only_requests: diagnosis only; no implementation, build, or Play required
 risk:
   R0: diff review
   R1: relevant checks and independent review when available

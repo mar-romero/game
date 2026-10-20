@@ -71,6 +71,14 @@ def _route(text: str) -> dict[str, Any]:
 
     gameplay_signal = _matches(text, [r"\b(arena|match.engine|gameplay|jugabilidad|partida|combate|bot|bots|civilization|civilizaci[oó]n|empire|imperio|progresi[oó]n|econom[ií]a del juego|matchmaking)\b"])
     ui_signal = _matches(text, [r"\b(ui|ux|hud|canvas|responsive|viewport|layout|css|html|interfaz|bot[oó]n|botones|mapa|pantalla|controles|touch|pointer|iframe)\b"])
+    unity_context = _matches(text, [r"\b(unity(?:\s*6)?|game\s*view|play\s*mode|modo\s*play|monobehaviour|gameobject|recttransform|ugui)\b"])
+    graphics_signal = visual_only or ui_signal or _matches(text, [r"\b(graphics|gr[aá]fic\w*|render\w*|sprite\w*|shader\w*|material(?:es|s)?|textur\w*|animaci[oó]n(?:es)?|animat\w*|cintas?|conveyor\w*|luces|lighting|part[ií]culas?|vfx|escenas?|scenes?|c[aá]mara|camera)\b"])
+    unity_visual = unity_context and graphics_signal
+    explicit_browser = _matches(text, [r"\b(web|browser|navegador|css|html|dom|iframe|javascript)\b"])
+    browser_ui = ui_signal and (not unity_context or explicit_browser)
+    unity_visual_change = unity_visual and not question_only and not research_only and not doc_only
+    if unity_visual_change:
+        risk = max(risk, "R1", key=RISK_RANK.get)
     persistence_signal = _matches(text, [r"\b(supabase|sql|schema|migration|migraci[oó]n|rls|rpc|persist|persistence|persistencia|save|guardado|auth|login|profile|perfil|sync|sincronizaci[oó]n|database|base de datos)\b"])
     balance_signal = _matches(text, [r"\b(balance|balancing|tuning|balanceo|equilibrio|simulat|simulaci[oó]n|simulador|win rate|tasa de victoria|econom[ií]a|economy|seed|semilla|matchup|enfrentamiento)\b"])
 
@@ -80,10 +88,10 @@ def _route(text: str) -> dict[str, Any]:
         tdd = "spike_then_tdd"
     elif legacy:
         tdd = "characterization_then_tdd"
-    elif visual_only:
-        tdd = "test_after_allowed"
     elif risk in {"R2", "R3"} or behavior_bug:
         tdd = "tdd_required"
+    elif unity_visual_change or visual_only:
+        tdd = "test_after_allowed"
     elif risk == "R1":
         tdd = "tdd_preferred"
     else:
@@ -92,8 +100,10 @@ def _route(text: str) -> dict[str, Any]:
     skills = ["harness-mvp"] if question_only or research_only else ["harness-mvp", "software-engineering"]
     if gameplay_signal:
         skills.append("gameplay-domain")
-    if ui_signal:
+    if browser_ui:
         skills.append("browser-game-ui")
+    if unity_visual:
+        skills.append("unity-visual-qa")
     if persistence_signal:
         skills.append("supabase-data")
     if balance_signal:
@@ -108,6 +118,8 @@ def _route(text: str) -> dict[str, Any]:
         skills.extend(["independent-review", "verification"])
     if review_request:
         skills.append("independent-review")
+    if unity_visual_change:
+        skills.extend(["independent-review", "verification"])
     if not question_only and _matches(text, [r"\b(auth|login|oauth|security|secret|credential|token|inyecci[oó]n|seguridad|secreto|credencial)\b"]):
         skills.append("harness-mvp")
     skills = list(dict.fromkeys(skills))
@@ -115,8 +127,10 @@ def _route(text: str) -> dict[str, Any]:
     roles: list[str] = []
     if gameplay_signal and risk != "R0":
         roles.append("gameplay_specialist")
-    if ui_signal and risk != "R0":
+    if browser_ui and risk != "R0":
         roles.append("web_game_ui_specialist")
+    if unity_visual:
+        roles.append("unity_graphics_specialist")
     if persistence_signal and risk != "R0":
         roles.append("supabase_specialist")
     if balance_signal and risk != "R0":
@@ -135,7 +149,7 @@ def _route(text: str) -> dict[str, Any]:
         roles.append("reviewer")
     elif review_request:
         roles.append("reviewer")
-    if risk in {"R2", "R3"} and not question_only and not research_only:
+    if (risk in {"R2", "R3"} or unity_visual_change) and not question_only and not research_only:
         roles.append("verifier")
     if (risk == "R3" or _matches(text, RISK_PATTERNS["R3"] + [r"\b(auth|authorization|authentication|security|secret|token|seguridad|autenticaci[oó]n|autorizaci[oó]n)\b"])) and not question_only and not research_only:
         roles.append("security_reviewer")
@@ -160,6 +174,8 @@ def _route(text: str) -> dict[str, Any]:
         stages.append("SDD" if risk != "R0" else "LIGHT_SPEC")
     if tdd in {"tdd_required", "characterization_then_tdd", "spike_then_tdd", "tdd_preferred"}:
         stages.extend(["BDD_SCENARIOS", "TDD_" + tdd.upper()])
+    elif unity_visual_change:
+        stages.append("BDD_SCENARIOS")
     if "implementer" in roles:
         stages.extend(["IMPLEMENT", "CHECKS"])
     if "reviewer" in roles:

@@ -42,6 +42,10 @@ config_file = "./agents/gameplay_specialist.toml"
 description = "Read-only specialist for the browser game UI, arena HUD, input, canvas, responsive layout, and script integration."
 config_file = "./agents/web_game_ui_specialist.toml"
 
+[agents.unity_graphics_specialist]
+description = "Read-only specialist for Unity graphics, UI, active scenes, animation paths, occlusion, and mobile rendering."
+config_file = "./agents/unity_graphics_specialist.toml"
+
 [agents.supabase_specialist]
 description = "Read-only specialist for Supabase schemas, migrations, RPC, auth, persistence, and synchronization."
 config_file = "./agents/supabase_specialist.toml"

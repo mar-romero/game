@@ -44,6 +44,8 @@ El comando imprime JSON y no modifica el repo. También acepta texto por stdin c
 
 Si RDD se activa, se agrega docs-researcher antes de SDD. Si el usuario pide solo investigar/documentar, no se invoca implementer. La selección de roles está en el JSON del hook para que el principal no tenga que deducirla de memoria.
 
+Los cambios visuales de Unity agregan `unity_graphics_specialist` como entrada de solo lectura y `verifier` después de `reviewer`, incluso en R1. La skill `unity-visual-qa` exige evidencia en Game/Play y admite `test_after_allowed` cuando no corresponde spike, caracterización o TDD más estricto. El QA visual se suma a las pruebas de lógica/persistencia y mantiene el riesgo R2/R3 detectado. Consultas visuales de solo lectura reciben diagnóstico sin obligar a implementar, compilar o entrar en Play. Ver [señales y perfiles](GAME_SPECIALISTS.md).
+
 ### Modelo por rol y tarea
 
 `harness/model-routing.json` asigna una clase por rol, preferencias de modelo/esfuerzo y overrides R2/R3. Explorer usa perfil rápido; planner, diseño de pruebas y review usan razonamiento; implementer usa coding. Para R2/R3 se sube esfuerzo y se elige otra familia/modelo para review/verify cuando el runtime lo permite. Los TOML bajo `.codex/agents/` **no fijan `model`** deliberadamente: el principal debe pasar `preferred_model` y `reasoning_effort` como override al invocar el agente. Así el modelo puede cambiar por riesgo/tarea. Disponibilidad de cuenta/runtime manda; si no está disponible, hereda el modelo principal y reporta el fallback. No se hace refresh externo ni se adivina disponibilidad.
@@ -119,6 +121,12 @@ Elige comandos reales de la zona modificada; ejecuta el subset más pequeño que
 - **Verify:** comprueba el resultado desde el comportamiento observable, criterio por criterio. Puede requerir abrir UI, ejecutar un flujo o comprobar un contrato.
 - Un implementador no se atribuye review/verify independiente. Si no se ejecutaron, dilo.
 
+### Cambios gráficos de Unity
+
+Aplicar [unity-visual-qa](../.agents/skills/unity-visual-qa/SKILL.md): confirmar proyecto/escena/arte activos, fijar criterios visuales a resolución destino y compilar después de la última edición relevante. Tras REVIEW, el verifier observa la pantalla correcta en Game/Play y comprueba la consola. Para animaciones, registrar una secuencia o varias muestras que prueben el movimiento y los puntos críticos; una captura aislada o anterior al cambio no lo demuestra. Comparar antes/después cuando esté disponible.
+
+Cerrar con estados separados: implementado, compilado, revisado y verificado visualmente. Un diff o un build correcto no equivalen a verificación visual. Si no hay acceso a Unity o a captura, completar los checks disponibles y declarar el criterio visual pendiente con el impedimento concreto, sin atribuir el problema a una recompilación faltante sin evidencia.
+
 ## 9. Cierre y publicación
 
 Resume qué cambió, por qué, comandos con resultado, revisión/verificación efectivamente realizadas y riesgos pendientes. Actualiza docs de usuario/arquitectura cuando cambie su contrato. La publicación/commit/push sigue la autorización del usuario y las restricciones del entorno; pre-commit solo detecta errores de whitespace y no reemplaza CI.
@@ -126,6 +134,8 @@ Resume qué cambió, por qué, comandos con resultado, revisión/verificación e
 ## Referencias canónicas
 
 - [Instrucciones](../AGENTS.md) · [Política](../AI_POLICY.md)
+- [Casos de uso del flujo](HARNESS_USE_CASES.md)
 - [Harness MVP](../.agents/skills/harness-mvp/SKILL.md)
 - [RDD](../.agents/skills/rdd/SKILL.md) · [SDD](../.agents/skills/sdd/SKILL.md) · [Adaptive TDD](../.agents/skills/adaptive-tdd/SKILL.md) · [Test strategy/BDD](../.agents/skills/test-strategy/SKILL.md)
 - [Implementación](../.agents/skills/implementation-loop/SKILL.md) · [Review](../.agents/skills/independent-review/SKILL.md) · [Verify](../.agents/skills/verification/SKILL.md)
+- [Gráficos y QA de Unity](../.agents/skills/unity-visual-qa/SKILL.md)
